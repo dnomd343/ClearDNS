@@ -19,6 +19,7 @@ EOF
 mkdir -p /etc/smartdns/expose/
 [ ! -s "/etc/smartdns/expose/domestic.conf" ] && load_domestic
 [ ! -s "/etc/smartdns/expose/foreign.conf" ] && load_foreign
+cat /etc/smartdns/base.conf > /etc/smartdns/config.conf
 cat /etc/smartdns/expose/domestic.conf >> /etc/smartdns/config.conf
 while read -r raw
 do

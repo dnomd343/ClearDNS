@@ -24,11 +24,11 @@ ipv6UseAlternativeDNS: false
 alternativeDNSConcurrent: false
 whenPrimaryDNSAnswerNoneUse: alternativeDNS
 ipNetworkFile:
-  primary: /etc/overture/china_ip_list.txt
+  primary: /etc/overture/list/china_ip_list.txt
   alternative: /etc/overture/loopback.txt
 domainFile:
-  primary: /etc/overture/chinalist.txt
-  alternative: /etc/overture/gfwlist.txt
+  primary: /etc/overture/list/chinalist.txt
+  alternative: /etc/overture/list/gfwlist.txt
   matcher: suffix-tree
 hostsFile:
   hostsFile: /etc/overture/hosts
