@@ -4,7 +4,6 @@ server 223.5.5.5
 server 223.6.6.6
 server 119.29.29.29
 server 119.28.28.28
-server 180.76.76.76
 server 114.114.114.114
 server 114.114.115.115
 EOF
@@ -12,7 +11,8 @@ EOF
 
 load_foreign(){
 cat>/etc/smartdns/expose/foreign.conf<<EOF
-server 8.8.8.8
+server-tls 223.5.5.5:853
+server-https https://doh.pub/dns-query
 EOF
 }
 
