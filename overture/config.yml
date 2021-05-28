@@ -4,7 +4,7 @@ primaryDNS:
     address: 127.0.0.1:4053
     protocol: udp
     socks5Address:
-    timeout: 6
+    timeout: 4
     ednsClientSubnet:
       policy: disable
       externalIP:
@@ -24,11 +24,11 @@ ipv6UseAlternativeDNS: false
 alternativeDNSConcurrent: false
 whenPrimaryDNSAnswerNoneUse: alternativeDNS
 ipNetworkFile:
-  primary: /etc/overture/list/china_ip_list.txt
+  primary: /etc/cleardns/list/china_ip_list.txt
   alternative: /etc/overture/loopback.txt
 domainFile:
-  primary: /etc/overture/list/chinalist.txt
-  alternative: /etc/overture/list/gfwlist.txt
+  primary: /etc/cleardns/list/chinalist.txt
+  alternative: /etc/cleardns/list/gfwlist.txt
   matcher: suffix-tree
 hostsFile:
   hostsFile: /etc/overture/hosts

@@ -1,17 +1,12 @@
-FROM alpine as tools
-COPY . /tmp/cleardns
+FROM alpine as asset
+COPY ./asset.sh /
 RUN apk --update add --no-cache curl wget && \
-    sh /tmp/cleardns/tools.sh
+    sh /asset.sh
 
 FROM alpine
-COPY . /tmp/cleardns
-COPY --from=tools /tmp/tools/ /usr/bin/
-RUN mv /tmp/cleardns/overture/ /etc/ && \
-    mv /tmp/cleardns/smartdns/ /etc/ && \
-    mkdir -p /opt/AdGuardHome && \
-    mkdir -p /etc/smartdns/expose && \
-    mkdir /etc/cleardns && \
-    mv /tmp/cleardns/init.sh / && \
-    rm -rf /tmp/cleardns && \
-    sed -i '$i\0\t0\t*\t*\t*\t/etc/overture/update.sh' /var/spool/cron/crontabs/root
+COPY ./init.sh /
+COPY ./overture /etc/overture/
+COPY --from=asset /tmp/asset/ /usr/bin/
+RUN mkdir -p /etc/cleardns && \
+    sed -i '$i\0\t2\t*\t*\t*\t/etc/overture/update.sh' /var/spool/cron/crontabs/root
 CMD ["sh","/init.sh"]
