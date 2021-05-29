@@ -23,4 +23,4 @@ eval "$cmd --cache --all-servers > /dev/null 2>&1 &"
 
 sh /etc/overture/update.sh
 /usr/sbin/crond
-/usr/bin/AdGuardHome -p 80 -w /etc/cleardns/AdGuardHome
+/usr/bin/AdGuardHome -p 80 -w /etc/cleardns/AdGuardHome --no-check-update
