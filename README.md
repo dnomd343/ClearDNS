@@ -1,12 +1,10 @@
 # ClearDNS
 
-> 容器化的无污染DNS服务，同时兼具DNS层面的广告拦截与防跟踪功能
+> 容器化的无污染DNS服务，同时兼具广告拦截与防跟踪功能
 
 ## 部署教程
 
 Docker可以选择两种部署模式，bridge模式与macvlan模式，前者通过端口映射和外界联通，占用宿主机53端口，后者拥有自己独立的IP地址，与宿主机分离。
-
-使用CleatDNS时，需要在路由器DHCP服务里选定DNS服务器，对于网桥模式，指定为宿主机IP，而macvlan模式则指定为容器IP地址。
 
 ### 网桥模式
 
@@ -94,7 +92,7 @@ shell> docker restart cleardns
 
 上游DNS信息位于 `/etc/cleardns/upstream`，分为国内外两组，国内组可指定阿里DNS、DNSPod、114DNS等国内公共DNS服务，国外组需要指定可用的加密DNS服务，建议自行搭建DoH或DoT服务器。
 
-ClearDNS支持多种[DNS服务协议](https://blog.343.re/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，写入时每一条记录一行，切勿加入任何无关注释。
+ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，写入时每条记录一行，切勿加入任何无关注释。
 
 DNSCrypt上游使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
 
@@ -146,19 +144,17 @@ shell> docker restart cleardns
 
 ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/list`
 
-+ `china_ip_list.txt`：国内IP段，默认来自 `https://raw.fastgit.org/17mon/china_ip_list/master/china_ip_list.txt`
++ `[china_ip_list.txt](https://raw.fastgit.org/17mon/china_ip_list/master/china_ip_list.txt)`：国内IP段
 
-+ `chinalist.txt`：国内常见域名，默认来自 `https://res.343.re/Share/chinalist/chinalist.txt`
++ `[chinalist.txt](https://res.343.re/Share/chinalist/chinalist.txt)`：国内常见域名
 
-+ `gfwlist.txt`：被墙的常见域名，默认来自 `https://res.343.re/Share/gfwlist/gfwlist.txt`
++ `[gfwlist.txt](https://res.343.re/Share/gfwlist/gfwlist.txt)`：被GFW屏蔽的常见域名
 
 以上文件将在每天凌晨2点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no_auto_update` 文件即可。
 
 ### 配置AdGuardHome
 
-浏览器打开ClearDNS服务，bridge模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码。
-
-登录进入AdGuardHome管理界面，修改上游DNS为 `127.0.0.1:5353`，同时启用DNSSEC。
+浏览器打开ClearDNS服务，bridge模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码，登录进入AdGuardHome管理界面，修改上游DNS为 `127.0.0.1:5353`，同时启用DNSSEC。
 
 DNS封锁清单中，建议配置以下规则
 
