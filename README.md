@@ -144,11 +144,11 @@ shell> docker restart cleardns
 
 ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/list`
 
-+ `[china_ip_list.txt](https://raw.fastgit.org/17mon/china_ip_list/master/china_ip_list.txt)`：国内IP段
++ [`china_ip_list.txt`](https://raw.fastgit.org/17mon/china_ip_list/master/china_ip_list.txt)：国内IP段
 
-+ `[chinalist.txt](https://res.343.re/Share/chinalist/chinalist.txt)`：国内常见域名
++ [`chinalist.txt`](https://res.343.re/Share/chinalist/chinalist.txt)：国内常见域名
 
-+ `[gfwlist.txt](https://res.343.re/Share/gfwlist/gfwlist.txt)`：被GFW屏蔽的常见域名
++ [`gfwlist.txt`](https://res.343.re/Share/gfwlist/gfwlist.txt)：被GFW屏蔽的常见域名
 
 以上文件将在每天凌晨2点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no_auto_update` 文件即可。
 
