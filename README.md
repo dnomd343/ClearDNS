@@ -2,15 +2,59 @@
 
 > 容器化的无污染DNS服务，同时兼具广告拦截与防跟踪功能
 
+ClearDNS基于Docker容器运行，用于提供纯净的DNS服务，避开运营商与防火长城的DNS污染与劫持，连接到路由器的内网设备无需任何改动即可使用，它还会记录所有解析请求，可以用于查询哪些设备都访问了哪些域名。
+
+ClearDNS可以在DNS层面上实现去广告与防跟踪功能，按需求配置自定义的拦截规则，无论APP、网页还是机顶盒、IoT设备等，只要接入到同个网络下均有效。同时兼具强制host功能，将指定域名直接解析到指定IP上，也可用于屏蔽特定的应用，如QQ、微信、微博等。
+
+ClearDNS可部署在主路由器上，但需要路由器刷入支持Docker的固件；对于性能较低或不支持刷机的路由器，建议部署在内网一台长期开机的设备上（树莓派、小主机、旁路由等）。
+
 ## 部署教程
 
-Docker可以选择两种部署模式，bridge模式与macvlan模式，前者通过端口映射和外界联通，占用宿主机53端口，后者拥有自己独立的IP地址，与宿主机分离。
+### 1. 网络配置
 
-### 网桥模式
+ClearDNS可选如下三种部署模式
 
-运行容器
+| |host模式|bridge模式|macvlan模式|
+|:-:|:-:|:-:|:-:|
+|网络原理|宿主机网络|桥接网络|虚拟独立mac网卡|
+|服务IP|宿主机IP|宿主机IP|容器独立IP|
+|宿主机IP|静态IP地址|静态IP地址|静态/动态IP地址|
+|宿主机网络|无需改动网络配置|Docker自动适配|手动修改底层网络配置|
+|宿主机端口|占用宿主机53,80,4053,5353,6053端口|占用宿主机53与80端口（后者可选）|不占用端口|
+|管理完整性|完全|无法区分客户端|完全|
+|宿主机耦合|强耦合|一般耦合|链路层以上完全分离|
+|网络性能|相对较高|相对较低|相对适中|
+|部署难度|简单|简单|复杂|
+
+不熟悉Linux网络配置请勿使用macvlan模式，新手建议首选bridge模式。
+
+以下操作均于root用户下执行
 
 ```
+# 检查Docker环境
+shell> docker --version
+Docker version ···, build ···
+# 无Docker环境请先执行安装
+shell> wget -qO- https://get.docker.com/ | bash
+```
+
+```
+# ClearDNS会将数据持久化，以在重启Docker或宿主机后保留
+# 使用以下命令清除之前的ClearDNS配置及数据
+shell> rm -rf /etc/cleardns
+```
+
+**bridge模式**
+
+```
+# 检查端口占用
+shell> netstat -tlnpu | grep -E ":53|:80"
+# 如果TCP/53或UDP/53已被占用，请先关闭对应进程
+# 如果TCP/80端口被占用，可以关闭对应进程，也可使用其他端口
+```
+
+```
+# 运行ClearDNS容器
 shell> docker run --restart always \
 --name cleardns -d \
 -v /etc/cleardns/:/etc/cleardns/ \
@@ -18,11 +62,31 @@ shell> docker run --restart always \
 -v /etc/localtime:/etc/localtime:ro \
 -p 53:53/udp -p 53:53 -p 80:80 \
 dnomd343/cleardns
+# 时间文件映射将容器内时间同步为当前系统时区
 ```
 
-### macvlan模式
+**host模式**
 
-启动容器之前需要创建一个macvlan网络
+```
+# 检查端口占用
+shell> netstat -tlnpu | grep -E ":53|:80|:4053|:5353|:6053"
+# 如果UDP/53、UDP/4053、UDP/5353、UDP/6053、TCP/53、TCP/80、TCP/4053、TCP/5353、TCP/6053已被占用，请先关闭对应进程
+```
+
+```
+# 运行ClearDNS容器
+docker run --restart always \
+--name cleardns -d \
+--network host \
+-v /etc/cleardns/:/etc/cleardns/ \
+-v /etc/timezone:/etc/timezone:ro \
+-v /etc/localtime:/etc/localtime:ro \
+dnomd343/cleardns
+```
+
+**macvlan模式**
+
+启动容器前需要创建一个macvlan网络
 
 ```
 # 开启网卡混杂模式
@@ -86,15 +150,13 @@ ip route add default via 192.168.2.2
 shell> docker restart cleardns
 ```
 
-## 初始化服务
-
-### 指定上游DNS服务器
+### 2. 指定上游DNS服务器
 
 上游DNS信息位于 `/etc/cleardns/upstream`，分为国内外两组，国内组可指定阿里DNS、DNSPod、114DNS等国内公共DNS服务，国外组需要指定可用的加密DNS服务，建议自行搭建DoH或DoT服务器。
 
 ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，写入时每条记录一行，切勿加入任何无关注释。
 
-DNSCrypt上游使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
+DNSCrypt上游使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容，示例如下
 
 ```
 # 常规DNS
@@ -140,9 +202,9 @@ shell> /etc/cleardns/upstream/foreign.conf
 shell> docker restart cleardns
 ```
 
-### 配置域名分流规则
+### 3. 配置域名分流规则
 
-ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/list`
+ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/list` 中
 
 + [`china_ip_list.txt`](https://raw.fastgit.org/17mon/china_ip_list/master/china_ip_list.txt)：国内IP段
 
@@ -150,25 +212,25 @@ ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件
 
 + [`gfwlist.txt`](https://res.343.re/Share/gfwlist/gfwlist.txt)：被GFW屏蔽的常见域名
 
-以上文件将在每天凌晨2点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no_auto_update` 文件即可。
+以上文件将在每天凌晨2点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no_auto_update` 文件即可关闭。
 
-### 配置AdGuardHome
+### 4. 配置AdGuardHome
 
-浏览器打开ClearDNS服务，bridge模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码，登录进入AdGuardHome管理界面，修改上游DNS为 `127.0.0.1:5353`，同时启用DNSSEC。
+浏览器打开ClearDNS服务，bridge模式或host模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码，登录进入AdGuardHome管理界面，修改上游DNS为 `127.0.0.1:5353`，同时启用DNSSEC。
 
 DNS封锁清单中，建议配置以下规则
 
 + `AdGuard DNS filte`：`https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt`
 
-+ `Anti-AD`：`https://anti-ad.net/easylist.txt`
++ `Anti-AD`：`https://anti-ad.net/easylist.txt`（此规则可能存在一定误杀）
 
-### 配置DHCP服务
+### 5. 配置DHCP信息
 
-使用ClearDNS时，需要在路由器DHCP服务中指定DNS服务器，对于网桥模式，指定为宿主机IP，macvlan模式则指定为容器IP地址。
+使用ClearDNS时，需要在路由器DHCP服务中指定DNS服务器，bridge模式或host模式指定为宿主机IP，macvlan模式指定为容器IP。
 
-## 构建
+## 开发相关
 
-如果需要修改ClearDNS或构建自己的容器，可按如下操作
+### 容器构建
 
 **本地构建**
 
