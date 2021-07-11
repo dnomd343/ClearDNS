@@ -20,7 +20,7 @@ ClearDNS可选如下三种部署模式
 |服务IP|宿主机IP|宿主机IP|容器独立IP|
 |宿主机IP|静态IP地址|静态IP地址|静态/动态IP地址|
 |宿主机网络|无需改动网络配置|Docker自动适配|手动修改底层网络配置|
-|宿主机端口|占用宿主机53,80,4053,5353,6053端口|占用宿主机53与80端口（后者可选）|不占用端口|
+|宿主机端口|占用宿主机53,80,4053,5353,6053端口|占用宿主机53与80端口|不占用端口|
 |管理完整性|完全|无法区分客户端|完全|
 |宿主机耦合|强耦合|一般耦合|链路层以上完全分离|
 |网络性能|相对较高|相对较低|相对适中|
@@ -34,6 +34,7 @@ ClearDNS可选如下三种部署模式
 # 检查Docker环境
 shell> docker --version
 Docker version ···, build ···
+
 # 无Docker环境请先执行安装
 shell> wget -qO- https://get.docker.com/ | bash
 ```
@@ -154,9 +155,7 @@ shell> docker restart cleardns
 
 上游DNS信息位于 `/etc/cleardns/upstream`，分为国内外两组，国内组可指定阿里DNS、DNSPod、114DNS等国内公共DNS服务，国外组需要指定可用的加密DNS服务，建议自行搭建DoH或DoT服务器。
 
-ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，写入时每条记录一行，切勿加入任何无关注释。
-
-DNSCrypt上游使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容，示例如下
+ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，其中DNSCrypt使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。写入时每条记录一行，切勿加入任何注释，各协议格式示例如下
 
 ```
 # 常规DNS
@@ -226,9 +225,33 @@ DNS封锁清单中，建议配置以下规则
 
 ### 5. 配置DHCP信息
 
-使用ClearDNS时，需要在路由器DHCP服务中指定DNS服务器，bridge模式或host模式指定为宿主机IP，macvlan模式指定为容器IP。
+为了使ClearDNS生效，需要在路由器DHCP服务中指定DNS服务器，bridge模式或host模式指定为宿主机IP，macvlan模式指定为容器IP。
+
+对于内网中一些固定IP信息的设备，需要手动更改其DNS为上述IP地址。
 
 ## 开发相关
+
+### 域名列表
+
+ClearDNS在对域名分流时需要两份域名列表，分别为 `chinalist.txt` 与 `gfwlist.txt`，前者为国内常见域名，后者包括大多数被墙的域名。
+
+`/list-build/` 文件夹下有对应的脚本，它从多个上游数据源拉取并整合，生成最新的 `chinalist.txt` 与 `gfwlist.txt` 域名列表，脚本部署在云服务器上，定时生成后由本地拉取。
+
+ClearDNS默认在每天2:00时自动拉取最新的规则文件，内置链接如下
+
+```
+https://res.343.re/Share/chinalist/chinalist.txt
+https://res.343.re/Share/gfwlist/gfwlist.txt
+```
+
+有需要时可以部署在自己的服务器上，更改 `/overture/update.sh` 中的更新链接即可
+
+```
+···
+wget -P $TEMP_DIR https://res.343.re/Share/chinalist/chinalist.txt
+wget -P $TEMP_DIR https://res.343.re/Share/gfwlist/gfwlist.txt
+···
+```
 
 ### 容器构建
 
