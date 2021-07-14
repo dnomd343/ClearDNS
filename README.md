@@ -2,7 +2,7 @@
 
 > 容器化的无污染DNS服务，同时兼具广告拦截与防跟踪功能
 
-ClearDNS基于Docker容器运行，用于提供纯净的DNS服务，避开运营商与防火长城的DNS污染与劫持，连接到路由器的内网设备无需任何改动即可使用，它还会记录所有解析请求，可以用于查询哪些设备都访问了哪些域名。
+ClearDNS基于Docker容器运行，用于提供纯净的DNS服务，避开运营商与防火长城的DNS污染与劫持，连接到路由器的内网设备无需任何改动即可使用，它还会记录所有解析请求，用于查询哪些设备都访问了哪些域名。
 
 ClearDNS可以在DNS层面上实现去广告与防跟踪功能，按需求配置自定义的拦截规则，无论APP、网页还是机顶盒、IoT设备等，只要接入到同个网络下均有效。同时兼具强制host功能，将指定域名直接解析到指定IP上，也可用于屏蔽特定的应用，如QQ、微信、微博等。
 
@@ -39,8 +39,21 @@ Docker version ···, build ···
 shell> wget -qO- https://get.docker.com/ | bash
 ```
 
+ClearDNS可以从多个镜像源获取，其数据完全相同，国内用户建议首选阿里云镜像。
+
 ```
-# ClearDNS会将数据持久化，以在重启Docker或宿主机后保留
+# Docker Hub
+shell> docker pull docker.io/dnomd343/cleardns
+
+# Github Package
+shell> docker pull ghcr.io/dnomd343/cleardns
+
+# 阿里云个人镜像
+shell> docker pull registry.cn-shenzhen.aliyuncs.com/dnomd343/cleardns
+```
+
+```
+# ClearDNS会将数据持久化，以在重启Docker或宿主机后保留配置及日志
 # 使用以下命令清除之前的ClearDNS配置及数据
 shell> rm -rf /etc/cleardns
 ```
@@ -56,6 +69,7 @@ shell> netstat -tlnpu | grep -E ":53|:80"
 
 ```
 # 运行ClearDNS容器
+# 映射系统时间文件以同步容器内部时区
 shell> docker run --restart always \
 --name cleardns -d \
 -v /etc/cleardns/:/etc/cleardns/ \
@@ -63,7 +77,7 @@ shell> docker run --restart always \
 -v /etc/localtime:/etc/localtime:ro \
 -p 53:53/udp -p 53:53 -p 80:80 \
 dnomd343/cleardns
-# 时间文件映射将容器内时间同步为当前系统时区
+# 此处为DockerHub镜像源，可按上文链接替换为其他源
 ```
 
 **host模式**
@@ -83,6 +97,7 @@ docker run --restart always \
 -v /etc/timezone:/etc/timezone:ro \
 -v /etc/localtime:/etc/localtime:ro \
 dnomd343/cleardns
+# 此处为DockerHub镜像源，可按上文链接替换为其他源
 ```
 
 **macvlan模式**
@@ -134,6 +149,7 @@ shell> docker run --restart always \
 -v /etc/timezone:/etc/timezone:ro \
 -v /etc/localtime:/etc/localtime:ro \
 dnomd343/cleardns
+# 此处为DockerHub镜像源，可按上文链接替换为其他源
 ```
 
 编辑macvlan网路的IP地址
@@ -235,7 +251,7 @@ DNS封锁清单中，建议配置以下规则
 
 ClearDNS在对域名分流时需要两份域名列表，分别为 `chinalist.txt` 与 `gfwlist.txt`，前者为国内常见域名，后者包括大多数被墙的域名。
 
-`/list-build/` 文件夹下有对应的脚本，它从多个上游数据源拉取并整合，生成最新的 `chinalist.txt` 与 `gfwlist.txt` 域名列表，脚本部署在云服务器上，定时生成后由本地拉取。
+`list-build/` 文件夹下有对应的脚本，它从多个上游数据源拉取并整合，生成最新的 `chinalist.txt` 与 `gfwlist.txt` 域名列表，脚本部署在云服务器上，定时生成后由本地拉取。
 
 ClearDNS默认在每天2:00时自动拉取最新的规则文件，内置链接如下
 
@@ -244,7 +260,7 @@ https://res.343.re/Share/chinalist/chinalist.txt
 https://res.343.re/Share/gfwlist/gfwlist.txt
 ```
 
-有需要时可以部署在自己的服务器上，更改 `/overture/update.sh` 中的更新链接即可
+有需要时可以部署在自己的服务器上，更改 `overture/update.sh` 中的更新链接即可
 
 ```
 ···
