@@ -15,14 +15,14 @@ while read -r raw
 do
   cmd="$cmd -u $raw"
 done < /etc/cleardns/upstream/domestic
-eval "$cmd --cache --all-servers > /dev/null 2>&1 &"
+eval "$cmd --cache --cache-size=4194304 --all-servers > /dev/null 2>&1 &"
 
 cmd="dnsproxy -p 6053"
 while read -r raw
 do
   cmd="$cmd -u $raw"
 done < /etc/cleardns/upstream/foreign
-eval "$cmd --cache --all-servers > /dev/null 2>&1 &"
+eval "$cmd --cache --cache-size=4194304 --all-servers > /dev/null 2>&1 &"
 
 rm -f /etc/cleardns/upstream/domestic
 rm -f /etc/cleardns/upstream/foreign
