@@ -16,7 +16,7 @@ char** dnsproxy_config(char *port, cJSON *json, int is_debug);
 void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug);
 
 void error_exit(char *message) { // exit with code 1
-    fprintf(stderr, "%s\n", message);
+    fprintf(stderr, "[ClearDNS] %s\n", message);
     exit(1);
 }
 
