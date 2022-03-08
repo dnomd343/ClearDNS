@@ -25,6 +25,18 @@ void server_exit() { // kill sub-process and exit
     exiting = 1;
     fprintf(stderr, "[ClearDNS] Get exit signal.\n");
 
+    if (crond_pid != 0) {
+        fprintf(stderr, "[ClearDNS] Kill crond. (pid = %d)\n", crond_pid);
+        kill(crond_pid, SIGTERM);
+    }
+    if (adguard_pid != 0) {
+        fprintf(stderr, "[ClearDNS] Kill AdGuardHome. (pid = %d)\n", adguard_pid);
+        kill(adguard_pid, SIGTERM);
+    }
+    if (overture_pid != 0) {
+        fprintf(stderr, "[ClearDNS] Kill overture. (pid = %d)\n", overture_pid);
+        kill(overture_pid, SIGTERM);
+    }
     if (domestic_dnsproxy_pid != 0) {
         fprintf(stderr, "[ClearDNS] Kill domestic dnsproxy. (pid = %d)\n", domestic_dnsproxy_pid);
         kill(domestic_dnsproxy_pid, SIGTERM);
@@ -45,6 +57,45 @@ void get_sub_exit() { // catch child process die
     int ret, status;
     int wait_time = 3; // seconds for wait before restart
     if (exiting) { return; } // server daemon is exiting
+
+    if (crond_pid != 0) { // check crond
+        ret = waitpid(crond_pid, &status, WNOHANG); // non-blocking
+        if (ret == -1) {
+            perror("[ClearDNS] Waitpid error");
+            server_exit();
+        } else if (ret) { // process exit
+            crond_pid = process_exec(crond_command);
+            fprintf(stderr, "[ClearDNS] Catch crond exit and restart it. (pid = %d)\n", crond_pid);
+            sleep(wait_time); // reduce restart frequency
+            return;
+        }
+    }
+
+    if (adguard_pid != 0) { // check AdGuardHome
+        ret = waitpid(adguard_pid, &status, WNOHANG); // non-blocking
+        if (ret == -1) {
+            perror("[ClearDNS] Waitpid error");
+            server_exit();
+        } else if (ret) { // process exit
+            adguard_pid = process_exec(adguard_command);
+            fprintf(stderr, "[ClearDNS] Catch AdGuardHome exit and restart it. (pid = %d)\n", adguard_pid);
+            sleep(wait_time); // reduce restart frequency
+            return;
+        }
+    }
+
+    if (overture_pid != 0) { // check overture
+        ret = waitpid(overture_pid, &status, WNOHANG); // non-blocking
+        if (ret == -1) {
+            perror("[ClearDNS] Waitpid error");
+            server_exit();
+        } else if (ret) { // process exit
+            overture_pid = process_exec(overture_command);
+            fprintf(stderr, "[ClearDNS] Catch overture exit and restart it. (pid = %d)\n", overture_pid);
+            sleep(wait_time); // reduce restart frequency
+            return;
+        }
+    }
 
     if (domestic_dnsproxy_pid != 0) { // check domestic dnsproxy
         ret = waitpid(domestic_dnsproxy_pid, &status, WNOHANG); // non-blocking
@@ -137,6 +188,18 @@ void server_daemon() { // run as a daemon of cleardns
     signal(SIGINT, server_exit); // catch Ctrl + C (2)
     signal(SIGTERM, server_exit); // catch exit signal (15)
     signal(SIGCHLD, get_sub_exit); // callback when child process die
+
+    crond_pid = process_exec(crond_command);
+    fprintf(stderr, "[ClearDNS] Exec crond. (pid = %d)\n", crond_pid);
+    usleep(wait_us_time);
+
+    adguard_pid = process_exec(adguard_command);
+    fprintf(stderr, "[ClearDNS] Exec AdGuardHome. (pid = %d)\n", adguard_pid);
+    usleep(wait_us_time);
+
+    overture_pid = process_exec(overture_command);
+    fprintf(stderr, "[ClearDNS] Exec overture. (pid = %d)\n", overture_pid);
+    usleep(wait_us_time);
 
     domestic_dnsproxy_pid = process_exec(domestic_dnsproxy_command);
     fprintf(stderr, "[ClearDNS] Exec domestic dnsproxy. (pid = %d)\n", domestic_dnsproxy_pid);

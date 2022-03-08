@@ -126,6 +126,8 @@ void load_start_command(char *adguard_workdir, char *overture_config, char *upst
     crond_command[1] = NULL; // end sign
     if (is_debug) { // debug mode
         crond_command = command_add_field(crond_command, "-f"); // run in foreground
+        crond_command = command_add_field(crond_command, "-l"); // log-level
+        crond_command = command_add_field(crond_command, "0"); // 0 -> verbose
         crond_command = command_add_field(crond_command, "-L");
         crond_command = command_add_field(crond_command, "/dev/stdout");
     }
@@ -181,5 +183,5 @@ void load_start_command(char *adguard_workdir, char *overture_config, char *upst
     if (foreign_dnsproxy_command == NULL) {
         error_exit("Miss foreign DNS settings.");
     }
-    cJSON_free(json_root);
+    cJSON_free(json_root); // free cJSON object
 }
