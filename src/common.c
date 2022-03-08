@@ -3,7 +3,6 @@
 #include <string.h>
 #include "cJSON.h"
 
-char **init_command = NULL;
 char **crond_command = NULL;
 char **adguard_command = NULL;
 char **overture_command = NULL;
@@ -121,12 +120,6 @@ char** dnsproxy_config(char *port, cJSON *json, int is_debug) { // generate dnsp
 }
 
 void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug) {
-    // init command
-    init_command = (char**)malloc(sizeof(char*) * 3);
-    init_command[0] = "sh";
-    init_command[1] = "/usr/bin/load";
-    init_command[2] = NULL;
-
     // crond command
     crond_command = (char**)malloc(sizeof(char*) * 2);
     crond_command[0] = "crond";

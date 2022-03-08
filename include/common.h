@@ -1,7 +1,6 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
-extern char **init_command;
 extern char **crond_command;
 extern char **adguard_command;
 extern char **overture_command;
