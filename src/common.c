@@ -3,13 +3,16 @@
 #include <string.h>
 #include "cJSON.h"
 
-#define TRUE 1
-#define FALSE 0
-
-int debug_mode = TRUE;
-
+char **adguard_command = NULL;
+char **overture_command = NULL;
 char **domestic_dnsproxy_command = NULL;
 char **foreign_dnsproxy_command = NULL;
+
+void error_exit(char *message);
+char* read_file(char *file_name);
+char** command_add_field(char **command_list, char *field);
+char** dnsproxy_config(char *port, cJSON *json, int is_debug);
+void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug);
 
 void error_exit(char *message) { // exit with code 1
     fprintf(stderr, "%s\n", message);
@@ -108,22 +111,38 @@ char** dnsproxy_config(char *port, cJSON *json, int is_debug) { // generate dnsp
         }
     }
 
-    if (debug_mode) { // verbose mode
+    if (is_debug) { // verbose mode
         command_list = command_add_field(command_list, "--verbose");
     }
 
     return command_list;
 }
 
-void show_dnsproxy_config(char **config) {
-    int num = 0;
-    while(config[num] != NULL) {
-        printf("%s\n", config[num++]);
-    }
-}
+void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug) {
+    // TODO: crond process
 
-int main(int argc, char *argv[]) {
-    char *upstream_config = "/etc/cleardns/upstream.json";
+    // AdGuardHome command
+    adguard_command = (char**)malloc(sizeof(char*) * 6);
+    adguard_command[0] = "AdGuardHome";
+    adguard_command[1] = "-w";
+    adguard_command[2] = adguard_workdir; // workdir for AdGuardHome
+    adguard_command[3] = "-p";
+    adguard_command[4] = "80"; // port for web manage
+    adguard_command[5] = "--no-check-update"; // skip check update (invalid in docker)
+    if (is_debug) {
+        adguard_command = command_add_field(adguard_command, "--verbose");
+    }
+
+    // overture command
+    overture_command = (char**)malloc(sizeof(char*) * 6);
+    overture_command[0] = "overture";
+    overture_command[1] = "-c";
+    overture_command[2] = overture_config;
+    if (is_debug) {
+        overture_command = command_add_field(overture_command, "-v");
+    }
+
+    // dnsproxy command
     cJSON *json = cJSON_Parse(read_file(upstream_config));
     if (json == NULL) {
         error_exit("JSON format error.");
@@ -134,25 +153,20 @@ int main(int argc, char *argv[]) {
             if (!cJSON_IsObject(json)) {
                 error_exit("`domestic` must be a object.");
             }
-            domestic_dnsproxy_command = dnsproxy_config("4053", json->child, debug_mode);
+            domestic_dnsproxy_command = dnsproxy_config("4053", json->child, is_debug);
         } else if (!strcmp(json->string, "foreign")) { // foreign dnsproxy config
             if (!cJSON_IsObject(json)) {
                 error_exit("`foreign` must be a object.");
             }
-            foreign_dnsproxy_command = dnsproxy_config("6053", json->child, debug_mode);
+            foreign_dnsproxy_command = dnsproxy_config("6053", json->child, is_debug);
         }
         json = json->next; // next field
     }
-
-    printf("[domestic dnsproxy]\n");
-    show_dnsproxy_config(domestic_dnsproxy_command);
-    printf("\n");
-
-    printf("[foreign dnsproxy]\n");
-    show_dnsproxy_config(foreign_dnsproxy_command);
-    printf("\n");
-
-    printf("decode complete\n");
-
-    return 0;
+    if (domestic_dnsproxy_command == NULL) {
+        error_exit("Miss domestic DNS settings.");
+    }
+    if (foreign_dnsproxy_command == NULL) {
+        error_exit("Miss foreign DNS settings.");
+    }
+    // TODO: free json object
 }
