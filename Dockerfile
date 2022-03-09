@@ -1,22 +1,28 @@
 FROM alpine:3.15 as build
 COPY . /tmp/ClearDNS
+ENV UPX_VERSION="v3.96"
 ENV OVERTURE_VERSION="v1.8"
 ENV DNSPROXY_VERSION="v0.41.3"
 ENV ADGUARD_VERSION="v0.107.5"
 RUN \
-apk add git build-base make cmake glib-dev go npm nodejs yarn upx && \
+apk add git build-base bash make cmake glib-dev go npm nodejs yarn perl ucl-dev zlib-dev && \
 \
 mkdir /tmp/release/ && cd /tmp/ && \
+git clone https://github.com/upx/upx.git && \
 git clone https://github.com/shawn1m/overture.git && \
 git clone https://github.com/AdguardTeam/dnsproxy.git && \
 git clone https://github.com/AdguardTeam/AdGuardHome.git && \
+\
+cd /tmp/upx/ && git checkout $UPX_VERSION && \
+git submodule update --init --recursive && \
+make all && mv ./src/upx.out /usr/bin/upx && \
 \
 cd /tmp/ClearDNS/ && mkdir ./build/ && \
 cd ./build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && make && \
 mv ../bin/cleardns /tmp/release/ && \
 \
 cd /tmp/overture/ && git checkout $OVERTURE_VERSION && \
-env CGO_ENABLED=0 go build -o overture -trimpath -ldflags "-X main.version=$OVERTURE_VERSION -s -w " ./main/main.go && \
+env CGO_ENABLED=0 go build -o overture -trimpath -ldflags "-X main.version=$OVERTURE_VERSION -s -w" ./main/main.go && \
 mv ./overture /tmp/release/ && \
 \
 cd /tmp/dnsproxy/ && git checkout $DNSPROXY_VERSION && \
@@ -49,3 +55,4 @@ COPY --from=asset /tmp/asset /
 RUN apk add --no-cache ca-certificates glib && \
 echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
 ENTRYPOINT ["cleardns"]
+EXPOSE 53/udp 53/tcp 80/tcp
