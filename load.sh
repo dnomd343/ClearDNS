@@ -4,10 +4,10 @@ mkdir -p /etc/cleardns/AdGuardHome/
 
 cleardns_dir="/etc/cleardns"
 overture_dir="/etc/overture"
-cd $overture_dir && tar xf asset.tar
-[ ! -f "$cleardns_dir/gfwlist.txt" ] && cp "$overture_dir/gfwlist.txt" "$cleardns_dir/gfwlist.txt"
-[ ! -f "$cleardns_dir/chinalist.txt" ] && cp "$overture_dir/chinalist.txt" "$cleardns_dir/chinalist.txt"
-[ ! -f "$cleardns_dir/china_ip.txt" ] && cp "$overture_dir/china_ip.txt" "$cleardns_dir/china_ip.txt"
+cd $overture_dir && tar xf asset.tar.gz
+[ ! -f "$cleardns_dir/asset/gfwlist.txt" ] && cp "$overture_dir/gfwlist.txt" "$cleardns_dir/asset/gfwlist.txt"
+[ ! -f "$cleardns_dir/asset/chinalist.txt" ] && cp "$overture_dir/chinalist.txt" "$cleardns_dir/asset/chinalist.txt"
+[ ! -f "$cleardns_dir/asset/china_ip.txt" ] && cp "$overture_dir/china_ip.txt" "$cleardns_dir/asset/china_ip.txt"
 
 upstream_file="/etc/cleardns/upstream.json"
 if [ ! -f "$upstream_file" ]; then
