@@ -1,10 +1,13 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <glib.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include "common.h"
+#include "exit_code.h"
 
 int exiting = 0;
 
@@ -14,16 +17,21 @@ pid_t overture_pid = 0;
 pid_t domestic_dnsproxy_pid = 0;
 pid_t foreign_dnsproxy_pid = 0;
 
-void server_exit();
 void get_sub_exit();
 void server_daemon();
+void get_exit_signal();
+void server_exit(int exit_code);
 pid_t process_exec(char **command);
 void init_server(char *init_script, char *custom_script);
 
-void server_exit() { // kill sub-process and exit
-    int status, ret;
-    exiting = 1;
+void get_exit_signal() { // get SIGINT or SIGTERM signal
     fprintf(stderr, "[ClearDNS] Get exit signal.\n");
+    server_exit(EXIT_NORMAL);
+}
+
+void server_exit(int exit_code) { // kill sub process and exit
+    int status, ret;
+    exiting = 1; // set a exit flag
 
     if (crond_pid != 0) {
         fprintf(stderr, "[ClearDNS] Kill crond. (pid = %d)\n", crond_pid);
@@ -49,11 +57,11 @@ void server_exit() { // kill sub-process and exit
     while ((ret = wait(&status)) != -1) {
         fprintf(stderr, "[ClearDNS] Subprocess exit. (pid = %d)\n", ret);
     }
-    printf("[ClearDNS] Exit successfully.\n");
-    exit(0);
+    fprintf(stderr, "[ClearDNS] Exit successfully.\n");
+    exit(exit_code);
 }
 
-void get_sub_exit() { // catch child process die
+void get_sub_exit() { // catch child process exit
     int ret, status;
     int wait_time = 3; // seconds for wait before restart
     if (exiting) { return; } // server daemon is exiting
@@ -62,10 +70,10 @@ void get_sub_exit() { // catch child process die
         ret = waitpid(crond_pid, &status, WNOHANG); // non-blocking
         if (ret == -1) {
             perror("[ClearDNS] Waitpid error");
-            server_exit();
+            server_exit(EXIT_WAIT_ERROR);
         } else if (ret) { // process exit
             crond_pid = process_exec(crond_command);
-            fprintf(stderr, "[ClearDNS] Catch crond exit and restart it. (pid = %d)\n", crond_pid);
+            fprintf(stderr, "[ClearDNS] Catch crond exit and restart it. (pid = %d -> %d)\n", ret, crond_pid);
             sleep(wait_time); // reduce restart frequency
             return;
         }
@@ -75,10 +83,10 @@ void get_sub_exit() { // catch child process die
         ret = waitpid(adguard_pid, &status, WNOHANG); // non-blocking
         if (ret == -1) {
             perror("[ClearDNS] Waitpid error");
-            server_exit();
+            server_exit(EXIT_WAIT_ERROR);
         } else if (ret) { // process exit
             adguard_pid = process_exec(adguard_command);
-            fprintf(stderr, "[ClearDNS] Catch AdGuardHome exit and restart it. (pid = %d)\n", adguard_pid);
+            fprintf(stderr, "[ClearDNS] Catch AdGuardHome exit and restart it. (pid = %d -> %d)\n", ret, adguard_pid);
             sleep(wait_time); // reduce restart frequency
             return;
         }
@@ -88,10 +96,10 @@ void get_sub_exit() { // catch child process die
         ret = waitpid(overture_pid, &status, WNOHANG); // non-blocking
         if (ret == -1) {
             perror("[ClearDNS] Waitpid error");
-            server_exit();
+            server_exit(EXIT_WAIT_ERROR);
         } else if (ret) { // process exit
             overture_pid = process_exec(overture_command);
-            fprintf(stderr, "[ClearDNS] Catch overture exit and restart it. (pid = %d)\n", overture_pid);
+            fprintf(stderr, "[ClearDNS] Catch overture exit and restart it. (pid = %d -> %d)\n", ret, overture_pid);
             sleep(wait_time); // reduce restart frequency
             return;
         }
@@ -101,10 +109,10 @@ void get_sub_exit() { // catch child process die
         ret = waitpid(domestic_dnsproxy_pid, &status, WNOHANG); // non-blocking
         if (ret == -1) {
             perror("[ClearDNS] Waitpid error");
-            server_exit();
+            server_exit(EXIT_WAIT_ERROR);
         } else if (ret) { // process exit
             domestic_dnsproxy_pid = process_exec(domestic_dnsproxy_command);
-            fprintf(stderr, "[ClearDNS] Catch domestic dnsproxy exit and restart it. (pid = %d)\n", domestic_dnsproxy_pid);
+            fprintf(stderr, "[ClearDNS] Catch domestic dnsproxy exit and restart it. (pid = %d -> %d)\n", ret, domestic_dnsproxy_pid);
             sleep(wait_time); // reduce restart frequency
             return;
         }
@@ -114,10 +122,10 @@ void get_sub_exit() { // catch child process die
         ret = waitpid(foreign_dnsproxy_pid, &status, WNOHANG); // non-blocking
         if (ret == -1) {
             perror("[ClearDNS] Waitpid error");
-            server_exit();
+            server_exit(EXIT_WAIT_ERROR);
         } else if (ret) { // process exit
             foreign_dnsproxy_pid = process_exec(foreign_dnsproxy_command);
-            fprintf(stderr, "[ClearDNS] Catch foreign dnsproxy exit and restart it. (pid = %d)\n", foreign_dnsproxy_pid);
+            fprintf(stderr, "[ClearDNS] Catch foreign dnsproxy exit and restart it. (pid = %d -> %d)\n", ret, foreign_dnsproxy_pid);
             sleep(wait_time); // reduce restart frequency
             return;
         }
@@ -126,7 +134,7 @@ void get_sub_exit() { // catch child process die
     ret = waitpid(-1, &status, WNOHANG); // waitpid for all sub-process (non-blocking)
     if (ret == -1) {
         perror("[ClearDNS] Waitpid error");
-        server_exit();
+        server_exit(EXIT_WAIT_ERROR);
     } else if (ret) { // process exit
         fprintf(stderr, "[ClearDNS] Catch subprocess exit. (pid = %d)\n", ret);
         return;
@@ -139,12 +147,12 @@ pid_t process_exec(char **command) {
     char **env = {NULL};
     if ((pid = fork()) < 0) {
         perror("[ClearDNS] Fork error");
-        exit(2);
+        server_exit(EXIT_FORK_ERROR);
     } else if (pid == 0) { // child process
         prctl(PR_SET_PDEATHSIG, SIGKILL); // child process die with father process
         if (execvpe(command[0], command, env) < 0) {
             perror("[ClearDNS] Exec error");
-            exit(3);
+            server_exit(EXIT_EXEC_ERROR);
         }
     }
     return pid;
@@ -156,12 +164,12 @@ void init_server(char *init_script, char *custom_script) { // run init script (b
 
     if ((init_pid = fork()) < 0) {
         perror("[ClearDNS] Fork error");
-        exit(2);
+        server_exit(EXIT_FORK_ERROR);
     } else if (init_pid == 0) { // child process
         prctl(PR_SET_PDEATHSIG, SIGKILL); // child process die with father process
         if (execlp("/bin/sh", "/bin/sh", init_script, NULL)) {
             perror("[ClearDNS] Init error");
-            exit(3);
+            server_exit(EXIT_EXEC_ERROR);
         }
     }
     wait(&status); // blocking wait
@@ -171,12 +179,12 @@ void init_server(char *init_script, char *custom_script) { // run init script (b
         fprintf(stderr, "[ClearDNS] Running custom script.\n");
         if ((custom_pid = fork()) < 0) {
             perror("[ClearDNS] Fork error");
-            exit(2);
+            server_exit(EXIT_FORK_ERROR);
         } else if (custom_pid == 0) { // child process
             prctl(PR_SET_PDEATHSIG, SIGKILL); // child process die with father process
             if (execlp("/bin/sh", "/bin/sh", custom_script, NULL)) {
                 perror("[ClearDNS] Custom script error");
-                exit(3);
+                server_exit(EXIT_EXEC_ERROR);
             }
         }
         sleep(1); // wait a moment
@@ -185,8 +193,8 @@ void init_server(char *init_script, char *custom_script) { // run init script (b
 
 void server_daemon() { // run as a daemon of cleardns
     int wait_us_time = 200 * 1000; // 200ms
-    signal(SIGINT, server_exit); // catch Ctrl + C (2)
-    signal(SIGTERM, server_exit); // catch exit signal (15)
+    signal(SIGINT, get_exit_signal); // catch Ctrl + C (2)
+    signal(SIGTERM, get_exit_signal); // catch exit signal (15)
     signal(SIGCHLD, get_sub_exit); // callback when child process die
 
     crond_pid = process_exec(crond_command);

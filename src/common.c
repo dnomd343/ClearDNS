@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cJSON.h"
+#include "exit_code.h"
 
 char **crond_command = NULL;
 char **adguard_command = NULL;
@@ -17,7 +18,7 @@ void load_start_command(char *adguard_workdir, char *overture_config, char *upst
 
 void error_exit(char *message) { // exit with code 1
     fprintf(stderr, "[ClearDNS] %s\n", message);
-    exit(1);
+    exit(EXIT_FILE_ERROR);
 }
 
 char* read_file(char *file_name) { // read file content
@@ -88,34 +89,30 @@ char** dnsproxy_config(char *port, cJSON *json, int is_debug) { // generate dnsp
         command_list = command_add_field(command_list, bootstrap_dns);
     }
 
-    if (primary_dns != NULL) { // add primary DNS server
-        while (primary_dns != NULL) { // iterate over server list
-            if (!cJSON_IsString(primary_dns)) {
-                error_exit("DNS Server should be a string.");
-            }
-            command_list = command_add_field(command_list, "--upstream");
-            command_list = command_add_field(command_list, primary_dns->valuestring);
-            primary_dns = primary_dns->next;
+    if (primary_dns == NULL) { // primary DNS server required
+        error_exit("Miss primary DNS server.");
+    }
+    while (primary_dns != NULL) { // iterate over primary DNS server list
+        if (!cJSON_IsString(primary_dns)) {
+            error_exit("DNS Server should be a string.");
         }
-    } else {
-        error_exit("Miss primary DNS server."); // primary DNS server required
+        command_list = command_add_field(command_list, "--upstream");
+        command_list = command_add_field(command_list, primary_dns->valuestring);
+        primary_dns = primary_dns->next;
     }
 
-    if (fallback_dns != NULL) { // add fallback DNS server
-        while (fallback_dns != NULL) { // iterate over server list
-            if (!cJSON_IsString(fallback_dns)) {
-                error_exit("DNS Server should be a string.");
-            }
-            command_list = command_add_field(command_list, "--fallback");
-            command_list = command_add_field(command_list, fallback_dns->valuestring);
-            fallback_dns = fallback_dns->next;
+    while (fallback_dns != NULL) { // iterate over fallback DNS server list
+        if (!cJSON_IsString(fallback_dns)) {
+            error_exit("DNS Server should be a string.");
         }
+        command_list = command_add_field(command_list, "--fallback");
+        command_list = command_add_field(command_list, fallback_dns->valuestring);
+        fallback_dns = fallback_dns->next;
     }
 
     if (is_debug) { // debug mode
         command_list = command_add_field(command_list, "--verbose");
     }
-
     return command_list;
 }
 

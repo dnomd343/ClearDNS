@@ -22,7 +22,7 @@ void show_command(char *title, char **command) {
     fprintf(stderr, "\"\n");
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) { // ClearDNS server
     int debug_mode = 0;
     fprintf(stderr, "[ClearDNS] Server start.\n");
     for (char **p = argv; p < argv + argc; ++p) {
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
         show_command("[ClearDNS] dnsproxy (foreign)", foreign_dnsproxy_command);
     }
 
-    init_server(init_script, custom_script);
-    server_daemon();
+    init_server(init_script, custom_script); // run init script and custom script
+    server_daemon(); // run as daemon to manage process in docker
     return 0;
 }
