@@ -48,5 +48,4 @@ FROM alpine:3.15
 COPY --from=asset /tmp/asset /
 RUN apk add --no-cache ca-certificates glib && \
 echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
-ENTRYPOINT ['cleardns']
-CMD ['--debug']
+ENTRYPOINT ["cleardns"]

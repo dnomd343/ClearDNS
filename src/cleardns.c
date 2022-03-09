@@ -31,6 +31,8 @@ int main(int argc, char *argv[]) { // ClearDNS server
         }
     }
 
+    init_server(init_script, custom_script); // run init script and custom script
+
     load_start_command(adguard_workdir, overture_config, upstream_config, debug_mode); // generate commands
     if (debug_mode) { // show exec command
         fprintf(stderr, "[ClearDNS] Debug mode.\n");
@@ -40,7 +42,6 @@ int main(int argc, char *argv[]) { // ClearDNS server
         show_command("[ClearDNS] dnsproxy (foreign)", foreign_dnsproxy_command);
     }
 
-    init_server(init_script, custom_script); // run init script and custom script
     server_daemon(); // run as daemon to manage process in docker
     return 0;
 }
