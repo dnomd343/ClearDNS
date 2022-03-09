@@ -11,7 +11,6 @@
 
 int exiting = 0;
 
-pid_t crond_pid = 0;
 pid_t adguard_pid = 0;
 pid_t overture_pid = 0;
 pid_t domestic_dnsproxy_pid = 0;
@@ -33,10 +32,6 @@ void server_exit(int exit_code) { // kill sub process and exit
     int status, ret;
     exiting = 1; // set a exit flag
 
-    if (crond_pid != 0) {
-        fprintf(stderr, "[ClearDNS] Kill crond. (pid = %d)\n", crond_pid);
-        kill(crond_pid, SIGTERM);
-    }
     if (adguard_pid != 0) {
         fprintf(stderr, "[ClearDNS] Kill AdGuardHome. (pid = %d)\n", adguard_pid);
         kill(adguard_pid, SIGTERM);
@@ -54,9 +49,18 @@ void server_exit(int exit_code) { // kill sub process and exit
         kill(foreign_dnsproxy_pid, SIGTERM);
     }
 
-    while ((ret = wait(&status)) != -1) {
-        fprintf(stderr, "[ClearDNS] Subprocess exit. (pid = %d)\n", ret);
-    }
+    ret = waitpid(adguard_pid, &status, 0); // blocking
+    fprintf(stderr, "[ClearDNS] AdGuardHome exit. (pid = %d)\n", ret);
+
+    ret = waitpid(overture_pid, &status, 0); // blocking
+    fprintf(stderr, "[ClearDNS] overture exit. (pid = %d)\n", ret);
+
+    ret = waitpid(domestic_dnsproxy_pid, &status, 0); // blocking
+    fprintf(stderr, "[ClearDNS] domestic dnsproxy exit. (pid = %d)\n", ret);
+
+    ret = waitpid(foreign_dnsproxy_pid, &status, 0); // blocking
+    fprintf(stderr, "[ClearDNS] foreign dnsproxy exit. (pid = %d)\n", ret);
+
     fprintf(stderr, "[ClearDNS] Exit successfully.\n");
     exit(exit_code);
 }
@@ -65,19 +69,6 @@ void get_sub_exit() { // catch child process exit
     int ret, status;
     int wait_time = 3; // seconds for wait before restart
     if (exiting) { return; } // server daemon is exiting
-
-    if (crond_pid != 0) { // check crond
-        ret = waitpid(crond_pid, &status, WNOHANG); // non-blocking
-        if (ret == -1) {
-            perror("[ClearDNS] Waitpid error");
-            server_exit(EXIT_WAIT_ERROR);
-        } else if (ret) { // process exit
-            crond_pid = process_exec(crond_command);
-            fprintf(stderr, "[ClearDNS] Catch crond exit and restart it. (pid = %d -> %d)\n", ret, crond_pid);
-            sleep(wait_time); // reduce restart frequency
-            return;
-        }
-    }
 
     if (adguard_pid != 0) { // check AdGuardHome
         ret = waitpid(adguard_pid, &status, WNOHANG); // non-blocking
@@ -136,7 +127,7 @@ void get_sub_exit() { // catch child process exit
         perror("[ClearDNS] Waitpid error");
         server_exit(EXIT_WAIT_ERROR);
     } else if (ret) { // process exit
-        fprintf(stderr, "[ClearDNS] Catch subprocess exit. (pid = %d)\n", ret);
+        fprintf(stderr, "[ClearDNS] Catch subprocess detach or exit. (pid = %d)\n", ret);
         return;
     }
     fprintf(stderr, "[ClearDNS] Subprocess not found.\n"); // get SIGCHLD signal but not exited subprocess found
@@ -159,47 +150,32 @@ pid_t process_exec(char **command) {
 }
 
 void init_server(char *init_script, char *custom_script) { // run init script (blocking) / custom script (non-blocking)
-    int status;
-    pid_t init_pid, custom_pid;
+    int pid, status;
+    char *crond_command[] = {"crond", NULL};
+    char *init_command[] = {"sh", init_script, NULL};
+    char *custom_command[] = {"sh", custom_script, NULL};
 
-    if ((init_pid = fork()) < 0) {
-        perror("[ClearDNS] Fork error");
-        server_exit(EXIT_FORK_ERROR);
-    } else if (init_pid == 0) { // child process
-        prctl(PR_SET_PDEATHSIG, SIGKILL); // child process die with father process
-        if (execlp("/bin/sh", "/bin/sh", init_script, NULL)) {
-            perror("[ClearDNS] Init error");
-            server_exit(EXIT_EXEC_ERROR);
-        }
-    }
+    fprintf(stderr, "[ClearDNS] Start init process.\n");
+    pid = process_exec(init_command);
     wait(&status); // blocking wait
-    fprintf(stderr, "[ClearDNS] Init complete.\n");
+    fprintf(stderr, "[ClearDNS] Init complete. (pid = %d)\n", pid); // init process
 
-    if (access(custom_script, F_OK) >= 0) { // custom script exist
-        fprintf(stderr, "[ClearDNS] Running custom script.\n");
-        if ((custom_pid = fork()) < 0) {
-            perror("[ClearDNS] Fork error");
-            server_exit(EXIT_FORK_ERROR);
-        } else if (custom_pid == 0) { // child process
-            prctl(PR_SET_PDEATHSIG, SIGKILL); // child process die with father process
-            if (execlp("/bin/sh", "/bin/sh", custom_script, NULL)) {
-                perror("[ClearDNS] Custom script error");
-                server_exit(EXIT_EXEC_ERROR);
-            }
-        }
-        sleep(1); // wait a moment
-    }
-}
-
-void server_daemon() { // run as a daemon of cleardns
-    int wait_us_time = 200 * 1000; // 200ms
     signal(SIGINT, get_exit_signal); // catch Ctrl + C (2)
     signal(SIGTERM, get_exit_signal); // catch exit signal (15)
     signal(SIGCHLD, get_sub_exit); // callback when child process die
 
-    crond_pid = process_exec(crond_command);
-    fprintf(stderr, "[ClearDNS] Exec crond. (pid = %d)\n", crond_pid);
-    usleep(wait_us_time);
+    pid = process_exec(crond_command);
+    fprintf(stderr, "[ClearDNS] Crond load success. (pid = %d)\n", pid); // crond process
+
+    if (access(custom_script, F_OK) >= 0) { // custom script exist
+        pid = process_exec(custom_command);
+        fprintf(stderr, "[ClearDNS] Custom script is working. (pid = %d)\n", pid); // custom process
+        sleep(1); // wait a moment
+    }
+}
+
+void server_daemon() { // run as a daemon of ClearDNS
+    int wait_us_time = 100000; // 100ms
 
     adguard_pid = process_exec(adguard_command);
     fprintf(stderr, "[ClearDNS] Exec AdGuardHome. (pid = %d)\n", adguard_pid);

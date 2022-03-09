@@ -34,7 +34,6 @@ int main(int argc, char *argv[]) { // ClearDNS server
     load_start_command(adguard_workdir, overture_config, upstream_config, debug_mode); // generate commands
     if (debug_mode) { // show exec command
         fprintf(stderr, "[ClearDNS] Debug mode.\n");
-        show_command("[ClearDNS] crond", crond_command);
         show_command("[ClearDNS] adguard", adguard_command);
         show_command("[ClearDNS] overture", overture_command);
         show_command("[ClearDNS] dnsproxy (domestic)", domestic_dnsproxy_command);

@@ -4,7 +4,6 @@
 #include "cJSON.h"
 #include "exit_code.h"
 
-char **crond_command = NULL;
 char **adguard_command = NULL;
 char **overture_command = NULL;
 char **domestic_dnsproxy_command = NULL;
@@ -117,18 +116,6 @@ char** dnsproxy_config(char *port, cJSON *json, int is_debug) { // generate dnsp
 }
 
 void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug) {
-    // crond command
-    crond_command = (char**)malloc(sizeof(char*) * 2);
-    crond_command[0] = "crond";
-    crond_command[1] = NULL; // end sign
-    if (is_debug) { // debug mode
-        crond_command = command_add_field(crond_command, "-f"); // run in foreground
-        crond_command = command_add_field(crond_command, "-l"); // log-level
-        crond_command = command_add_field(crond_command, "0"); // 0 -> verbose
-        crond_command = command_add_field(crond_command, "-L");
-        crond_command = command_add_field(crond_command, "/dev/stdout");
-    }
-
     // AdGuardHome command
     adguard_command = (char**)malloc(sizeof(char*) * 7);
     adguard_command[0] = "AdGuardHome";
