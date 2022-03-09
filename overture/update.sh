@@ -1,3 +1,4 @@
+#!/bin/sh
 ASSET_DIR="/etc/cleardns/asset"
 [ -f "$ASSET_DIR/no_auto_update" ] && exit
 

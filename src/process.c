@@ -127,7 +127,7 @@ void get_sub_exit() { // catch child process exit
         perror("[ClearDNS] Waitpid error");
         server_exit(EXIT_WAIT_ERROR);
     } else if (ret) { // process exit
-        fprintf(stderr, "[ClearDNS] Catch subprocess detach or exit. (pid = %d)\n", ret);
+        fprintf(stderr, "[ClearDNS] Catch subprocess exit. (pid = %d)\n", ret);
         return;
     }
     fprintf(stderr, "[ClearDNS] Subprocess not found.\n"); // get SIGCHLD signal but not exited subprocess found
