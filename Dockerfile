@@ -33,8 +33,9 @@ cd /tmp/AdGuardHome/ && git checkout ${ADGUARD_VERSION} && \
 make CHANNEL="release" VERSION=${ADGUARD_VERSION} && \
 mv ./AdGuardHome /tmp/release/ && \
 \
-cd /tmp/release/ && strip cleardns && \
-upx -9 AdGuardHome && upx -9 dnsproxy && upx -9 overture
+cd /tmp/release/ && \
+strip cleardns && \
+upx -9 AdGuardHome dnsproxy overture
 
 FROM alpine:3.15 as asset
 COPY . /tmp/ClearDNS
@@ -55,4 +56,3 @@ COPY --from=asset /tmp/asset /
 RUN apk add --no-cache ca-certificates glib && \
 echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
 ENTRYPOINT ["cleardns"]
-EXPOSE 53/udp 53/tcp 80/tcp
