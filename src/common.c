@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cJSON.h"
-#include "exit_code.h"
+#include "flag.h"
 
 char **adguard_command = NULL;
 char **overture_command = NULL;

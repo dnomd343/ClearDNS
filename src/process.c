@@ -7,15 +7,7 @@
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include "common.h"
-#include "exit_code.h"
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
+#include "flag.h"
 
 int exiting = 0;
 
@@ -73,7 +65,7 @@ void server_exit(int exit_code) { // kill sub process and exit
     if (custom_pgid != 0) {
         ret = waitpid(-custom_pgid, &status, WNOHANG);
         if (ret == 0) { // custom script still running
-            fprintf(stderr, "[ClearDNS] Kill custom script.\n");
+            fprintf(stderr, "[ClearDNS] Kill custom script. (pgid = %d)\n", custom_pgid);
             kill(-custom_pgid, SIGTERM); // kill process group
         }
     }
