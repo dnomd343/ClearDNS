@@ -53,6 +53,6 @@ mv /tmp/ClearDNS/load.sh /tmp/asset/usr/bin/load
 
 FROM alpine:3.15
 COPY --from=asset /tmp/asset /
-RUN apk add --no-cache ca-certificates glib && \
+RUN apk add --no-cache ca-certificates glib iptables ip6tables && \
 echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
 ENTRYPOINT ["cleardns"]
