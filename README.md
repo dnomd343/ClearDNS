@@ -12,21 +12,21 @@ ClearDNS可部署在主路由器上，但需要路由器刷入支持Docker的固
 
 ### 1. 网络配置
 
-ClearDNS可选如下三种部署模式
+ClearDNS基于Docker网络有以下三种部署模式：
 
-| |host模式|bridge模式|macvlan模式|
-|:-:|:-:|:-:|:-:|
-|网络原理|宿主机网络|桥接网络|虚拟独立mac网卡|
-|服务IP|宿主机IP|宿主机IP|容器独立IP|
-|宿主机IP|静态IP地址|静态IP地址|静态/动态IP地址|
-|宿主机网络|无需改动网络配置|Docker自动适配|手动修改底层网络配置|
-|宿主机端口|占用宿主机53,80,4053,5353,6053端口|占用宿主机53与80端口|不占用端口|
-|管理完整性|完全|无法区分客户端|完全|
-|宿主机耦合|强耦合|一般耦合|链路层以上完全分离|
-|网络性能|相对较高|相对较低|相对适中|
-|部署难度|简单|简单|复杂|
+| | host模式 | bridge模式 | macvlan模式 |
+| :-: | :-: | :-: | :-: |
+| 网络原理 | 宿主机网络 | 桥接网络 | 虚拟独立mac网卡 |
+| 服务IP | 宿主机IP | 宿主机IP | 容器独立IP |
+| 宿主机IP | 静态IP地址 | 静态IP地址 | 静态/动态IP地址 |
+| 宿主机网络 | 无需改动网络配置 | Docker自动适配 | 手动修改底层网络配置 |
+| 宿主机端口 | 占用宿主机53,80,4053,5353,6053端口 | 占用宿主机53与80端口 | 不占用端口 |
+| 管理完整性 | 完全 | 无法区分客户端 | 完全 |
+| 宿主机耦合 | 强耦合 | 一般耦合 | 链路层以上完全分离 |
+| 网络性能 | 相对较高 | 相对较低 | 相对适中 |
+| 部署难度 | 简单 | 简单 | 复杂 |
 
-不熟悉Linux网络配置请勿使用macvlan模式，新手建议首选bridge模式。
+> 不熟悉Linux网络配置请勿使用macvlan模式，新手建议首选host模式。
 
 以下操作均于root用户下执行
 
@@ -52,13 +52,11 @@ shell> docker pull ghcr.io/dnomd343/cleardns
 shell> docker pull registry.cn-shenzhen.aliyuncs.com/dnomd343/cleardns
 ```
 
-```
-# ClearDNS会将数据持久化，以在重启Docker或宿主机后保留配置及日志
-# 使用以下命令清除之前的ClearDNS配置及数据
-shell> rm -rf /etc/cleardns
-```
+<details>
 
-**bridge模式**
+<summary><b>bridge模式</b></summary>
+
+<br/>
 
 ```
 # 检查端口占用
@@ -80,7 +78,13 @@ dnomd343/cleardns
 # 此处为DockerHub镜像源，可按上文链接替换为其他源
 ```
 
-**host模式**
+</details>
+
+<details>
+
+<summary><b>host模式</b></summary>
+
+<br/>
 
 ```
 # 检查端口占用
@@ -100,7 +104,13 @@ dnomd343/cleardns
 # 此处为DockerHub镜像源，可按上文链接替换为其他源
 ```
 
-**macvlan模式**
+</details>
+
+<details>
+
+<summary><b>macvlan模式</b></summary>
+
+<br/>
 
 启动容器前需要创建一个macvlan网络
 
@@ -167,11 +177,23 @@ ip route add default via 192.168.2.2
 shell> docker restart cleardns
 ```
 
+</details>
+
+<hr/>
+
+```
+# ClearDNS会将数据持久化，以在重启Docker或宿主机后保留配置及日志
+# 使用以下命令清除之前的ClearDNS配置及数据
+shell> rm -rf /etc/cleardns
+```
+
 ### 2. 指定上游DNS服务器
 
-上游DNS信息位于 `/etc/cleardns/upstream`，分为国内外两组，国内组可指定阿里DNS、DNSPod、114DNS等国内公共DNS服务，国外组需要指定可用的加密DNS服务，建议自行搭建DoH或DoT服务器。
+上游DNS信息位于 `/etc/cleardns/upstream.json`，分为国内外两组，国内组可指定阿里DNS、DNSPod、114DNS等国内公共DNS服务，国外组需要指定可用的加密DNS服务，建议自行搭建DoH或DoT服务器。
 
-ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，其中DNSCrypt使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。写入时每条记录一行，切勿加入任何注释，各协议格式示例如下
+ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，其中DNSCrypt使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
+
+各协议格式示例如下：
 
 ```
 # 常规DNS
@@ -196,19 +218,34 @@ sdns://AQIAAAAAAAAAFDE3Ni4xMDMuMTMwLjEzMDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigx
 ClearDNS默认配置了以下DNS服务器
 
 ```
-# 国内DNS服务器
-# 可酌情添加其他DNS服务，运行时将并行请求，选取最快返回的记录
-shell> /etc/cleardns/upstream/domestic.conf
-223.5.5.5
-119.29.29.29
-114.114.114.114
-
-# 国外DNS服务器
-# 基于53端口的DNS服务会被GFW劫持，请移除默认的谷歌DNS服务
-# 此处必须使用加密DNS服务地址，切勿使用UDP53方式
-shell> /etc/cleardns/upstream/foreign.conf
-8.8.4.4
-8.8.8.8
+# 此处指定的国外组服务器可能已被GFW屏蔽，强烈建议使用私有加密DNS服务器
+# bootstrap指定DNS服务器IP地址，用于解析加密DNS服务器域名，省略时使用系统DNS
+# 若指定多台服务器，DNS请求时将并发查询，因此不宜指定过多服务器
+# 当primary中DNS均不可用时，将自动尝试fallback中的DNS地址
+{
+  "domestic": {
+    "bootstrap": "223.5.5.5",
+    "primary": [
+      "tls://dns.alidns.com",
+      "https://doh.pub/dns-query"
+    ],
+    "fallback": [
+      "223.5.5.5",
+      "119.29.29.29"
+    ]
+  },
+  "foreign": {
+    "bootstrap": "8.8.8.8",
+    "primary": [
+      "tls://dns.google",
+      "https://dns.cloudflare.com/dns-query"
+    ],
+    "fallback": [
+      "1.1.1.1",
+      "8.8.8.8"
+    ]
+  }
+}
 ```
 
 重启Docker容器生效
@@ -219,25 +256,29 @@ shell> docker restart cleardns
 
 ### 3. 配置域名分流规则
 
-ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/list` 中
+ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/asset` 中
 
-+ [`china_ip_list.txt`](https://raw.fastgit.org/17mon/china_ip_list/master/china_ip_list.txt)：国内IP段
++ [`china_ip.txt`](https://res.343.re/Share/chinalist/china_ip.txt)：国内IP段
 
 + [`chinalist.txt`](https://res.343.re/Share/chinalist/chinalist.txt)：国内常见域名
 
 + [`gfwlist.txt`](https://res.343.re/Share/gfwlist/gfwlist.txt)：被GFW屏蔽的常见域名
 
-以上文件将在每天凌晨2点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no_auto_update` 文件即可关闭。
+以上文件将在每天凌晨4点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no_update` 文件即可。
 
 ### 4. 配置AdGuardHome
 
 浏览器打开ClearDNS服务，bridge模式或host模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码，登录进入AdGuardHome管理界面，修改上游DNS为 `127.0.0.1:5353`，同时启用DNSSEC。
 
-DNS封锁清单中，建议配置以下规则
+DNS封锁清单中，可配置以下规则
 
-+ `AdGuard DNS filte`：`https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt`
++ `AdGuard`：`https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt`
 
-+ `Anti-AD`：`https://anti-ad.net/easylist.txt`（此规则可能存在一定误杀）
++ `Anti-AD`：`https://anti-ad.net/easylist.txt`
+
++ `AdAway`：`https://adaway.org/hosts.txt`
+
++ `乘风规则`：`https://res.343.re/Share/Adblock-Rules/xinggsf.txt`
 
 ### 5. 配置DHCP信息
 
@@ -245,31 +286,7 @@ DNS封锁清单中，建议配置以下规则
 
 对于内网中一些固定IP信息的设备，需要手动更改其DNS为上述IP地址。
 
-## 开发相关
-
-### 域名列表
-
-ClearDNS在对域名分流时需要两份域名列表，分别为 `chinalist.txt` 与 `gfwlist.txt`，前者为国内常见域名，后者包括大多数被墙的域名。
-
-`list-build/` 文件夹下有对应的脚本，它从多个上游数据源拉取并整合，生成最新的 `chinalist.txt` 与 `gfwlist.txt` 域名列表，脚本部署在云服务器上，定时生成后由本地拉取。
-
-ClearDNS默认在每天2:00时自动拉取最新的规则文件，内置链接如下
-
-```
-https://res.343.re/Share/chinalist/chinalist.txt
-https://res.343.re/Share/gfwlist/gfwlist.txt
-```
-
-有需要时可以部署在自己的服务器上，更改 `overture/update.sh` 中的更新链接即可
-
-```
-···
-wget -P $TEMP_DIR https://res.343.re/Share/chinalist/chinalist.txt
-wget -P $TEMP_DIR https://res.343.re/Share/gfwlist/gfwlist.txt
-···
-```
-
-### 容器构建
+## 手动编译
 
 **本地构建**
 
