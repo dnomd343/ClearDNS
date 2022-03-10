@@ -290,4 +290,4 @@ shell> docker buildx build -t dnomd343/cleardns --platform="linux/amd64,linux/ar
 
 ## 许可证
 
-MIT ©2021 [@dnomd343](https://github.com/dnomd343)
+MIT ©2022 [@dnomd343](https://github.com/dnomd343)
