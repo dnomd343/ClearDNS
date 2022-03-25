@@ -2,7 +2,7 @@ FROM alpine:3.15 as build
 COPY . /tmp/ClearDNS
 ENV UPX_VERSION="3.96"
 ENV OVERTURE_VERSION="v1.8"
-ENV DNSPROXY_VERSION="v0.41.3"
+ENV DNSPROXY_VERSION="v0.42.0"
 ENV ADGUARD_VERSION="v0.107.5"
 RUN \
 apk add git build-base bash make cmake glib-dev go npm nodejs yarn perl ucl-dev zlib-dev && \
