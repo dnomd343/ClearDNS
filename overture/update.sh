@@ -1,6 +1,6 @@
 #!/bin/sh
 ASSET_DIR="/etc/cleardns/asset"
-[ -f "$ASSET_DIR/no_update" ] && exit
+[ -f "$ASSET_DIR/no-update" ] && exit
 
 TEMP_DIR="$ASSET_DIR/temp"
 rm -rf "$TEMP_DIR" && mkdir -p "$TEMP_DIR"

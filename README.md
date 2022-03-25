@@ -264,7 +264,7 @@ ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件
 
 + [`gfwlist.txt`](https://res.343.re/Share/gfwlist/gfwlist.txt)：被GFW屏蔽的常见域名
 
-以上文件将在每天凌晨4点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no_update` 文件即可。
+以上文件将在每天凌晨4点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no-update` 文件即可。
 
 ### 4. 配置AdGuardHome
 
