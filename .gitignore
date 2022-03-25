@@ -2,3 +2,9 @@
 /bin/
 /build/
 /cmake-build-debug/
+/asset/chinalist/china-ip.txt
+/asset/chinalist/china-ip.txt.gz
+/asset/chinalist/chinalist.txt
+/asset/chinalist/chinalist.txt.gz
+/asset/gfwlist/gfwlist.txt
+/asset/gfwlist/gfwlist.txt.gz
