@@ -43,8 +43,8 @@ COPY --from=build /tmp/release /tmp/release
 RUN \
 wget https://res.dnomd343.top/Share/gfwlist/gfwlist.txt && \
 wget https://res.dnomd343.top/Share/chinalist/chinalist.txt && \
-wget https://res.dnomd343.top/Share/chinalist/china_ip.txt && \
-tar czf asset.tar.gz gfwlist.txt chinalist.txt china_ip.txt && \
+wget https://res.dnomd343.top/Share/chinalist/china-ip.txt && \
+tar czf asset.tar.gz gfwlist.txt chinalist.txt china-ip.txt && \
 mkdir -p /tmp/asset/etc/ && mkdir -p /tmp/asset/usr/ && \
 cp -r /tmp/ClearDNS/overture/ /tmp/asset/etc/ && \
 mv asset.tar.gz /tmp/asset/etc/overture/ && \

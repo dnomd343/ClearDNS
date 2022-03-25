@@ -25,7 +25,7 @@ ipv6UseAlternativeDNS: false
 alternativeDNSConcurrent: true
 whenPrimaryDNSAnswerNoneUse: alternativeDNS
 ipNetworkFile:
-  primary: /etc/cleardns/asset/china_ip.txt
+  primary: /etc/cleardns/asset/china-ip.txt
   alternative: /dev/null
 domainFile:
   primary: /etc/cleardns/asset/chinalist.txt

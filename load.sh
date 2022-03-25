@@ -7,7 +7,7 @@ overture_dir="/etc/overture"
 cd $overture_dir && tar xf asset.tar.gz
 [ ! -f "$cleardns_dir/asset/gfwlist.txt" ] && cp "$overture_dir/gfwlist.txt" "$cleardns_dir/asset/gfwlist.txt"
 [ ! -f "$cleardns_dir/asset/chinalist.txt" ] && cp "$overture_dir/chinalist.txt" "$cleardns_dir/asset/chinalist.txt"
-[ ! -f "$cleardns_dir/asset/china_ip.txt" ] && cp "$overture_dir/china_ip.txt" "$cleardns_dir/asset/china_ip.txt"
+[ ! -f "$cleardns_dir/asset/china-ip.txt" ] && cp "$overture_dir/china-ip.txt" "$cleardns_dir/asset/china-ip.txt"
 
 upstream_file="/etc/cleardns/upstream.json"
 if [ ! -f "$upstream_file" ]; then

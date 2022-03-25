@@ -258,7 +258,7 @@ shell> docker restart cleardns
 
 ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/asset` 中
 
-+ [`china_ip.txt`](https://res.343.re/Share/chinalist/china_ip.txt)：国内IP段
++ [`china-ip.txt`](https://res.343.re/Share/chinalist/china-ip.txt)：国内IP段
 
 + [`chinalist.txt`](https://res.343.re/Share/chinalist/chinalist.txt)：国内常见域名
 
