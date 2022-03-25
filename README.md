@@ -191,12 +191,14 @@ shell> rm -rf /etc/cleardns
 
 上游DNS信息位于 `/etc/cleardns/upstream.json`，分为国内外两组，国内组可指定阿里DNS、DNSPod、114DNS等国内公共DNS服务，国外组需要指定可用的加密DNS服务，建议自行搭建DoH或DoT服务器。
 
-ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt，其中DNSCrypt使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
+ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt。
+
+> DNSCrypt使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
 
 各协议格式示例如下：
 
 ```
-# 常规DNS
+# Plain DNS
 1.1.1.1
 8.8.8.8
 
@@ -264,13 +266,19 @@ ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件
 
 + [`gfwlist.txt`](https://res.343.re/Share/gfwlist/gfwlist.txt)：被GFW屏蔽的常见域名
 
-以上文件将在每天凌晨4点自动更新，如果不想启用该功能，创建 `/etc/cleardns/list/no-update` 文件即可。
+以上文件将在每天凌晨4点自动更新，如果不想启用该功能，创建 `/etc/cleardns/asset/no-update` 文件即可。
+
+规则文件默认从 `res.dnomd343.top` 拉取，若该域名被污染或屏蔽，你可以使用本项目 `asset/gfwlist/build` 与 `asset/chinalist/build` 下的构建脚本自行生成规则列表。
+
+> 构建脚本需要访问Github获取资源，手动构建时请注意网络连通性。
 
 ### 4. 配置AdGuardHome
 
-浏览器打开ClearDNS服务，bridge模式或host模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码，登录进入AdGuardHome管理界面，修改上游DNS为 `127.0.0.1:5353`，同时启用DNSSEC。
+浏览器打开ClearDNS服务，host与bridge模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码，登录进入AdGuardHome管理界面。
 
-DNS封锁清单中，可配置以下规则
+进入 `设置` - `DNS设置`，修改上游DNS为 `127.0.0.1:5353`，其他选项保持默认。此外，下方其他设置中建议启用DNSSEC，内存允许的情况下适当拉大缓存大小，并开启乐观缓存。
+
+DNS封锁清单中，可配置以下规则：
 
 + `AdGuard`：`https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt`
 
@@ -280,11 +288,13 @@ DNS封锁清单中，可配置以下规则
 
 + `乘风规则`：`https://res.343.re/Share/Adblock-Rules/xinggsf.txt`
 
+> 配置过多的规则会导致设备负载变大，请酌情添加。
+
 ### 5. 配置DHCP信息
 
-为了使ClearDNS生效，需要在路由器DHCP服务中指定DNS服务器，bridge模式或host模式指定为宿主机IP，macvlan模式指定为容器IP。
+为了使ClearDNS生效，需要在路由器DHCP服务中指定DNS服务器，host与bridge模式指定为宿主机IP，macvlan模式指定为容器IP。
 
-对于内网中一些固定IP信息的设备，需要手动更改其DNS为上述IP地址。
+> 对于内网中一些固定IP信息的设备，需要手动更改其DNS为上述IP地址。
 
 ## 手动编译
 
