@@ -1,11 +1,17 @@
 FROM alpine:3.15 as build
 COPY . /tmp/ClearDNS
+ENV GO_VERSION="1.17.8"
 ENV UPX_VERSION="3.96"
 ENV OVERTURE_VERSION="v1.8"
 ENV DNSPROXY_VERSION="v0.42.0"
 ENV ADGUARD_VERSION="v0.107.5"
 RUN \
 apk add git build-base bash make cmake glib-dev go npm nodejs yarn perl ucl-dev zlib-dev && \
+\
+wget https://dl.google.com/go/go${GO_VERSION}.src.tar.gz -P /tmp/ && \
+tar -C /usr/local/ -xf /tmp/go${GO_VERSION}.src.tar.gz && \
+cd /usr/local/go/src/ && ./make.bash && \
+apk del go && export PATH=$PATH:/usr/local/go/bin && \
 \
 mkdir /tmp/release/ && cd /tmp/ && \
 git clone https://github.com/shawn1m/overture.git && \
