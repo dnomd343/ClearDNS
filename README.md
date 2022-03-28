@@ -312,7 +312,7 @@ shell> docker build -t cleardns .
 
 ```
 # 构建并推送至Docker Hub
-shell> docker buildx build -t dnomd343/cleardns --platform="linux/amd64,linux/arm64,linux/386,linux/arm/v7" https://github.com/dnomd343/ClearDNS.git#master --push
+shell> docker buildx build -t dnomd343/cleardns --platform="linux/amd64,linux/arm64,linux/386,linux/arm/v7" https://github.com/dnomd343/ClearDNS.git --push
 ```
 
 ## 许可证
