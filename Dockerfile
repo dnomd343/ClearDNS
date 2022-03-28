@@ -1,4 +1,4 @@
-FROM alpine:3.15 as build
+FROM alpine:3.15.2 as build
 COPY . /tmp/ClearDNS
 ENV GO_VERSION="1.17.8"
 ENV UPX_VERSION="3.96"
@@ -43,7 +43,7 @@ cd /tmp/release/ && \
 strip cleardns && \
 upx -9 AdGuardHome dnsproxy overture
 
-FROM alpine:3.15 as asset
+FROM alpine:3.15.2 as asset
 COPY . /tmp/ClearDNS
 COPY --from=build /tmp/release /tmp/release
 RUN \
@@ -57,7 +57,7 @@ mv asset.tar.gz /tmp/asset/etc/overture/ && \
 mv /tmp/release/ /tmp/asset/usr/bin/ && \
 mv /tmp/ClearDNS/load.sh /tmp/asset/usr/bin/load
 
-FROM alpine:3.15
+FROM alpine:3.15.2
 COPY --from=asset /tmp/asset /
 RUN apk add --no-cache ca-certificates glib iptables ip6tables && \
 echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
