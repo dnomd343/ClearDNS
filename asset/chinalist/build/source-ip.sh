@@ -1,5 +1,6 @@
-curl -sL https://github.com/17mon/china_ip_list/raw/master/china_ip_list.txt
 curl -sL https://github.com/misakaio/chnroutes2/raw/master/chnroutes.txt | sed '/^#/d'
+curl -sL https://github.com/metowolf/iplist/raw/master/data/special/china.txt
+curl -sL https://github.com/17mon/china_ip_list/raw/master/china_ip_list.txt
 curl -sL https://gaoyifan.github.io/china-operator-ip/cernet.txt
 curl -sL https://gaoyifan.github.io/china-operator-ip/china.txt
 curl -sL https://gaoyifan.github.io/china-operator-ip/chinanet.txt
