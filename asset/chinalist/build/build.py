@@ -27,9 +27,9 @@ for ipStr in ipList:
         pass
 ipList = []
 for ipAddr in ipv4List:
-    ipList.append(str(ipAddr))
+    ipList.append(str(ipAddr) if str(ipAddr).find('/') != -1 else str(ipAddr) + '/32')
 for ipAddr in ipv6List:
-    ipList.append(str(ipAddr))
+    ipList.append(str(ipAddr) if str(ipAddr).find('/') != -1 else str(ipAddr) + '/128')
 with open (workDir + '/../china-ip.txt', 'w') as fileObj:
     fileObj.write('\n'.join(ipList) + '\n')
 os.popen('gzip -cf9 ' + workDir + '/../china-ip.txt > ' + workDir + '/../china-ip.txt.gz')
