@@ -1,9 +1,9 @@
-FROM golang:1.17.8-alpine3.15 AS asset
+FROM golang:1.18.1-alpine3.15 AS asset
 COPY . /build/ClearDNS
 ENV UPX_VERSION="3.96"
 ENV OVERTURE_VERSION="v1.8"
-ENV DNSPROXY_VERSION="v0.42.0"
-ENV ADGUARD_VERSION="v0.107.5"
+ENV DNSPROXY_VERSION="v0.42.2"
+ENV ADGUARD_VERSION="v0.107.6"
 RUN \
 apk add git build-base bash make cmake glib-dev npm nodejs yarn perl ucl-dev zlib-dev && \
 \
@@ -49,7 +49,7 @@ mv asset.tar.gz /asset/etc/overture/ && \
 mv /build/release/ /asset/usr/bin/ && \
 mv /build/ClearDNS/load.sh /asset/usr/bin/load
 
-FROM alpine:3.15.2
+FROM alpine:3.15.4
 COPY --from=asset /asset /
 RUN apk add --no-cache ca-certificates glib iptables ip6tables && \
 echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
