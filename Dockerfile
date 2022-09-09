@@ -1,71 +1,61 @@
-FROM golang:1.18-alpine3.16 AS adguardhome
-ENV ADGUARD_VERSION="v0.107.8"
-RUN \
-  apk add git make npm yarn && \
-  git clone https://github.com/AdguardTeam/AdGuardHome.git && \
-  cd ./AdGuardHome/ && git checkout ${ADGUARD_VERSION} && \
-  make CHANNEL="release" VERSION=${ADGUARD_VERSION} && \
-  mv ./AdGuardHome /tmp/
+ARG ALPINE_IMG="alpine:3.16"
+ARG GOLANG_IMG="golang:1.18-alpine3.16"
 
-FROM golang:1.18-alpine3.16 AS dnsproxy
-ENV DNSPROXY_VERSION="v0.43.1"
-RUN \
-  apk add git && \
-  git clone https://github.com/AdguardTeam/dnsproxy.git && \
-  cd ./dnsproxy/ && git checkout ${DNSPROXY_VERSION} && \
-  env CGO_ENABLED=0 go build -trimpath \
-    -ldflags "-X main.VersionString=${DNSPROXY_VERSION} -s -w" && \
-  mv ./dnsproxy /tmp/
+FROM ${ALPINE_IMG} AS upx
+ENV UPX_VER="3.96"
+RUN sed -i 's/v3.\d\d/v3.15/' /etc/apk/repositories && apk add bash build-base perl ucl-dev zlib-dev
+RUN wget https://github.com/upx/upx/releases/download/v${UPX_VER}/upx-${UPX_VER}-src.tar.xz && tar xf upx-${UPX_VER}-src.tar.xz
+WORKDIR ./upx-${UPX_VER}-src/
+RUN make -C ./src/ && mkdir -p /upx/bin/ && mv ./src/upx.out /upx/bin/upx && \
+    mkdir -p /upx/lib/ && cd /usr/lib/ && cp -d ./libgcc_s.so* ./libstdc++.so* ./libucl.so* /upx/lib/
 
-FROM golang:1.18-alpine3.16 AS overture
-ENV OVERTURE_VERSION="v1.8"
-RUN \
-  apk add git && \
-  git clone https://github.com/shawn1m/overture.git && \
-  cd ./overture/ && git checkout ${OVERTURE_VERSION} && \
-  env CGO_ENABLED=0 go build -o overture -trimpath \
-    -ldflags "-X main.version=${OVERTURE_VERSION} -s -w" ./main/main.go && \
-  mv ./overture /tmp/
+FROM ${GOLANG_IMG} AS adguardhome
+ENV ADGUARD_VER="v0.107.12"
+RUN apk add git make npm yarn
+RUN git clone https://github.com/AdguardTeam/AdGuardHome.git
+WORKDIR ./AdGuardHome/
+RUN git checkout ${ADGUARD_VER} && make CHANNEL="release" VERSION=${ADGUARD_VER} && mv ./AdGuardHome /tmp/
 
-# upx can't be compiled under gcc11, so we should use alpine:3.15
-FROM alpine:3.15 AS upx
-ENV UPX_VERSION="3.96"
-RUN \
-  apk add bash build-base perl ucl-dev zlib-dev && \
-  wget https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-src.tar.xz && \
-  tar xf upx-${UPX_VERSION}-src.tar.xz && \
-  cd upx-${UPX_VERSION}-src/ && make all && \
-  mv ./src/upx.out /tmp/upx
+FROM ${GOLANG_IMG} AS dnsproxy
+ENV DNSPROXY_VER="0.44.0"
+RUN wget https://github.com/AdguardTeam/dnsproxy/archive/refs/tags/v${DNSPROXY_VER}.tar.gz && tar xf v${DNSPROXY_VER}.tar.gz
+WORKDIR ./dnsproxy-${DNSPROXY_VER}/
+RUN go mod download -x
+RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY_VER} -s -w" && mv ./dnsproxy /tmp/
 
-FROM alpine:3.16 AS cleardns
+FROM ${GOLANG_IMG} AS overture
+ENV OVERTURE_VER="1.8"
+RUN wget https://github.com/shawn1m/overture/archive/refs/tags/v${OVERTURE_VER}.tar.gz && tar xf ./v${OVERTURE_VER}.tar.gz
+WORKDIR ./overture-${OVERTURE_VER}/
+RUN env CGO_ENABLED=0 go build -o overture -trimpath -ldflags "-X main.version=v${OVERTURE_VER} -s -w" ./main/main.go && mv ./overture /tmp/
+
+FROM ${ALPINE_IMG} AS cleardns
 COPY . /ClearDNS
-RUN \
-  apk add build-base cmake glib-dev && \
-  cd ./ClearDNS/ && mkdir ./build/ && \
-  cd ./build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && make && \
-  mv ../bin/cleardns /tmp/
+RUN apk add build-base cmake glib-dev
+RUN cd ./ClearDNS/ && mkdir ./build/ && \
+    cd ./build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && make && \
+    mv ../bin/cleardns /tmp/ && strip /tmp/cleardns
 
-FROM alpine:3.16 AS asset
-COPY --from=adguardhome /tmp/AdGuardHome /release/
-COPY --from=dnsproxy /tmp/dnsproxy /release/
-COPY --from=overture /tmp/overture /release/
-COPY --from=cleardns /tmp/cleardns /release/
-COPY --from=upx /tmp/upx /usr/bin/
+FROM ${ALPINE_IMG} AS asset
+RUN apk add xz && \
+    wget https://res.dnomd343.top/Share/gfwlist/gfwlist.txt && \
+    wget https://res.dnomd343.top/Share/chinalist/china-ip.txt && \
+    wget https://res.dnomd343.top/Share/chinalist/chinalist.txt && \
+    tar cJf /tmp/assets.tar.xz ./gfwlist.txt ./china-ip.txt ./chinalist.txt
+COPY --from=dnsproxy /tmp/dnsproxy /asset/usr/bin/
+COPY --from=overture /tmp/overture /asset/usr/bin/
+COPY --from=adguardhome /tmp/AdGuardHome /asset/usr/bin/
+COPY --from=upx /upx/ /usr/
+RUN ls /asset/usr/bin/* | xargs -P0 -n1 upx -9
+COPY --from=cleardns /tmp/cleardns /asset/usr/bin/
 COPY . /ClearDNS
-RUN \
-  apk add gcc ucl && \
-  cd /release/ && strip cleardns && \
-  upx -9 AdGuardHome dnsproxy overture && \
-  wget https://res.dnomd343.top/Share/gfwlist/gfwlist.txt && \
-  wget https://res.dnomd343.top/Share/chinalist/chinalist.txt && \
-  wget https://res.dnomd343.top/Share/chinalist/china-ip.txt && \
-  tar czf asset.tar.gz gfwlist.txt chinalist.txt china-ip.txt && rm -f *.txt && \
-  mkdir -p /asset/etc/ && mkdir -p /asset/usr/ && \
-  cp -r /ClearDNS/overture/ /asset/etc/ && mv asset.tar.gz /asset/etc/overture/ && \
-  mv /release/ /asset/usr/bin/ && mv /ClearDNS/load.sh /asset/usr/bin/load
+RUN mkdir -p /asset/etc/ && \
+    cp -r /ClearDNS/overture/ /asset/etc/ && \
+    mv /tmp/assets.tar.xz /asset/etc/overture/asset.tar.xz && \
+    mv /ClearDNS/load.sh /asset/usr/bin/load
 
-FROM alpine:3.16
+FROM ${ALPINE_IMG}
 COPY --from=asset /asset /
-RUN apk add --no-cache ca-certificates glib iptables ip6tables && \
-echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
-ENTRYPOINT ["cleardns"]
+RUN #apk add --no-cache ca-certificates glib && \
+#echo -e "0\t4\t*\t*\t*\t/etc/overture/update.sh" > /var/spool/cron/crontabs/root
+#ENTRYPOINT ["cleardns"]
