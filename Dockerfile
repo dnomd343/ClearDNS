@@ -29,25 +29,25 @@ RUN wget https://github.com/shawn1m/overture/archive/refs/tags/v${OVERTURE_VER}.
 WORKDIR ./overture-${OVERTURE_VER}/main/
 RUN env CGO_ENABLED=0 go build -o overture -trimpath -ldflags "-X main.version=v${OVERTURE_VER} -s -w" ./main.go && mv ./overture /tmp/
 
-#FROM ${ALPINE_IMG} AS cleardns
+FROM ${ALPINE_IMG} AS cleardns
+RUN apk add build-base cmake
 #COPY . /ClearDNS
-#RUN apk add build-base cmake glib-dev
+RUN touch /tmp/cleardns
 #RUN cd ./ClearDNS/ && mkdir ./build/ && \
 #    cd ./build/ && cmake -DCMAKE_BUILD_TYPE=Release .. && make && \
 #    mv ../bin/cleardns /tmp/ && strip /tmp/cleardns
 
 FROM ${ALPINE_IMG} AS asset
-RUN apk add xz && mkdir -p /asset/ && \
-    wget https://res.dnomd343.top/Share/gfwlist/gfwlist.txt && \
-    wget https://res.dnomd343.top/Share/chinalist/china-ip.txt && \
-    wget https://res.dnomd343.top/Share/chinalist/chinalist.txt && \
-    tar cJf /asset/assets.tar.xz ./*.txt
+COPY --from=upx /upx/ /usr/
 COPY --from=dnsproxy /tmp/dnsproxy /asset/usr/bin/
 COPY --from=overture /tmp/overture /asset/usr/bin/
 COPY --from=adguardhome /tmp/AdGuardHome /asset/usr/bin/
-COPY --from=upx /upx/ /usr/
 RUN ls /asset/usr/bin/* | xargs -P0 -n1 upx -9
-#COPY --from=cleardns /tmp/cleardns /asset/usr/bin/
+RUN wget https://res.dnomd343.top/Share/gfwlist/gfwlist.txt && \
+    wget https://res.dnomd343.top/Share/chinalist/china-ip.txt && \
+    wget https://res.dnomd343.top/Share/chinalist/chinalist.txt
+RUN apk add xz && tar cJf /asset/assets.tar.xz ./gfwlist.txt ./china-ip.txt ./chinalist.txt
+COPY --from=cleardns /tmp/cleardns /asset/usr/bin/
 
 FROM ${ALPINE_IMG}
 COPY --from=asset /asset/ /
