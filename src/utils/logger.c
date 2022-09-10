@@ -32,7 +32,7 @@ void log_printf(int level, const char *fmt, ...) {
 
     va_list ap;
     va_start(ap, fmt);
-    fprintf(stderr, "\x1b[36m[Bootstrap]\x1b[0m \x1b[90m%s\x1b[0m", time_str); // show log prefix
+    fprintf(stderr, "\x1b[36m[ClearDNS]\x1b[0m \x1b[90m%s\x1b[0m", time_str); // show log prefix
     fprintf(stderr, " %s%s\x1b[0m ", log_color[level], log_string[level]); // show log level
     vfprintf(stderr, fmt, ap); // output log content
     fprintf(stderr, "\n"); // add LF after line
@@ -48,7 +48,7 @@ void log_perror(char *prefix) {
     time_t t;
     time(&t);
     struct tm *lt = localtime(&t);
-    fprintf(stderr, "\x1b[36m[Bootstrap]\x1b[0m ");
+    fprintf(stderr, "\x1b[36m[ClearDNS]\x1b[0m ");
     fprintf(stderr, "\x1b[90m%04d-%02d-%02d %02d:%02d:%02d\x1b[0m",
             lt->tm_year + 1900, lt->tm_mon, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
     fprintf(stderr, " %s%s\x1b[0m ", log_color[3], log_string[3]); // error level
