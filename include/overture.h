@@ -14,5 +14,6 @@ typedef struct {
 
 overture* overture_init(int port);
 void overture_dump(overture *info);
+char* overture_gen_config(overture *info);
 
 #endif

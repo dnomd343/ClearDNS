@@ -57,7 +57,15 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     overture *diverter = overture_init(DIVERTER_PORT);
 
+    diverter->timeout = 8;
+    diverter->domestic_ip_file = "china-ip.txt";
+    diverter->domestic_domain_file = "chinalist.txt";
+    diverter->foreign_domain_file = "gfwlist.txt";
+
     overture_dump(diverter);
+
+    char *config = overture_gen_config(diverter);
+    log_info("\n%s", config);
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");

@@ -22,6 +22,7 @@ static const char *log_color[] = {
     "\x1b[95m", // fatal
 };
 
+// TODO: add ms field
 void log_printf(int level, const char *fmt, ...) {
     if (level < LOG_LEVEL) { // skip low log level
         return;
@@ -44,6 +45,7 @@ void log_printf(int level, const char *fmt, ...) {
     }
 }
 
+// TODO: add ms field
 void log_perror(char *prefix) {
     time_t t;
     time(&t);
