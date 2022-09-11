@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "common.h"
 #include "dnsproxy.h"
+#include "overture.h"
 #include "str.h"
 
 //#include <stdio.h>
@@ -32,26 +33,31 @@ int main(int argc, char *argv[]) { // ClearDNS server
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
-
-    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
-    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
-
-    dnsproxy_add_primary(domestic, "223.5.5.5");
-    dnsproxy_add_primary(domestic, "tls://dns.pub");
-
-    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
-    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
+//    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
+//
+//    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
+//    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
+//
+//    dnsproxy_add_primary(domestic, "223.5.5.5");
+//    dnsproxy_add_primary(domestic, "tls://dns.pub");
+//
+//    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
+//    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
 
 //    domestic->verify = FALSE;
 //    domestic->parallel = FALSE;
-    domestic->optimistic = TRUE;
+//    domestic->optimistic = TRUE;
 //    domestic->cache = 0;
 
-    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
-    log_info("cmd -> %s", string_list_dump(p->cmd));
-    log_info("env -> %s", string_list_dump(p->env));
-    log_info("cwd -> %s", p->cwd);
+//    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
+//    log_info("cmd -> %s", string_list_dump(p->cmd));
+//    log_info("env -> %s", string_list_dump(p->env));
+//    log_info("cwd -> %s", p->cwd);
+
+
+    overture *diverter = overture_init(DIVERTER_PORT);
+
+    overture_dump(diverter);
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");

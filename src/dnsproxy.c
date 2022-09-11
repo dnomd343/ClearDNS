@@ -55,7 +55,7 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
 
     char *option = string_join("--config-path=", file);
     process *p = (process*)malloc(sizeof(process));
-    p->cmd = command_init(DNSPROXY_BIN);
+    p->cmd = string_list_append(string_list_init(), DNSPROXY_BIN);
     p->cmd = string_list_append(p->cmd, option);
     p->env = string_list_init();
     p->cwd = WORK_DIR;

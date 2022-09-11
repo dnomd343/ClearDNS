@@ -8,6 +8,7 @@
 
 #define DOMESTIC_PORT 4053
 #define FOREIGN_PORT  6053
+#define DIVERTER_PORT 5353
 
 #define DNSPROXY_BIN "dnsproxy"
 #define OVERTURE_BIN "overture"
@@ -23,7 +24,6 @@
 //void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug);
 
 char* show_bool(int value);
-char** command_init(char *bin);
 void save_file(char *file, char *content);
 
 #endif

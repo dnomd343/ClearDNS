@@ -5,5 +5,5 @@ include_directories(${PROJECT_SOURCE_DIR}/include/utils)
 
 add_subdirectory(utils)
 
-add_executable(cleardns cleardns.c dnsproxy.c common.c)
+add_executable(cleardns cleardns.c dnsproxy.c common.c overture.c)
 target_link_libraries(cleardns utils)
