@@ -1,8 +1,11 @@
 #include <stdlib.h>
+#include <string.h>
 #include "dnsproxy.h"
 #include "logger.h"
 #include "common.h"
 #include "strList.h"
+
+#include "cJSON.h"
 
 dnsproxy* dnsproxy_init(int port) {
     dnsproxy *info = (dnsproxy*)malloc(sizeof(dnsproxy));
@@ -38,4 +41,45 @@ void dnsproxy_add_fallback(dnsproxy *info, char *server) {
 
 void dnsproxy_add_bootstrap(dnsproxy *info, char *server) {
     info->bootstrap = string_list_append(info->bootstrap, server);
+}
+
+void dnsproxy_gen_config(dnsproxy *info) {
+    cJSON *config = cJSON_CreateObject();
+    if (!info->verify) {
+        cJSON_AddTrueToObject(config, "insecure"); // insecure --(default)--> `false`
+    }
+    if (info->parallel) {
+        cJSON_AddTrueToObject(config, "all-servers");
+    }
+    if (strcmp(info->cache, "0") != 0) {
+        cJSON_AddTrueToObject(config, "cache");
+        cJSON_AddStringToObject(config, "cache-size", info->cache);
+    }
+    if (info->optimistic) {
+        cJSON_AddTrueToObject(config, "cache-optimistic");
+    }
+
+    cJSON *port = cJSON_CreateArray();
+    cJSON_AddItemToArray(port, cJSON_CreateNumber(info->port));
+    cJSON_AddItemToObject(config, "listen-ports", port);
+
+    cJSON *bootstrap = cJSON_CreateArray();
+    for (char **server = info->bootstrap; *server != NULL; ++server) {
+        cJSON_AddItemToArray(bootstrap, cJSON_CreateString(*server));
+    }
+    cJSON_AddItemToObject(config, "bootstrap", bootstrap);
+
+    cJSON *fallback = cJSON_CreateArray();
+    for (char **server = info->fallback; *server != NULL; ++server) {
+        cJSON_AddItemToArray(fallback, cJSON_CreateString(*server));
+    }
+    cJSON_AddItemToObject(config, "fallback", fallback);
+
+    cJSON *primary = cJSON_CreateArray();
+    for (char **server = info->primary; *server != NULL; ++server) {
+        cJSON_AddItemToArray(primary, cJSON_CreateString(*server));
+    }
+    cJSON_AddItemToObject(config, "upstream", primary);
+
+    log_info("\n%s", cJSON_Print(config));
 }

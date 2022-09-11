@@ -19,4 +19,6 @@ void dnsproxy_add_primary(dnsproxy *info, char *server);
 void dnsproxy_add_fallback(dnsproxy *info, char *server);
 void dnsproxy_add_bootstrap(dnsproxy *info, char *server);
 
+void dnsproxy_gen_config(dnsproxy *info);
+
 #endif
