@@ -2,7 +2,7 @@
 #include "common.h"
 #include "dnsproxy.h"
 
-#include "strList.h"
+#include "str.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -52,10 +52,13 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     dnsproxy_dump("Domestic", domestic);
 
-    char *config = dnsproxy_gen_config(domestic);
-    log_info("\n%s", config);
+//    char *config = dnsproxy_gen_config(domestic);
+//    log_info("\n%s", config);
 
-    save_file("/tmp/test.txt", config);
+//    log_info("%s", string_join(WORK_DIR, "domestic.json", TRUE));
+
+    process *p = dnsproxy_load("Domestic", domestic, WORK_DIR, "domestic.json");
+    log_info("%s", string_list_dump(p->cmd));
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");

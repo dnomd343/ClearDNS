@@ -1,7 +1,8 @@
-#ifndef _STRLIST_H_
-#define _STRLIST_H_
+#ifndef _STR_H_
+#define _STR_H_
 
 char* string_init(char *str);
+char* string_join(char *base, const char *add, int is_new);
 
 char** string_list_init();
 int string_list_len(char **string_list);

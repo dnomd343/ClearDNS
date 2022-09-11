@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "dnsproxy.h"
-#include "strList.h"
+#include "str.h"
+#include "process.h"
 #include "logger.h"
 #include "common.h"
 #include "cJSON.h"
@@ -82,4 +83,17 @@ char* dnsproxy_gen_config(dnsproxy *info) {
     char *config_str = cJSON_Print(config);
     cJSON_Delete(config);
     return config_str;
+}
+
+process* dnsproxy_load(char *caption, dnsproxy *info, char *work_dir, char *file) {
+    char *config = dnsproxy_gen_config(info);
+
+    save_file(string_join(work_dir, file, TRUE), config);
+
+    process *demo = (process*)malloc(sizeof(process));
+    demo->cmd = command_init(DNSPROXY_BIN);
+    demo->env = string_list_init();
+    demo->cwd = work_dir;
+
+    return demo;
 }

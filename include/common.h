@@ -13,6 +13,7 @@
 #define OVERTURE_BIN "overture"
 #define ADGUARD_BIN  "AdGuardHome"
 
+#define WORK_DIR "/etc/cleardns/"
 
 //extern char **adguard_command;
 //extern char **overture_command;
@@ -23,6 +24,6 @@
 
 char* show_bool(int value);
 char** command_init(char *bin);
-void save_file(char *file, char *data);
+void save_file(char *file, char *content);
 
 #endif

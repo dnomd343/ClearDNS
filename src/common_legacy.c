@@ -41,7 +41,7 @@ char* read_file(char *file_name) { // read file content
 char** command_add_field(char **command_list, char *field) { // add field into command
     int num = 0;
     while(command_list[num++] != NULL); // get options number
-    command_list = (char**)realloc(command_list, sizeof(char**) * (num + 1));
+    command_list = (char**)realloc(command_list, sizeof(char*) * (num + 1));
     command_list[num - 1] = strcpy((char*)malloc(strlen(field) + 1), field);
     command_list[num] = NULL; // end sign
     return command_list;

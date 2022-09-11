@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "common.h"
 #include "logger.h"
-#include "strList.h"
+#include "str.h"
 
 char* show_bool(int value) {
     if (value) {
