@@ -3,13 +3,13 @@
 
 typedef struct {
     int port;
+    int cache;
     int verify; // bool value
     int parallel; // bool value
     int optimistic; // bool value
     char **bootstrap;
     char **fallback;
     char **primary;
-    char *cache;
 } dnsproxy;
 
 dnsproxy* dnsproxy_init(int port);

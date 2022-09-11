@@ -16,7 +16,7 @@ dnsproxy* dnsproxy_init(int port) {
     info->bootstrap = string_list_init();
     info->fallback = string_list_init();
     info->primary = string_list_init();
-    info->cache = "4194304"; // 4MiB
+    info->cache = 4194304; // 4MiB
     return info;
 }
 
@@ -28,7 +28,7 @@ void dnsproxy_dump(char *caption, dnsproxy *info) {
     log_debug("%s bootstrap -> %s", caption, string_list_dump(info->bootstrap));
     log_debug("%s fallback -> %s", caption, string_list_dump(info->fallback));
     log_debug("%s primary -> %s", caption, string_list_dump(info->primary));
-    log_debug("%s cache -> %s", caption, info->cache);
+    log_debug("%s cache -> %d", caption, info->cache);
 }
 
 void dnsproxy_add_primary(dnsproxy *info, char *server) {
@@ -51,9 +51,9 @@ void dnsproxy_gen_config(dnsproxy *info) {
     if (info->parallel) {
         cJSON_AddTrueToObject(config, "all-servers");
     }
-    if (strcmp(info->cache, "0") != 0) {
+    if (info->cache) {
         cJSON_AddTrueToObject(config, "cache");
-        cJSON_AddStringToObject(config, "cache-size", info->cache);
+        cJSON_AddNumberToObject(config, "cache-size", info->cache);
     }
     if (info->optimistic) {
         cJSON_AddTrueToObject(config, "cache-optimistic");

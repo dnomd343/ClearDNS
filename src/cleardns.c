@@ -45,10 +45,10 @@ int main(int argc, char *argv[]) { // ClearDNS server
     dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
     dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
 
-    domestic->verify = FALSE;
+//    domestic->verify = FALSE;
 //    domestic->parallel = FALSE;
-    domestic->optimistic = TRUE;
-//    domestic->cache = "0";
+//    domestic->optimistic = TRUE;
+    domestic->cache = 0;
 
     dnsproxy_dump("Domestic", domestic);
 
