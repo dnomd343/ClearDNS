@@ -21,4 +21,7 @@
 
 //void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug);
 
+char* show_bool(int value);
+char** command_init(char *bin);
+
 #endif

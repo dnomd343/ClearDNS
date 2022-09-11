@@ -2,6 +2,8 @@
 #include "common.h"
 #include "dnsproxy.h"
 
+#include "strList.h"
+
 //#include <stdio.h>
 //#include <string.h>
 //#include "common.h"
@@ -33,6 +35,16 @@ int main(int argc, char *argv[]) { // ClearDNS server
     log_info("ClearDNS server start (%s)", VERSION);
 
     dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
+
+    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
+    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
+
+    dnsproxy_add_primary(domestic, "223.5.5.5");
+    dnsproxy_add_primary(domestic, "tls://dns.pub");
+
+    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
+    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
+
     dnsproxy_dump("Domestic", domestic);
 
 //    int debug_mode = 0;

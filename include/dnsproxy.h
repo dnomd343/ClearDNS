@@ -15,4 +15,8 @@ typedef struct {
 dnsproxy* dnsproxy_init(int port);
 void dnsproxy_dump(char *caption, dnsproxy *info);
 
+void dnsproxy_add_primary(dnsproxy *info, char *server);
+void dnsproxy_add_fallback(dnsproxy *info, char *server);
+void dnsproxy_add_bootstrap(dnsproxy *info, char *server);
+
 #endif
