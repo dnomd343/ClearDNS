@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "logger.h"
 #include "common.h"
 #include "dnsproxy.h"
@@ -28,10 +29,16 @@
 //    fprintf(stderr, "\"\n");
 //}
 
+
 int main(int argc, char *argv[]) { // ClearDNS server
 
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
+
+    FILE *fp = fopen("/dev/null/123", "r");
+    log_perror("Test prefix");
+
+    return 0;
 
 //    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
 //

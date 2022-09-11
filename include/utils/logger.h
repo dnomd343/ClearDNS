@@ -1,6 +1,8 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
+#define LOG_PREFIX "ClearDNS"
+
 enum {
     LOG_DEBUG,
     LOG_INFO,
