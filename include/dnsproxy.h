@@ -15,14 +15,9 @@ typedef struct {
 } dnsproxy;
 
 dnsproxy* dnsproxy_init(int port);
-void dnsproxy_dump(char *caption, dnsproxy *info);
-
-void dnsproxy_add_primary(dnsproxy *info, char *server);
-void dnsproxy_add_fallback(dnsproxy *info, char *server);
-void dnsproxy_add_bootstrap(dnsproxy *info, char *server);
-
-char* dnsproxy_gen_config(dnsproxy *info);
-
-process* dnsproxy_load(char *caption, dnsproxy *info, char *work_dir, char *file);
+void dnsproxy_add_primary(dnsproxy *info, const char *server);
+void dnsproxy_add_fallback(dnsproxy *info, const char *server);
+void dnsproxy_add_bootstrap(dnsproxy *info, const char *server);
+process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file);
 
 #endif

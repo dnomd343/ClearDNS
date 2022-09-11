@@ -2,19 +2,25 @@
 #include <string.h>
 #include "str.h"
 
-char* string_init(char *str) {
+char* string_init(const char *str) {
     return strcpy((char*)malloc(strlen(str) + 1), str);
 }
 
-char* string_join(char *base, const char *add, int is_new) {
-    unsigned long string_len = strlen(base) + strlen(add);
-    if (is_new) {
-        char *ret = (char*)malloc(sizeof(char) * (string_len + 1));
-        return strcat(strcpy(ret, base), add);
-    } else {
-        base = (char*)realloc(base, sizeof(char) * (string_len + 1));
-        return strcat(base, add);
-    }
+char* string_join(const char *base, const char *add) {
+    char *ret = (char*)malloc(sizeof(char) * (strlen(base) + strlen(add) + 1));
+    return strcat(strcpy(ret, base), add);
+}
+
+char** string_list_init() {
+    char **string_list = (char**)malloc(sizeof(char*));
+    *string_list = NULL;
+    return string_list;
+}
+
+int string_list_len(char **string_list) {
+    int num = 0;
+    while(string_list[num++] != NULL); // get string list size
+    return num - 1;
 }
 
 char* string_list_dump(char **string_list) { // ['a', 'b', 'c', ...]
@@ -37,19 +43,7 @@ char* string_list_dump(char **string_list) { // ['a', 'b', 'c', ...]
     return string_ret;
 }
 
-int string_list_len(char **string_list) {
-    int num = 0;
-    while(string_list[num++] != NULL); // get string list size
-    return num - 1;
-}
-
-char** string_list_init() {
-    char **string_list = (char**)malloc(sizeof(char*));
-    *string_list = NULL;
-    return string_list;
-}
-
-char** string_list_append(char **string_list, char *string) {
+char** string_list_append(char **string_list, const char *string) {
     int len = string_list_len(string_list);
     string_list = (char**)realloc(string_list, sizeof(char*) * (len + 2));
     string_list[len] = string_init(string);

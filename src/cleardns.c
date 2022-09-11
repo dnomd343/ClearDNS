@@ -1,7 +1,6 @@
 #include "logger.h"
 #include "common.h"
 #include "dnsproxy.h"
-
 #include "str.h"
 
 //#include <stdio.h>
@@ -31,7 +30,6 @@
 int main(int argc, char *argv[]) { // ClearDNS server
 
     LOG_LEVEL = LOG_DEBUG;
-
     log_info("ClearDNS server start (%s)", VERSION);
 
     dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
@@ -47,18 +45,13 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
 //    domestic->verify = FALSE;
 //    domestic->parallel = FALSE;
-//    domestic->optimistic = TRUE;
-    domestic->cache = 0;
+    domestic->optimistic = TRUE;
+//    domestic->cache = 0;
 
-    dnsproxy_dump("Domestic", domestic);
-
-//    char *config = dnsproxy_gen_config(domestic);
-//    log_info("\n%s", config);
-
-//    log_info("%s", string_join(WORK_DIR, "domestic.json", TRUE));
-
-    process *p = dnsproxy_load("Domestic", domestic, WORK_DIR, "domestic.json");
-    log_info("%s", string_list_dump(p->cmd));
+    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
+    log_info("cmd -> %s", string_list_dump(p->cmd));
+    log_info("env -> %s", string_list_dump(p->env));
+    log_info("cwd -> %s", p->cwd);
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");
