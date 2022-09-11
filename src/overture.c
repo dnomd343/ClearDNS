@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "overture.h"
+#include "process.h"
 #include "common.h"
 #include "logger.h"
 #include "cJSON.h"
 #include "str.h"
+
+void overture_dump(overture *info);
+char* overture_gen_config(overture *info);
 
 overture* overture_init(int port) { // init overture options
     overture *info = (overture*)malloc(sizeof(overture));
@@ -28,6 +32,23 @@ void overture_dump(overture *info) { // show overture info in debug log
     log_debug("Overture domestic ip file -> %s", info->domestic_ip_file);
     log_debug("Overture foreign domain file -> %s", info->foreign_domain_file);
     log_debug("Overture domestic domain file -> %s", info->domestic_domain_file);
+}
+
+process* overture_load(overture *info, const char *file) {
+    overture_dump(info);
+    char *config = overture_gen_config(info); // string config (JSON format)
+    char *config_file = string_join(WORK_DIR, file);
+    save_file(config_file, config);
+    free(config_file);
+    free(config);
+
+    process *p = (process*)malloc(sizeof(process));
+    p->cmd = string_list_append(string_list_init(), OVERTURE_BIN);
+    p->cmd = string_list_append(p->cmd, "-c");
+    p->cmd = string_list_append(p->cmd, file);
+    p->env = string_list_init();
+    p->cwd = WORK_DIR;
+    return p;
 }
 
 char* overture_gen_config(overture *info) { // generate json configure from overture options

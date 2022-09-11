@@ -62,10 +62,10 @@ int main(int argc, char *argv[]) { // ClearDNS server
     diverter->domestic_domain_file = "chinalist.txt";
     diverter->foreign_domain_file = "gfwlist.txt";
 
-    overture_dump(diverter);
-
-    char *config = overture_gen_config(diverter);
-    log_info("\n%s", config);
+    process *p = overture_load(diverter, "overture.json");
+    log_info("cmd -> %s", string_list_dump(p->cmd));
+    log_info("env -> %s", string_list_dump(p->env));
+    log_info("cwd -> %s", p->cwd);
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");

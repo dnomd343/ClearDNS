@@ -1,6 +1,8 @@
 #ifndef _OVERTURE_H_
 #define _OVERTURE_H_
 
+#include "process.h"
+
 typedef struct {
     int port;
     int timeout;
@@ -13,7 +15,6 @@ typedef struct {
 } overture;
 
 overture* overture_init(int port);
-void overture_dump(overture *info);
-char* overture_gen_config(overture *info);
+process* overture_load(overture *info, const char *file);
 
 #endif
