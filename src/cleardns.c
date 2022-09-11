@@ -1,5 +1,6 @@
 #include "logger.h"
 #include "common.h"
+#include "dnsproxy.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -27,7 +28,12 @@
 
 int main(int argc, char *argv[]) { // ClearDNS server
 
+    LOG_LEVEL = LOG_DEBUG;
+
     log_info("ClearDNS server start (%s)", VERSION);
+
+    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
+    dnsproxy_dump("Domestic", domestic);
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");

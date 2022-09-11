@@ -37,7 +37,7 @@
 #pragma warning (disable : 4001)
 #endif
 
-#include <string.h>
+#include <strList.bak>
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
