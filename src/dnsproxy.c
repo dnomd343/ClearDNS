@@ -1,10 +1,8 @@
 #include <stdlib.h>
-#include <string.h>
 #include "dnsproxy.h"
+#include "strList.h"
 #include "logger.h"
 #include "common.h"
-#include "strList.h"
-
 #include "cJSON.h"
 
 dnsproxy* dnsproxy_init(int port) {
@@ -43,7 +41,7 @@ void dnsproxy_add_bootstrap(dnsproxy *info, char *server) {
     info->bootstrap = string_list_append(info->bootstrap, server);
 }
 
-void dnsproxy_gen_config(dnsproxy *info) {
+char* dnsproxy_gen_config(dnsproxy *info) {
     cJSON *config = cJSON_CreateObject();
     if (!info->verify) {
         cJSON_AddTrueToObject(config, "insecure"); // insecure --(default)--> `false`
@@ -81,5 +79,7 @@ void dnsproxy_gen_config(dnsproxy *info) {
     }
     cJSON_AddItemToObject(config, "upstream", primary);
 
-    log_info("\n%s", cJSON_Print(config));
+    char *config_str = cJSON_Print(config);
+    cJSON_Delete(config);
+    return config_str;
 }

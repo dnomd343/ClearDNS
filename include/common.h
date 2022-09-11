@@ -23,5 +23,6 @@
 
 char* show_bool(int value);
 char** command_init(char *bin);
+void save_file(char *file, char *data);
 
 #endif

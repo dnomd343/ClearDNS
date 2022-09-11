@@ -52,7 +52,10 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     dnsproxy_dump("Domestic", domestic);
 
-    dnsproxy_gen_config(domestic);
+    char *config = dnsproxy_gen_config(domestic);
+    log_info("\n%s", config);
+
+    save_file("/tmp/test.txt", config);
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");
