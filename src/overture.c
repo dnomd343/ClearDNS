@@ -110,7 +110,7 @@ char* overture_config(overture *info) { // generate json configure from overture
     if (info->host_file != NULL) {
         cJSON_AddStringToObject(host_file, "hostsFile", info->host_file);
     }
-    cJSON_AddStringToObject(host_file, "finder", "full-map");
+    cJSON_AddStringToObject(host_file, "finder", "regex-list");
     cJSON_AddItemToObject(config, "hostsFile", host_file);
 
     if (info->ttl_file != NULL) {
