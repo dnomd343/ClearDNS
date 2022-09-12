@@ -13,9 +13,14 @@ typedef u_int64_t uint64_t;
 #define TRUE  1
 #define FALSE 0
 
+#define DNS_PORT      53
+#define ADGUARD_PORT  80
+#define DIVERTER_PORT 5353
 #define DOMESTIC_PORT 4053
 #define FOREIGN_PORT  6053
-#define DIVERTER_PORT 5353
+
+#define ADGUARD_USER   "admin"
+#define ADGUARD_PASSWD "adguard"
 
 #define DNSPROXY_BIN "dnsproxy"
 #define OVERTURE_BIN "overture"
@@ -30,8 +35,10 @@ typedef u_int64_t uint64_t;
 
 //void load_start_command(char *adguard_workdir, char *overture_config, char *upstream_config, int is_debug);
 
-char* show_bool(int value);
-char* read_file(char *file);
-void save_file(char *file, char *content);
+char* show_bool(uint8_t value);
+char* read_file(const char *file);
+void save_file(const char *file, const char *content);
+void string_list_debug(char *describe, char **string_list);
+void uint32_list_debug(char *describe, uint32_t **uint32_list);
 
 #endif

@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include "common.h"
 #include "logger.h"
+#include "structure.h"
 
-char* show_bool(int value) { // return `true` or `false`
+char* show_bool(uint8_t value) { // return `true` or `false`
     if (value) {
         return "true";
     } else {
@@ -11,7 +12,19 @@ char* show_bool(int value) { // return `true` or `false`
     }
 }
 
-void save_file(char *file, char *content) { // save into file
+void string_list_debug(char *describe, char **string_list) {
+    char *string_ret = string_list_dump(string_list);
+    log_debug("%s -> %s", describe, string_ret);
+    free(string_ret);
+}
+
+void uint32_list_debug(char *describe, uint32_t **uint32_list) {
+    char *string_ret = uint32_list_dump(uint32_list);
+    log_debug("%s -> %s", describe, string_ret);
+    free(string_ret);
+}
+
+void save_file(const char *file, const char *content) { // save into file
     log_debug("Write into `%s` -> \n%s", file, content);
     FILE* fp = fopen(file , "w");
     if (fp == NULL) {
@@ -22,7 +35,7 @@ void save_file(char *file, char *content) { // save into file
     log_debug("Save `%s` success", file);
 }
 
-char* read_file(char *file) { // read file content
+char* read_file(const char *file) { // read file content
     log_debug("Read file -> %s", file);
     FILE *fp = fopen(file, "rb");
     if (fp == NULL) { // file open failed
