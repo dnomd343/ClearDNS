@@ -1,3 +1,3 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-add_library(utils logger.c structure.c cJSON.c)
+add_library(utils cJSON.c logger.c process.c structure.c)

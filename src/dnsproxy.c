@@ -66,16 +66,13 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
     free(config);
 
     char *option = string_join("--config-path=", file);
-    process *p = (process *)malloc(sizeof(process));
-    p->cmd = string_list_append(string_list_init(), DNSPROXY_BIN);
-    p->cmd = string_list_append(p->cmd, option);
+    process *proc = process_init(caption, DNSPROXY_BIN);
+    process_add_arg(proc, option);
     if (info->debug) {
-        p->cmd = string_list_append(p->cmd, "--verbose"); // dnsproxy enable debug mode
+        process_add_arg(proc, "--verbose"); // dnsproxy enable debug mode
     }
-    p->env = string_list_init();
-    p->cwd = WORK_DIR;
     free(option);
-    return p;
+    return proc;
 }
 
 char* dnsproxy_config(dnsproxy *info) { // generate json configure from dnsproxy options

@@ -46,15 +46,16 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    free(str);
 //    string_list_free(temp);
 
-    uint32_t **temp = uint32_list_init();
-    temp = uint32_list_append(temp, 123);
-    temp = uint32_list_append(temp, 456);
-    temp = uint32_list_append(temp, 789);
+//    uint32_t **temp = uint32_list_init();
+//    temp = uint32_list_append(temp, 123);
+//    temp = uint32_list_append(temp, 456);
+//    temp = uint32_list_append(temp, 789);
+//
+//    char *str = uint32_list_dump(temp);
+//    log_info("`%s`\n", str);
+//    free(str);
+//    uint32_list_free(temp);
 
-    char *str = uint32_list_dump(temp);
-    log_info("`%s`\n", str);
-    free(str);
-    uint32_list_free(temp);
 
 //    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
 //
@@ -66,35 +67,36 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //
 //    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
 //    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
-
+//
 //    domestic->verify = FALSE;
 //    domestic->parallel = FALSE;
 //    domestic->optimistic = TRUE;
 //    domestic->debug = TRUE;
-//    domestic->cache = 0;
-
+//    domestic->cache = 4194304; // 4MiB
+//
 //    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
 //    log_info("cmd -> %s", string_list_dump(p->cmd));
 //    log_info("env -> %s", string_list_dump(p->env));
 //    log_info("cwd -> %s", p->cwd);
 
 
-//    overture *diverter = overture_init(DIVERTER_PORT);
-//
-//    diverter->timeout = 8;
-//    diverter->domestic_ip_file = "china-ip.txt";
-//    diverter->domestic_domain_file = "chinalist.txt";
-//    diverter->foreign_domain_file = "gfwlist.txt";
-//
-//    diverter->debug = TRUE;
-//    diverter->ttl_file = "domain_ttl.txt";
-//    diverter->host_file = "hosts.txt";
-//    diverter->reject_type = int_list_append(diverter->reject_type, 255);
-//
-//    process *p = overture_load(diverter, "overture.json");
-//    log_info("cmd -> %s", string_list_dump(p->cmd));
-//    log_info("env -> %s", string_list_dump(p->env));
-//    log_info("cwd -> %s", p->cwd);
+    overture *diverter = overture_init(DIVERTER_PORT);
+
+    diverter->timeout = 8;
+    diverter->domestic_ip_file = "china-ip.txt";
+    diverter->domestic_domain_file = "chinalist.txt";
+    diverter->foreign_domain_file = "gfwlist.txt";
+
+    diverter->debug = TRUE;
+    diverter->ttl_file = "domain_ttl.txt";
+    diverter->host_file = "hosts.txt";
+    diverter->reject_type = uint32_list_append(diverter->reject_type, 255);
+    diverter->reject_type = uint32_list_append(diverter->reject_type, 254);
+
+    process *p = overture_load(diverter, "overture.json");
+    log_info("cmd -> %s", string_list_dump(p->cmd));
+    log_info("env -> %s", string_list_dump(p->env));
+    log_info("cwd -> %s", p->cwd);
 
 
 //    int debug_mode = 0;

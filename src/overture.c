@@ -52,15 +52,13 @@ process* overture_load(overture *info, const char *file) {
     free(config_file);
     free(config);
 
-    process *p = (process *)malloc(sizeof(process));
-    p->cmd = string_list_append(string_list_init(), OVERTURE_BIN);
-    p->cmd = string_list_append(string_list_append(p->cmd, "-c"), file);
+    process *proc = process_init("Overture", OVERTURE_BIN);
+    process_add_arg(proc, "-c");
+    process_add_arg(proc, file);
     if (info->debug) {
-        p->cmd = string_list_append(p->cmd, "-v"); // overture enable debug mode
+        process_add_arg(proc, "-v"); // overture enable debug mode
     }
-    p->env = string_list_init();
-    p->cwd = WORK_DIR;
-    return p;
+    return proc;
 }
 
 char* overture_config(overture *info) { // generate json configure from overture options
