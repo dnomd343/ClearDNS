@@ -21,7 +21,7 @@ void dnsproxy_add_bootstrap(dnsproxy *info, const char *server) { // add bootstr
     info->bootstrap = string_list_append(info->bootstrap, server);
 }
 
-dnsproxy* dnsproxy_init(int port) { // init dnsproxy options
+dnsproxy* dnsproxy_init(uint16_t port) { // init dnsproxy options
     dnsproxy *info = (dnsproxy*)malloc(sizeof(dnsproxy));
     info->port = port;
     info->cache = 0; // disable cache in default

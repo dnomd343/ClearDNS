@@ -2,20 +2,21 @@
 #define _DNSPROXY_H_
 
 #include "process.h"
+#include "common.h"
 
 typedef struct {
-    int port;
-    int cache;
-    int debug; // bool value
-    int verify; // bool value
-    int parallel; // bool value
-    int optimistic; // bool value
+    uint16_t port;
+    uint32_t cache;
+    uint8_t debug; // bool value
+    uint8_t verify; // bool value
+    uint8_t parallel; // bool value
+    uint8_t optimistic; // bool value
     char **bootstrap;
     char **fallback;
     char **primary;
 } dnsproxy;
 
-dnsproxy* dnsproxy_init(int port);
+dnsproxy* dnsproxy_init(uint16_t port);
 void dnsproxy_add_primary(dnsproxy *info, const char *server);
 void dnsproxy_add_fallback(dnsproxy *info, const char *server);
 void dnsproxy_add_bootstrap(dnsproxy *info, const char *server);

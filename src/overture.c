@@ -10,7 +10,7 @@
 void overture_dump(overture *info);
 char* overture_gen_config(overture *info);
 
-overture* overture_init(int port) { // init overture options
+overture* overture_init(uint16_t port) { // init overture options
     overture *info = (overture*)malloc(sizeof(overture));
     info->port = port;
     info->debug = FALSE;
@@ -19,7 +19,7 @@ overture* overture_init(int port) { // init overture options
     info->host_file = NULL;
     info->foreign_port = FOREIGN_PORT;
     info->domestic_port = DOMESTIC_PORT;
-    info->reject_type = int_list_init();
+    info->reject_type = uint32_list_init();
     info->foreign_ip_file = "/dev/null";
     info->domestic_ip_file = "/dev/null";
     info->foreign_domain_file = "/dev/null";
@@ -28,7 +28,7 @@ overture* overture_init(int port) { // init overture options
 }
 
 void overture_dump(overture *info) { // show overture info in debug log
-    char *reject_type = int_list_dump(info->reject_type);
+    char *reject_type = uint32_list_dump(info->reject_type);
     log_debug("Overture port -> %d", info->port);
     log_debug("Overture debug -> %s", show_bool(info->debug));
     log_debug("Overture timeout -> %d", info->timeout);
@@ -120,9 +120,9 @@ char* overture_gen_config(overture *info) { // generate json configure from over
         cJSON_AddStringToObject(config, "domainTTLFile", info->ttl_file);
     }
 
-    if (int_list_len(info->reject_type)) {
+    if (uint32_list_len(info->reject_type)) {
         cJSON *reject_type = cJSON_CreateArray();
-        for (int **rr_num = info->reject_type; *rr_num != NULL; ++rr_num) {
+        for (uint32_t **rr_num = info->reject_type; *rr_num != NULL; ++rr_num) {
             cJSON_AddItemToArray(reject_type, cJSON_CreateNumber(**rr_num));
         }
         cJSON_AddItemToObject(config, "rejectQType", reject_type);
