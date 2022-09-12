@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
-#include "load.h"
+#include "loader.h"
 #include "cJSON.h"
 #include "common.h"
 #include "logger.h"
@@ -41,7 +41,7 @@ char** json_string_list_value(char *key, cJSON *json, char **string_list) {
             string_list = string_list_append(string_list, json->valuestring);
             json = json->next; // next field
         }
-    } else {
+    } else if (!cJSON_IsNull(json)) {
         log_fatal("`%s` must be array or string", key);
     }
     return string_list;
@@ -59,7 +59,7 @@ uint32_t** json_uint32_list_value(char *key, cJSON *json, uint32_t **uint32_list
             uint32_list = uint32_list_append(uint32_list, json->valueint);
             json = json->next; // next field
         }
-    } else {
+    } else if (!cJSON_IsNull(json)) {
         log_fatal("`%s` must be array or number", key);
     }
     return uint32_list;
@@ -73,6 +73,10 @@ uint8_t json_bool_value(char *key, cJSON *json) { // json bool value -> bool
 }
 
 void json_cache_parser(cache_config *config, cJSON *json) { // cache options parser
+    if (!cJSON_IsObject(json)) {
+        log_fatal("`cache` must be object");
+    }
+    json = json->child;
     while (json != NULL) {
         if (!strcmp(json->string, "size")) {
             config->size = json_int_value("cache.size", json);
@@ -87,7 +91,52 @@ void json_cache_parser(cache_config *config, cJSON *json) { // cache options par
     }
 }
 
+void json_upstream_parser(char *caption, upstream_config *config, cJSON *json) {
+    if (!cJSON_IsObject(json)) {
+        log_fatal("`%s` must be object", caption);
+    }
+    char *key_name;
+    json = json->child;
+    while (json != NULL) {
+        if (!strcmp(json->string, "port")) {
+            key_name = string_join(caption, ".port");
+            config->port = json_int_value(key_name, json);
+            free(key_name);
+        }
+        if (!strcmp(json->string, "verify")) {
+            key_name = string_join(caption, ".verify");
+            config->verify = json_bool_value(key_name, json);
+            free(key_name);
+        }
+        if (!strcmp(json->string, "parallel")) {
+            key_name = string_join(caption, ".parallel");
+            config->parallel = json_bool_value(key_name, json);
+            free(key_name);
+        }
+        if (!strcmp(json->string, "bootstrap")) {
+            key_name = string_join(caption, ".bootstrap");
+            config->bootstrap = json_string_list_value(key_name, json, config->bootstrap);
+            free(key_name);
+        }
+        if (!strcmp(json->string, "fallback")) {
+            key_name = string_join(caption, ".fallback");
+            config->fallback = json_string_list_value(key_name, json, config->fallback);
+            free(key_name);
+        }
+        if (!strcmp(json->string, "primary")) {
+            key_name = string_join(caption, ".primary");
+            config->primary = json_string_list_value(key_name, json, config->primary);
+            free(key_name);
+        }
+        json = json->next; // next field
+    }
+}
+
 void json_diverter_parser(diverter_config *config, cJSON *json) { // diverter options parser
+    if (!cJSON_IsObject(json)) {
+        log_fatal("`diverter` must be object");
+    }
+    json = json->child;
     while (json != NULL) {
         if (!strcmp(json->string, "port")) {
             config->port = json_int_value("diverter.port", json);
@@ -106,6 +155,10 @@ void json_diverter_parser(diverter_config *config, cJSON *json) { // diverter op
 }
 
 void json_adguard_parser(adguard_config *config, cJSON *json) { // adguard options parser
+    if (!cJSON_IsObject(json)) {
+        log_fatal("`adguard` must be array");
+    }
+    json = json->child;
     while (json != NULL) {
         if (!strcmp(json->string, "port")) {
             config->port = json_int_value("adguard.port", json);
@@ -135,17 +188,19 @@ void json_config_parser(cleardns_config *config, const char *config_file) { // J
             config->port = json_int_value("port", json);
         }
         if (!strcmp(json->string, "cache")) {
-            json_cache_parser(&config->cache, json->child);
+            json_cache_parser(&config->cache, json);
         }
-
-        // domestic
-        // foreign
-
+        if (!strcmp(json->string, "domestic")) {
+            json_upstream_parser("domestic", &config->domestic, json);
+        }
+        if (!strcmp(json->string, "foreign")) {
+            json_upstream_parser("foreign", &config->foreign, json);
+        }
         if (!strcmp(json->string, "diverter")) {
-            json_diverter_parser(&config->diverter, json->child);
+            json_diverter_parser(&config->diverter, json);
         }
         if (!strcmp(json->string, "adguard")) {
-            json_adguard_parser(&config->adguard, json->child);
+            json_adguard_parser(&config->adguard, json);
         }
         if (!strcmp(json->string, "reject")) {
             config->reject = json_uint32_list_value("reject", json, config->reject);

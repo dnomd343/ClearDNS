@@ -1,4 +1,4 @@
-#include "load.h"
+#include "loader.h"
 #include "common.h"
 #include "logger.h"
 #include "structure.h"
@@ -82,4 +82,9 @@ void load_config(const char *config_file) {
 
     log_info("Configure load success");
     config_dump(config);
+
+    // TODO: load into process
+
+    // TODO: free config struct
+
 }

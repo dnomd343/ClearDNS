@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "load.h"
+#include "loader.h"
 #include "logger.h"
 #include "common.h"
 #include "dnsproxy.h"
