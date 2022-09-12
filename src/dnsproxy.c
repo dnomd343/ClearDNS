@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "dnsproxy.h"
-#include "str.h"
+#include "structure.h"
 #include "process.h"
 #include "logger.h"
 #include "common.h"

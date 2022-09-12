@@ -5,7 +5,7 @@
 #include "common.h"
 #include "logger.h"
 #include "cJSON.h"
-#include "str.h"
+#include "structure.h"
 
 void overture_dump(overture *info);
 char* overture_gen_config(overture *info);

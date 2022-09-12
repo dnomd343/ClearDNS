@@ -3,7 +3,7 @@
 #include "common.h"
 #include "dnsproxy.h"
 #include "overture.h"
-#include "str.h"
+#include "structure.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -35,8 +35,23 @@ int main(int argc, char *argv[]) { // ClearDNS server
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-    FILE *fp = fopen("/dev/null/123", "r");
-    log_perror("Test prefix");
+    int **temp = int_list_init();
+    temp = int_list_append(temp, 1232);
+    temp = int_list_append(temp, 2342);
+    temp = int_list_append(temp, 3435);
+    temp = int_list_append(temp, 456);
+    temp = int_list_append(temp, 567);
+
+    char *str = int_list_dump(temp);
+    log_info("`%s`", str);
+
+//    char **temp = string_list_init();
+//    temp = string_list_append(temp, "1");
+//    temp = string_list_append(temp, "");
+//    temp = string_list_append(temp, "3");
+
+//    char *str = string_list_dump(temp);
+//    log_info("`%s`", str);
 
     return 0;
 
