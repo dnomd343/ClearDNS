@@ -3,15 +3,6 @@
 #include <string.h>
 #include "structure.h"
 
-char* string_init(const char *str) { // new string
-    return strcpy((char *)malloc(strlen(str) + 1), str);
-}
-
-char* string_join(const char *base, const char *add) { // combine string
-    char *ret = (char *)malloc(strlen(base) + strlen(add) + 1);
-    return strcat(strcpy(ret, base), add);
-}
-
 uint32_t* uint32_init(uint32_t number) { // new uint32 (by malloc)
     uint32_t *data = (uint32_t *)malloc(sizeof(uint32_t));
     *data = number;

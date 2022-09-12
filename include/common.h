@@ -41,4 +41,7 @@ void save_file(const char *file, const char *content);
 void string_list_debug(char *describe, char **string_list);
 void uint32_list_debug(char *describe, uint32_t **uint32_list);
 
+char* string_init(const char *str);
+char* string_join(const char *base, const char *add);
+
 #endif

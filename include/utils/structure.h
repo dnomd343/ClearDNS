@@ -3,9 +3,6 @@
 
 #include "common.h"
 
-char* string_init(const char *str);
-char* string_join(const char *base, const char *add);
-
 uint32_t** uint32_list_init();
 char* uint32_list_dump(uint32_t **int_list);
 void uint32_list_free(uint32_t **uint32_list);

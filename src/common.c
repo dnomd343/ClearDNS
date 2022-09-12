@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 #include "logger.h"
 #include "structure.h"
@@ -10,6 +11,15 @@ char* show_bool(uint8_t value) { // return `true` or `false`
     } else {
         return "false";
     }
+}
+
+char* string_init(const char *str) { // new string
+    return strcpy((char *)malloc(strlen(str) + 1), str);
+}
+
+char* string_join(const char *base, const char *add) { // combine string
+    char *ret = (char *)malloc(strlen(base) + strlen(add) + 1);
+    return strcat(strcpy(ret, base), add);
 }
 
 void string_list_debug(char *describe, char **string_list) {
