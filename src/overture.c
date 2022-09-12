@@ -13,9 +13,13 @@ char* overture_gen_config(overture *info);
 overture* overture_init(int port) { // init overture options
     overture *info = (overture*)malloc(sizeof(overture));
     info->port = port;
+    info->debug = FALSE;
     info->timeout = 6; // default timeout -> 6s
+    info->ttl_file = NULL;
+    info->host_file = NULL;
     info->foreign_port = FOREIGN_PORT;
     info->domestic_port = DOMESTIC_PORT;
+    info->reject_type = int_list_init();
     info->foreign_ip_file = "/dev/null";
     info->domestic_ip_file = "/dev/null";
     info->foreign_domain_file = "/dev/null";
@@ -24,14 +28,20 @@ overture* overture_init(int port) { // init overture options
 }
 
 void overture_dump(overture *info) { // show overture info in debug log
+    char *reject_type = int_list_dump(info->reject_type);
     log_debug("Overture port -> %d", info->port);
+    log_debug("Overture debug -> %s", show_bool(info->debug));
     log_debug("Overture timeout -> %d", info->timeout);
+    log_debug("Overture ttl file -> %s", info->ttl_file);
+    log_debug("Overture host file -> %s", info->host_file);
     log_debug("Overture foreign port -> %d", info->foreign_port);
     log_debug("Overture domestic port -> %d", info->domestic_port);
+    log_debug("Overture reject type -> %s", reject_type);
     log_debug("Overture foreign ip file -> %s", info->foreign_ip_file);
     log_debug("Overture domestic ip file -> %s", info->domestic_ip_file);
     log_debug("Overture foreign domain file -> %s", info->foreign_domain_file);
     log_debug("Overture domestic domain file -> %s", info->domestic_domain_file);
+    free(reject_type);
 }
 
 process* overture_load(overture *info, const char *file) {
@@ -46,6 +56,9 @@ process* overture_load(overture *info, const char *file) {
     p->cmd = string_list_append(string_list_init(), OVERTURE_BIN);
     p->cmd = string_list_append(p->cmd, "-c");
     p->cmd = string_list_append(p->cmd, file);
+    if (info->debug) {
+        p->cmd = string_list_append(p->cmd, "-v"); // overture enable debug mode
+    }
     p->env = string_list_init();
     p->cwd = WORK_DIR;
     return p;
@@ -97,8 +110,23 @@ char* overture_gen_config(overture *info) { // generate json configure from over
     cJSON_AddItemToObject(config, "domainFile", domain_file);
 
     cJSON *host_file = cJSON_CreateObject();
+    if (info->host_file != NULL) {
+        cJSON_AddStringToObject(host_file, "hostsFile", info->host_file);
+    }
     cJSON_AddStringToObject(host_file, "finder", "full-map");
     cJSON_AddItemToObject(config, "hostsFile", host_file);
+
+    if (info->ttl_file != NULL) {
+        cJSON_AddStringToObject(config, "domainTTLFile", info->ttl_file);
+    }
+
+    if (int_list_len(info->reject_type)) {
+        cJSON *reject_type = cJSON_CreateArray();
+        for (int **rr_num = info->reject_type; *rr_num != NULL; ++rr_num) {
+            cJSON_AddItemToArray(reject_type, cJSON_CreateNumber(**rr_num));
+        }
+        cJSON_AddItemToObject(config, "rejectQType", reject_type);
+    }
 
     char *config_str = cJSON_Print(config);
     cJSON_Delete(config); // free json object

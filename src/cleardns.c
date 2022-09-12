@@ -35,60 +35,47 @@ int main(int argc, char *argv[]) { // ClearDNS server
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-//    int **temp = int_list_init();
-//    temp = int_list_append(temp, 1232);
-//    temp = int_list_append(temp, 2342);
-//    temp = int_list_append(temp, 3435);
-//    temp = int_list_append(temp, 456);
-//    temp = int_list_append(temp, 567);
+
+//    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
 //
-//    char *str = int_list_dump(temp);
-//    log_info("`%s`", str);
+//    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
+//    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
+//
+//    dnsproxy_add_primary(domestic, "223.5.5.5");
+//    dnsproxy_add_primary(domestic, "tls://dns.pub");
+//
+//    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
+//    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
 
-//    char **temp = string_list_init();
-//    temp = string_list_append(temp, "1");
-//    temp = string_list_append(temp, "");
-//    temp = string_list_append(temp, "3");
-
-//    char *str = string_list_dump(temp);
-//    log_info("`%s`", str);
-
-//    return 0;
-
-    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
-
-    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
-    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
-
-    dnsproxy_add_primary(domestic, "223.5.5.5");
-    dnsproxy_add_primary(domestic, "tls://dns.pub");
-
-    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
-    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
-
-    domestic->verify = FALSE;
-    domestic->parallel = FALSE;
-    domestic->optimistic = TRUE;
+//    domestic->verify = FALSE;
+//    domestic->parallel = FALSE;
+//    domestic->optimistic = TRUE;
 //    domestic->debug = TRUE;
-    domestic->cache = 0;
+//    domestic->cache = 0;
 
-    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
+//    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
+//    log_info("cmd -> %s", string_list_dump(p->cmd));
+//    log_info("env -> %s", string_list_dump(p->env));
+//    log_info("cwd -> %s", p->cwd);
+
+
+    overture *diverter = overture_init(DIVERTER_PORT);
+
+    diverter->timeout = 8;
+    diverter->domestic_ip_file = "china-ip.txt";
+    diverter->domestic_domain_file = "chinalist.txt";
+    diverter->foreign_domain_file = "gfwlist.txt";
+
+    diverter->debug = TRUE;
+    diverter->ttl_file = "domain_ttl.txt";
+    diverter->host_file = "hosts.txt";
+    diverter->reject_type = int_list_append(diverter->reject_type, 255);
+
+    process *p = overture_load(diverter, "overture.json");
     log_info("cmd -> %s", string_list_dump(p->cmd));
     log_info("env -> %s", string_list_dump(p->env));
     log_info("cwd -> %s", p->cwd);
 
-
-//    overture *diverter = overture_init(DIVERTER_PORT);
-//
-//    diverter->timeout = 8;
-//    diverter->domestic_ip_file = "china-ip.txt";
-//    diverter->domestic_domain_file = "chinalist.txt";
-//    diverter->foreign_domain_file = "gfwlist.txt";
-//
-//    process *p = overture_load(diverter, "overture.json");
-//    log_info("cmd -> %s", string_list_dump(p->cmd));
-//    log_info("env -> %s", string_list_dump(p->env));
-//    log_info("cwd -> %s", p->cwd);
 
 //    int debug_mode = 0;
 //    fprintf(stderr, "[ClearDNS] Server start.\n");

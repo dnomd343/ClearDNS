@@ -70,7 +70,7 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
     p->cmd = string_list_append(string_list_init(), DNSPROXY_BIN);
     p->cmd = string_list_append(p->cmd, option);
     if (info->debug) {
-        p->cmd = string_list_append(p->cmd, "--verbose"); // dnsproxy into debug mode
+        p->cmd = string_list_append(p->cmd, "--verbose"); // dnsproxy enable debug mode
     }
     p->env = string_list_init();
     p->cwd = WORK_DIR;
