@@ -36,15 +36,25 @@ int main(int argc, char *argv[]) { // ClearDNS server
     log_info("ClearDNS server start (%s)", VERSION);
 
 
-    char **temp = string_list_init();
+//    char **temp = string_list_init();
 //    temp = string_list_append(temp, "123");
 //    temp = string_list_append(temp, "abc");
 //    temp = string_list_append(temp, "ok");
+//
+//    char *str = string_list_dump(temp);
+//    log_info("`%s`", str);
+//    free(str);
+//    string_list_free(temp);
 
-    char *str = string_list_dump(temp);
-    log_info("`%s`", str);
+    uint32_t **temp = uint32_list_init();
+    temp = uint32_list_append(temp, 123);
+    temp = uint32_list_append(temp, 456);
+    temp = uint32_list_append(temp, 789);
+
+    char *str = uint32_list_dump(temp);
+    log_info("`%s`\n", str);
     free(str);
-
+    uint32_list_free(temp);
 
 //    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
 //
