@@ -8,7 +8,7 @@
 #include "structure.h"
 
 void overture_dump(overture *info);
-char* overture_gen_config(overture *info);
+char* overture_config(overture *info);
 
 overture* overture_init(uint16_t port) { // init overture options
     overture *info = (overture*)malloc(sizeof(overture));
@@ -29,13 +29,13 @@ overture* overture_init(uint16_t port) { // init overture options
 
 void overture_dump(overture *info) { // show overture info in debug log
     char *reject_type = uint32_list_dump(info->reject_type);
-    log_debug("Overture port -> %d", info->port);
+    log_debug("Overture port -> %u", info->port);
     log_debug("Overture debug -> %s", show_bool(info->debug));
-    log_debug("Overture timeout -> %d", info->timeout);
+    log_debug("Overture timeout -> %u", info->timeout);
     log_debug("Overture ttl file -> %s", info->ttl_file);
     log_debug("Overture host file -> %s", info->host_file);
-    log_debug("Overture foreign port -> %d", info->foreign_port);
-    log_debug("Overture domestic port -> %d", info->domestic_port);
+    log_debug("Overture foreign port -> %u", info->foreign_port);
+    log_debug("Overture domestic port -> %u", info->domestic_port);
     log_debug("Overture reject type -> %s", reject_type);
     log_debug("Overture foreign ip file -> %s", info->foreign_ip_file);
     log_debug("Overture domestic ip file -> %s", info->domestic_ip_file);
@@ -46,16 +46,15 @@ void overture_dump(overture *info) { // show overture info in debug log
 
 process* overture_load(overture *info, const char *file) {
     overture_dump(info);
-    char *config = overture_gen_config(info); // string config (JSON format)
+    char *config = overture_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config);
     free(config_file);
     free(config);
 
-    process *p = (process*)malloc(sizeof(process));
+    process *p = (process *)malloc(sizeof(process));
     p->cmd = string_list_append(string_list_init(), OVERTURE_BIN);
-    p->cmd = string_list_append(p->cmd, "-c");
-    p->cmd = string_list_append(p->cmd, file);
+    p->cmd = string_list_append(string_list_append(p->cmd, "-c"), file);
     if (info->debug) {
         p->cmd = string_list_append(p->cmd, "-v"); // overture enable debug mode
     }
@@ -64,14 +63,14 @@ process* overture_load(overture *info, const char *file) {
     return p;
 }
 
-char* overture_gen_config(overture *info) { // generate json configure from overture options
+char* overture_config(overture *info) { // generate json configure from overture options
     cJSON *config = cJSON_CreateObject();
     char port_str[12]; // 32-bits (MAX_LEN -> -2147483648 -> 12-bytes)
-    sprintf(port_str, "%d", info->port);
+    sprintf(port_str, "%u", info->port);
     char *bind_addr = string_join(":", port_str);
-    sprintf(port_str, "%d", info->foreign_port);
+    sprintf(port_str, "%u", info->foreign_port);
     char *foreign_addr = string_join("127.0.0.1:", port_str);
-    sprintf(port_str, "%d", info->domestic_port);
+    sprintf(port_str, "%u", info->domestic_port);
     char *domestic_port = string_join("127.0.0.1:", port_str);
 
     cJSON_AddStringToObject(config, "bindAddress", bind_addr);

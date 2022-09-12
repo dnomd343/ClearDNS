@@ -6,7 +6,7 @@
 #include "common.h"
 #include "cJSON.h"
 
-char* dnsproxy_gen_config(dnsproxy *info);
+char* dnsproxy_config(dnsproxy *info);
 void dnsproxy_dump(const char *caption, dnsproxy *info);
 
 void dnsproxy_add_primary(dnsproxy *info, const char *server) { // add primary dns server
@@ -22,7 +22,7 @@ void dnsproxy_add_bootstrap(dnsproxy *info, const char *server) { // add bootstr
 }
 
 dnsproxy* dnsproxy_init(uint16_t port) { // init dnsproxy options
-    dnsproxy *info = (dnsproxy*)malloc(sizeof(dnsproxy));
+    dnsproxy *info = (dnsproxy *)malloc(sizeof(dnsproxy));
     info->port = port;
     info->cache = 0; // disable cache in default
     info->debug = FALSE;
@@ -37,8 +37,8 @@ dnsproxy* dnsproxy_init(uint16_t port) { // init dnsproxy options
 
 void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy info in debug log
     char *str_dump;
-    log_debug("%s port -> %d", caption, info->port);
-    log_debug("%s cache -> %d", caption, info->cache);
+    log_debug("%s port -> %u", caption, info->port);
+    log_debug("%s cache -> %u", caption, info->cache);
     log_debug("%s debug -> %s", caption, show_bool(info->debug));
     log_debug("%s verify -> %s", caption, show_bool(info->verify));
     log_debug("%s parallel -> %s", caption, show_bool(info->parallel));
@@ -49,24 +49,24 @@ void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy info 
     free(str_dump);
 
     str_dump = string_list_dump(info->fallback);
-    log_debug("%s fallback -> %s", caption, string_list_dump(info->fallback));
+    log_debug("%s fallback -> %s", caption, str_dump);
     free(str_dump);
 
     str_dump = string_list_dump(info->primary);
-    log_debug("%s primary -> %s", caption, string_list_dump(info->primary));
+    log_debug("%s primary -> %s", caption, str_dump);
     free(str_dump);
 }
 
 process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
     dnsproxy_dump(caption, info);
-    char *config = dnsproxy_gen_config(info); // string config (JSON format)
+    char *config = dnsproxy_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config);
     free(config_file);
     free(config);
 
     char *option = string_join("--config-path=", file);
-    process *p = (process*)malloc(sizeof(process));
+    process *p = (process *)malloc(sizeof(process));
     p->cmd = string_list_append(string_list_init(), DNSPROXY_BIN);
     p->cmd = string_list_append(p->cmd, option);
     if (info->debug) {
@@ -78,7 +78,7 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
     return p;
 }
 
-char* dnsproxy_gen_config(dnsproxy *info) { // generate json configure from dnsproxy options
+char* dnsproxy_config(dnsproxy *info) { // generate json configure from dnsproxy options
     cJSON *config = cJSON_CreateObject();
     if (!info->verify) {
         cJSON_AddTrueToObject(config, "insecure"); // insecure --(default)--> `false`
