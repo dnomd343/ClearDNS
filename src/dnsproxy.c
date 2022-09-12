@@ -24,25 +24,37 @@ void dnsproxy_add_bootstrap(dnsproxy *info, const char *server) { // add bootstr
 dnsproxy* dnsproxy_init(int port) { // init dnsproxy options
     dnsproxy *info = (dnsproxy*)malloc(sizeof(dnsproxy));
     info->port = port;
+    info->cache = 0; // disable cache in default
+    info->debug = FALSE;
     info->verify = TRUE;
     info->parallel = TRUE;
     info->optimistic = FALSE;
     info->bootstrap = string_list_init();
     info->fallback = string_list_init();
     info->primary = string_list_init();
-    info->cache = 4194304; // 4MiB
     return info;
 }
 
 void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy info in debug log
-    log_debug("%s listen port -> %d", caption, info->port);
+    char *str_dump;
+    log_debug("%s port -> %d", caption, info->port);
+    log_debug("%s cache -> %d", caption, info->cache);
+    log_debug("%s debug -> %s", caption, show_bool(info->debug));
     log_debug("%s verify -> %s", caption, show_bool(info->verify));
     log_debug("%s parallel -> %s", caption, show_bool(info->parallel));
     log_debug("%s optimistic -> %s", caption, show_bool(info->optimistic));
-    log_debug("%s bootstrap -> %s", caption, string_list_dump(info->bootstrap));
+
+    str_dump = string_list_dump(info->bootstrap);
+    log_debug("%s bootstrap -> %s", caption, str_dump);
+    free(str_dump);
+
+    str_dump = string_list_dump(info->fallback);
     log_debug("%s fallback -> %s", caption, string_list_dump(info->fallback));
+    free(str_dump);
+
+    str_dump = string_list_dump(info->primary);
     log_debug("%s primary -> %s", caption, string_list_dump(info->primary));
-    log_debug("%s cache -> %d", caption, info->cache);
+    free(str_dump);
 }
 
 process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
@@ -57,6 +69,9 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
     process *p = (process*)malloc(sizeof(process));
     p->cmd = string_list_append(string_list_init(), DNSPROXY_BIN);
     p->cmd = string_list_append(p->cmd, option);
+    if (info->debug) {
+        p->cmd = string_list_append(p->cmd, "--verbose"); // dnsproxy into debug mode
+    }
     p->env = string_list_init();
     p->cwd = WORK_DIR;
     free(option);

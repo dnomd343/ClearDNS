@@ -6,6 +6,7 @@
 typedef struct {
     int port;
     int cache;
+    int debug; // bool value
     int verify; // bool value
     int parallel; // bool value
     int optimistic; // bool value
