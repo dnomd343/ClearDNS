@@ -1,8 +1,8 @@
 #ifndef _DNSPROXY_H_
 #define _DNSPROXY_H_
 
-#include "process.h"
 #include "common.h"
+#include "process.h"
 
 typedef struct {
     uint16_t port;

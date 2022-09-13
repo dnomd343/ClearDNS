@@ -11,7 +11,7 @@ void overture_dump(overture *info);
 char* overture_config(overture *info);
 
 overture* overture_init(uint16_t port) { // init overture options
-    overture *info = (overture*)malloc(sizeof(overture));
+    overture *info = (overture *)malloc(sizeof(overture));
     info->port = port;
     info->debug = FALSE;
     info->timeout = 6; // default timeout -> 6s

@@ -1,8 +1,8 @@
 #ifndef _OVERTURE_H_
 #define _OVERTURE_H_
 
-#include "process.h"
 #include "common.h"
+#include "process.h"
 
 typedef struct {
     uint16_t port;
