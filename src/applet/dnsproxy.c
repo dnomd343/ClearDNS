@@ -1,10 +1,9 @@
 #include <stdlib.h>
+#include "cJSON.h"
+#include "common.h"
+#include "logger.h"
 #include "dnsproxy.h"
 #include "structure.h"
-#include "process.h"
-#include "logger.h"
-#include "common.h"
-#include "cJSON.h"
 
 char* dnsproxy_config(dnsproxy *info);
 void dnsproxy_dump(const char *caption, dnsproxy *info);
@@ -58,11 +57,14 @@ void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy info 
 }
 
 process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
-
-    // TODO: check primary server number (non-zero)
-    // TODO: check port (1 ~ 65535)
-
     dnsproxy_dump(caption, info);
+    if (!check_port(info->port)) { // invalid server port
+        log_fatal("Invalid port `%u`", info->port);
+    }
+    if (string_list_len(info->primary) == 0) { // without primary dns server
+        log_fatal("%s without primary dns server", caption);
+    }
+
     char *config = dnsproxy_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config);

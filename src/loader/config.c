@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "common.h"
 #include "config.h"
 #include "logger.h"

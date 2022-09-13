@@ -1,7 +1,7 @@
 #ifndef _DNSPROXY_H_
 #define _DNSPROXY_H_
 
-#include "common.h"
+#include <stdint.h>
 #include "process.h"
 
 typedef struct {

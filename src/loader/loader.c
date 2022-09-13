@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "loader.h"
 #include "config.h"
 #include "parser.h"

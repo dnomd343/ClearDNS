@@ -1,6 +1,7 @@
-#include "common.h"
+#include <stdlib.h>
 #include "process.h"
 #include "structure.h"
+#include "common.h"
 
 process* process_init(const char *caption, const char *bin) { // init process struct
     process *proc = (process *)malloc(sizeof(process));

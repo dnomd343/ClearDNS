@@ -1,7 +1,7 @@
 #ifndef _OVERTURE_H_
 #define _OVERTURE_H_
 
-#include "common.h"
+#include <stdint.h>
 #include "process.h"
 
 typedef struct {

@@ -34,6 +34,13 @@ void uint32_list_debug(char *describe, uint32_t **uint32_list) {
     free(string_ret);
 }
 
+uint8_t check_port(uint16_t port) {
+    if (port > 0 && port <= 65535) { // 1 ~ 65535
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void save_file(const char *file, const char *content) { // save into file
     log_debug("Write into `%s` -> \n%s", file, content);
     FILE* fp = fopen(file , "w");

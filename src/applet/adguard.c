@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include "common.h"
 #include "adguard.h"
 
 adguard* adguard_init() {

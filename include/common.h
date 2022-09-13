@@ -1,12 +1,14 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
-#include <stdlib.h>
+//#include <stdlib.h>
+//
+//typedef u_int8_t uint8_t;
+//typedef u_int16_t uint16_t;
+//typedef u_int32_t uint32_t;
+//typedef u_int64_t uint64_t;
 
-typedef u_int8_t uint8_t;
-typedef u_int16_t uint16_t;
-typedef u_int32_t uint32_t;
-typedef u_int64_t uint64_t;
+#include <stdint.h>
 
 #define VERSION "1.3.0-dev"
 
@@ -40,6 +42,8 @@ char* read_file(const char *file);
 void save_file(const char *file, const char *content);
 void string_list_debug(char *describe, char **string_list);
 void uint32_list_debug(char *describe, uint32_t **uint32_list);
+
+uint8_t check_port(uint16_t port);
 
 char* string_init(const char *str);
 char* string_join(const char *base, const char *add);

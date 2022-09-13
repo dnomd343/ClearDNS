@@ -1,7 +1,7 @@
-#ifndef _STR_H_
-#define _STR_H_
+#ifndef _STRUCTURE_H_
+#define _STRUCTURE_H_
 
-#include "common.h"
+#include <stdint.h>
 
 uint32_t** uint32_list_init();
 char* uint32_list_dump(uint32_t **int_list);

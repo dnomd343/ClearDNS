@@ -1,8 +1,7 @@
 #ifndef _ADGUARD_H_
 #define _ADGUARD_H_
 
-#include "common.h"
-#include "process.h"
+#include <stdint.h>
 
 typedef struct {
     uint8_t debug; // bool value

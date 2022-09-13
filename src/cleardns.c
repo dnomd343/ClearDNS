@@ -36,10 +36,10 @@ int main(int argc, char *argv[]) { // ClearDNS server
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-    load_config("test.json");
-
-    dnsproxy_load("Domestic", loader.domestic, "domestic.json");
-    dnsproxy_load("Foreign", loader.foreign, "foreign.json");
+//    load_config("test.json");
+//
+//    dnsproxy_load("Domestic", loader.domestic, "domestic.json");
+//    dnsproxy_load("Foreign", loader.foreign, "foreign.json");
 
 //    char **temp = string_list_init();
 //    temp = string_list_append(temp, "123");
@@ -62,27 +62,27 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    uint32_list_free(temp);
 
 
-//    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
-//
-//    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
-//    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
-//
-//    dnsproxy_add_primary(domestic, "223.5.5.5");
-//    dnsproxy_add_primary(domestic, "tls://dns.pub");
-//
-//    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
-//    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
-//
-//    domestic->verify = FALSE;
-//    domestic->parallel = FALSE;
-//    domestic->optimistic = TRUE;
-//    domestic->debug = TRUE;
-//    domestic->cache = 4194304; // 4MiB
-//
-//    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
-//    log_info("cmd -> %s", string_list_dump(p->cmd));
-//    log_info("env -> %s", string_list_dump(p->env));
-//    log_info("cwd -> %s", p->cwd);
+    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
+
+    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
+    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
+
+    dnsproxy_add_primary(domestic, "223.5.5.5");
+    dnsproxy_add_primary(domestic, "tls://dns.pub");
+
+    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
+    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
+
+    domestic->verify = FALSE;
+    domestic->parallel = FALSE;
+    domestic->optimistic = TRUE;
+    domestic->debug = TRUE;
+    domestic->cache = 4194304; // 4MiB
+
+    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
+    log_info("cmd -> %s", string_list_dump(p->cmd));
+    log_info("env -> %s", string_list_dump(p->env));
+    log_info("cwd -> %s", p->cwd);
 
 
 //    overture *diverter = overture_init(DIVERTER_PORT);
