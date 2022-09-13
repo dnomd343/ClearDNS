@@ -3,7 +3,7 @@
 #include "logger.h"
 #include "structure.h"
 
-cleardns_config* config_init() {
+cleardns_config* config_init() { // init config struct of cleardns
     cleardns_config *config = (cleardns_config *)malloc(sizeof(cleardns_config));
     config->port = DNS_PORT;
     config->cache.size = 0;
@@ -31,8 +31,8 @@ cleardns_config* config_init() {
 
     config->adguard.port = ADGUARD_PORT;
     config->adguard.enable = TRUE;
-    config->adguard.username = ADGUARD_USER;
-    config->adguard.password = ADGUARD_PASSWD;
+    config->adguard.username = string_init(ADGUARD_USER);
+    config->adguard.password = string_init(ADGUARD_PASSWD);
 
     config->reject = uint32_list_init();
     config->hosts = string_list_init();
@@ -40,7 +40,7 @@ cleardns_config* config_init() {
     return config;
 }
 
-void config_dump(cleardns_config *config) {
+void config_dump(cleardns_config *config) { // dump config info of cleardns
     log_debug("DNS port -> %u", config->port);
     log_debug("Cache size -> %u", config->cache.size);
     log_debug("Cache enable -> %s", show_bool(config->cache.enable));
@@ -75,6 +75,27 @@ void config_dump(cleardns_config *config) {
     string_list_debug("Hosts", config->hosts);
 }
 
+void config_free(cleardns_config *config) { // free config struct of cleardns
+    string_list_free(config->domestic.bootstrap);
+    string_list_free(config->domestic.fallback);
+    string_list_free(config->domestic.primary);
+
+    string_list_free(config->foreign.bootstrap);
+    string_list_free(config->foreign.fallback);
+    string_list_free(config->foreign.primary);
+
+    string_list_free(config->diverter.gfwlist);
+    string_list_free(config->diverter.china_ip);
+    string_list_free(config->diverter.chinalist);
+
+    uint32_list_free(config->reject);
+    string_list_free(config->hosts);
+    string_list_free(config->ttl);
+    free(config->adguard.username);
+    free(config->adguard.password);
+    free(config);
+}
+
 void load_config(const char *config_file) {
     cleardns_config *config = config_init();
 
@@ -85,6 +106,5 @@ void load_config(const char *config_file) {
 
     // TODO: load into process
 
-    // TODO: free config struct
-
+    config_free(config);
 }
