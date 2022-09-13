@@ -1,6 +1,9 @@
 #include <stdlib.h>
+#include <string.h>
+#include "cJSON.h"
 #include "common.h"
 #include "logger.h"
+#include "toJSON.h"
 #include "adguard.h"
 
 adguard* adguard_init() {
@@ -25,6 +28,53 @@ void adguard_dump(adguard *info) { // show adguard info in debug log
     log_debug("AdGuardHome password -> %s", info->password);
 }
 
+void json_field_replace(cJSON *entry, const char *field, cJSON *content) {
+    if (!cJSON_ReplaceItemInObject(entry, field, content)) { // field not exist
+        cJSON_AddItemToObject(entry, field, content); // add new field
+    }
+}
+
+cJSON* json_field_get(cJSON *entry, const char *field) {
+    cJSON *sub = entry->child;
+    while (sub != NULL) {
+        if (!strcmp(sub->string, field)) {
+            return sub;
+        }
+        sub = sub->next; // next field
+    }
+    cJSON *new = cJSON_CreateObject();
+    cJSON_AddItemToObject(entry, field, new);
+    return new;
+}
+
+char *adguard_config(adguard *info, const char *raw_config) {
+    cJSON *json = cJSON_Parse(raw_config);
+    if (json == NULL) {
+        log_fatal("AdGuardHome configure error");
+    }
+
+    // TODO: password use bcencrypt
+    cJSON *user_config = cJSON_CreateObject();
+    cJSON *users_config = cJSON_CreateArray();
+    cJSON_AddItemToObject(user_config, "name", cJSON_CreateString(info->username));
+    cJSON_AddItemToObject(user_config, "password", cJSON_CreateString(info->password));
+    cJSON_AddItemToArray(users_config, user_config);
+    json_field_replace(json, "users", users_config);
+
+    cJSON *dns = json_field_get(json, "dns");
+    cJSON *upstream = cJSON_CreateArray();
+    cJSON_AddItemToArray(upstream, cJSON_CreateString(info->upstream));
+    json_field_replace(dns, "port", cJSON_CreateNumber(info->dns_port));
+    json_field_replace(dns, "bind_host", cJSON_CreateString("0.0.0.0"));
+    json_field_replace(dns, "upstream_dns", upstream);
+    json_field_replace(dns, "upstream_dns_file", cJSON_CreateString(""));
+    json_field_replace(dns, "bootstrap_dns", cJSON_CreateArray());
+
+    char *config = cJSON_Print(json);
+    cJSON_free(json);
+    return config;
+}
+
 process* adguard_load(adguard *info, const char *dir) {
     adguard_dump(info);
     if (!check_port(info->dns_port)) { // invalid dns port
@@ -34,11 +84,22 @@ process* adguard_load(adguard *info, const char *dir) {
         log_fatal("Invalid web port `%u`", info->web_port);
     }
 
-    // TODO: modify configure file
-    // inject -> dns_port / upstream / username / password
+    char *adguard_config_ret;
+    char *adguard_config_file = string_join(dir, "AdGuardHome.yaml");
+    char *adguard_config_raw = to_json(adguard_config_file);
+    if (adguard_config_raw == NULL) { // configure not exist
+        log_info("Create AdGuardHome configure");
+        adguard_config_ret = adguard_config(info, "{}"); // begin with empty json
+    } else {
+        adguard_config_ret = adguard_config(info, adguard_config_raw);
+        free(adguard_config_raw);
+    }
+    save_file(adguard_config_file, adguard_config_ret); // save modified configure
+    free(adguard_config_file);
 
     process *proc = process_init("AdGuardHome", ADGUARD_BIN);
     char *port_str = uint32_to_string(info->web_port);
+    process_add_arg(proc, "--no-check-update");
     process_add_arg(proc, "--work-dir");
     process_add_arg(proc, dir);
     process_add_arg(proc, "--port");

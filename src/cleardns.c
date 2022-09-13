@@ -8,6 +8,7 @@
 #include "overture.h"
 #include "structure.h"
 #include "toJSON.h"
+#include "adguard.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -39,10 +40,6 @@ int main(int argc, char *argv[]) { // ClearDNS server
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-    char *str = to_json("AdGuardHome.yaml");
-    log_info("%s", str);
-    return 0;
-
 
 //    load_config("test.json");
 //
@@ -70,27 +67,27 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    uint32_list_free(temp);
 
 
-    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
-
-    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
-    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
-
-    dnsproxy_add_primary(domestic, "223.5.5.5");
-    dnsproxy_add_primary(domestic, "tls://dns.pub");
-
-    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
-    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
-
-    domestic->verify = FALSE;
-    domestic->parallel = FALSE;
-    domestic->optimistic = TRUE;
-    domestic->debug = TRUE;
-    domestic->cache = 4194304; // 4MiB
-
-    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
-    log_info("cmd -> %s", string_list_dump(p->cmd));
-    log_info("env -> %s", string_list_dump(p->env));
-    log_info("cwd -> %s", p->cwd);
+//    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
+//
+//    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
+//    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
+//
+//    dnsproxy_add_primary(domestic, "223.5.5.5");
+//    dnsproxy_add_primary(domestic, "tls://dns.pub");
+//
+//    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
+//    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
+//
+//    domestic->verify = FALSE;
+//    domestic->parallel = FALSE;
+//    domestic->optimistic = TRUE;
+//    domestic->debug = TRUE;
+//    domestic->cache = 4194304; // 4MiB
+//
+//    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
+//    log_info("cmd -> %s", string_list_dump(p->cmd));
+//    log_info("env -> %s", string_list_dump(p->env));
+//    log_info("cwd -> %s", p->cwd);
 
 
 //    overture *diverter = overture_init(DIVERTER_PORT);
@@ -110,6 +107,22 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    log_info("cmd -> %s", string_list_dump(p->cmd));
 //    log_info("env -> %s", string_list_dump(p->env));
 //    log_info("cwd -> %s", p->cwd);
+
+
+    adguard *filter = adguard_init();
+
+    filter->debug = TRUE;
+    filter->dns_port = 54;
+    filter->web_port = 8080;
+    filter->upstream = "127.0.0.1:5454";
+
+    filter->username = "dnomd343";
+    filter->password = "password";
+
+    process *p = adguard_load(filter, "/cleardns/adguard/");
+    log_info("cmd -> %s", string_list_dump(p->cmd));
+    log_info("env -> %s", string_list_dump(p->env));
+    log_info("cwd -> %s", p->cwd);
 
 
 //    int debug_mode = 0;
