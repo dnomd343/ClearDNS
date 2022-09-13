@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <sys/time.h>
 #include "common.h"
 #include "logger.h"
 #include "structure.h"
@@ -45,6 +47,17 @@ char* uint32_to_string(uint32_t number) {
     char to_str[11]; // 32-bits (MAX_LEN -> 4294967296 -> 10-bytes)
     sprintf(to_str, "%u", number);
     return string_init(to_str);
+}
+
+uint16_t gen_rand_num(uint16_t limit) { // 0 ~ (limit - 1)
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    srand(tv.tv_usec);
+    return rand() % limit; // NOLINT
+}
+
+int run_command(const char *command) {
+    return system(command) / 256;
 }
 
 void save_file(const char *file, const char *content) { // save into file

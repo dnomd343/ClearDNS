@@ -1,10 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "loader.h"
 #include "logger.h"
 #include "common.h"
 #include "dnsproxy.h"
 #include "overture.h"
 #include "structure.h"
+#include "toJSON.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -35,6 +38,11 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
+
+    char *str = to_json("AdGuardHome.yaml");
+    log_info("%s", str);
+    return 0;
+
 
 //    load_config("test.json");
 //
