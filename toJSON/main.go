@@ -5,55 +5,36 @@ import (
     "fmt"
     "github.com/BurntSushi/toml"
     "gopkg.in/yaml.v3"
+    "os"
 )
 
-var jsonTest = `
-{
-    "field1": "test",
-    "field2": {
-        "field3": "value",
-        "field4": [
-            42,
-            1024
-        ]
-    }
-}
-`
-
-var yamlTest = `
-field1: test
-field2:
-  field3: value
-  field4: [42, 1024]
-`
-
-var tomlTest = `
-field1 = "test"
-
-[field2]
-field3 = "value"
-field4 = [ 42, 1_024 ]
-`
-
-func parser(raw string) (interface{}, interface{}) {
+func parser(raw []byte) (interface{}, interface{}) {
     var object interface{}
-    if err := json.Unmarshal([]byte(raw), &object); err == nil { // try json
+    if err := json.Unmarshal(raw, &object); err == nil { // try json
         return object, nil // json format
     }
-    if err := toml.Unmarshal([]byte(raw), &object); err == nil { // try toml
+    if err := toml.Unmarshal(raw, &object); err == nil { // try toml
         return object, nil // toml format
     }
-    if err := yaml.Unmarshal([]byte(raw), &object); err == nil { // try yaml
+    if err := yaml.Unmarshal(raw, &object); err == nil { // try yaml
         return object, nil // yaml format
     }
     return nil, nil // parser error
 }
 
 func main() {
-    //if object, err := parser(jsonTest); err == nil {
-    //if object, err := parser(yamlTest); err == nil {
-    if object, err := parser(tomlTest); err == nil {
-        b, _ := json.Marshal(object)
-        fmt.Println(string(b))
+    if len(os.Args) < 2 { // without argument
+        fmt.Printf("usage: toJSON [file]\n")
+        os.Exit(0)
     }
+    raw, err := os.ReadFile(os.Args[1])
+    if err != nil {
+        os.Exit(2) // file open failed
+    }
+    if object, err := parser(raw); err == nil {
+        ret, _ := json.Marshal(object)
+        fmt.Println(string(ret))
+        os.Exit(0)
+    }
+    os.Exit(1) // unmarshal failed
 }
