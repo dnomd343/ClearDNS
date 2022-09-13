@@ -1,9 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
-#include "loader.h"
 #include "cJSON.h"
 #include "common.h"
 #include "logger.h"
+#include "config.h"
 #include "structure.h"
 
 int json_int_value(char *key, cJSON *json) { // json int or string value -> int
@@ -176,11 +176,10 @@ void json_adguard_parser(adguard_config *config, cJSON *json) { // adguard optio
     }
 }
 
-void json_config_parser(cleardns_config *config, const char *config_file) { // JSON format configure
-    char *config_content = read_file(config_file);
+void json_config_parser(cleardns_config *config, const char *config_content) { // JSON format configure
     cJSON *json = cJSON_Parse(config_content);
     if (json == NULL) {
-        log_fatal("JSON configure `%s` format error", config_file);
+        log_fatal("JSON configure format error");
     }
     json = json->child;
     while (json != NULL) {
@@ -214,4 +213,33 @@ void json_config_parser(cleardns_config *config, const char *config_file) { // J
         json = json->next; // next field
     }
     cJSON_free(json); // free JSON struct
+}
+
+void yaml_config_parser(cleardns_config *config, const char *config_content) { // YAML format configure
+    // TODO: change YAML -> JSON
+    char *json_content = string_init(config_content); // just demo for now
+
+    json_config_parser(config, json_content);
+}
+
+uint8_t is_json_suffix(const char *file_name) {
+    if (strlen(file_name) <= 5) { // `.json`
+        return FALSE;
+    }
+    if (!strcmp(file_name + strlen(file_name) - 5, ".json")) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void config_parser(cleardns_config *config, const char *config_file) {
+    char *config_content = read_file(config_file);
+    if (is_json_suffix(config_file)) {
+        log_info("Start JSON configure parser");
+        json_config_parser(config, config_content);
+    } else {
+        log_info("Start YAML configure parser");
+        yaml_config_parser(config, config_content);
+    }
+    log_info("Configure parser success");
 }

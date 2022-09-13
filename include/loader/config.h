@@ -1,5 +1,5 @@
-#ifndef _LOAD_H_
-#define _LOAD_H_
+#ifndef _CONFIG_H_
+#define _CONFIG_H_
 
 #include "common.h"
 
@@ -44,7 +44,8 @@ typedef struct {
     char **ttl;
 } cleardns_config;
 
-void load_config(const char *config_file);
-void json_config_parser(cleardns_config *config, const char *config_file);
+cleardns_config* config_init();
+void config_dump(cleardns_config *config);
+void config_free(cleardns_config *config);
 
 #endif

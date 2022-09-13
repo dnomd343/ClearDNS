@@ -1,5 +1,5 @@
-#include "loader.h"
 #include "common.h"
+#include "config.h"
 #include "logger.h"
 #include "structure.h"
 
@@ -94,17 +94,4 @@ void config_free(cleardns_config *config) { // free config struct of cleardns
     free(config->adguard.username);
     free(config->adguard.password);
     free(config);
-}
-
-void load_config(const char *config_file) {
-    cleardns_config *config = config_init();
-
-    json_config_parser(config, config_file);
-
-    log_info("Configure load success");
-    config_dump(config);
-
-    // TODO: load into process
-
-    config_free(config);
 }
