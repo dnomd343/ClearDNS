@@ -1,10 +1,8 @@
-/.idea/
 /bin/
 /build/
+**/.idea/
 /cmake-build-debug/
-/asset/chinalist/china-ip.txt
-/asset/chinalist/china-ip.txt.gz
-/asset/chinalist/chinalist.txt
-/asset/chinalist/chinalist.txt.gz
-/asset/gfwlist/gfwlist.txt
-/asset/gfwlist/gfwlist.txt.gz
+/cmake-build-release/
+/asset/gfwlist/gfwlist.*
+/asset/chinalist/china-ip.*
+/asset/chinalist/chinalist.*
