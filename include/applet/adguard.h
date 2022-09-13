@@ -2,6 +2,7 @@
 #define _ADGUARD_H_
 
 #include <stdint.h>
+#include "process.h"
 
 typedef struct {
     uint8_t debug; // bool value
@@ -11,5 +12,8 @@ typedef struct {
     char *username;
     char *password;
 } adguard;
+
+adguard* adguard_init();
+process* adguard_load(adguard *info, const char *dir);
 
 #endif

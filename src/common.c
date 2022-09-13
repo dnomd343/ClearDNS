@@ -41,6 +41,12 @@ uint8_t check_port(uint16_t port) {
     return FALSE;
 }
 
+char* uint32_to_string(uint32_t number) {
+    char to_str[11]; // 32-bits (MAX_LEN -> 4294967296 -> 10-bytes)
+    sprintf(to_str, "%u", number);
+    return string_init(to_str);
+}
+
 void save_file(const char *file, const char *content) { // save into file
     log_debug("Write into `%s` -> \n%s", file, content);
     FILE* fp = fopen(file , "w");

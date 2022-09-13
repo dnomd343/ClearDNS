@@ -19,7 +19,7 @@ typedef struct {
     char *domestic_domain_file;
 } overture;
 
-overture* overture_init(uint16_t port);
+overture* overture_init();
 process* overture_load(overture *info, const char *file);
 
 #endif

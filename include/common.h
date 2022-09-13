@@ -44,6 +44,7 @@ void string_list_debug(char *describe, char **string_list);
 void uint32_list_debug(char *describe, uint32_t **uint32_list);
 
 uint8_t check_port(uint16_t port);
+char* uint32_to_string(uint32_t number);
 
 char* string_init(const char *str);
 char* string_join(const char *base, const char *add);
