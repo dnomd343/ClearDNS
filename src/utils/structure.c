@@ -29,6 +29,13 @@ char** string_list_append(char **string_list, const char *string) { // add new s
     return string_list;
 }
 
+char** string_list_update(char **base_list, char **update_list) {
+    for (char **string = update_list; *string != NULL; ++string) {
+        base_list = string_list_append(base_list, *string);
+    }
+    return base_list;
+}
+
 void string_list_free(char **string_list) { // free string list
     for (char **string = string_list; *string != NULL; ++string) {
         free(*string);

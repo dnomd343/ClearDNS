@@ -13,6 +13,7 @@ char** string_list_init();
 void string_list_free(char **string_list);
 char* string_list_dump(char **string_list);
 uint32_t string_list_len(char **string_list);
+char** string_list_update(char **base_list, char **update_list);
 char** string_list_append(char **string_list, const char *string);
 
 #endif

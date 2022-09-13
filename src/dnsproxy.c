@@ -58,6 +58,10 @@ void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy info 
 }
 
 process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
+
+    // TODO: check primary server number (non-zero)
+    // TODO: check port (1 ~ 65535)
+
     dnsproxy_dump(caption, info);
     char *config = dnsproxy_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);

@@ -45,6 +45,11 @@ void overture_dump(overture *info) { // show overture info in debug log
 }
 
 process* overture_load(overture *info, const char *file) {
+
+    // TODO: check port (1 ~ 65535)
+    // TODO: check timeout not zero
+    // TODO: check whether file exist
+
     overture_dump(info);
     char *config = overture_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
