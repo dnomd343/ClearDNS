@@ -34,29 +34,15 @@
 //    fprintf(stderr, "\"\n");
 //}
 
-#include "bcrypt.h"
+
 
 int main(int argc, char *argv[]) { // ClearDNS server
 
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-
-    char salt[BCRYPT_HASHSIZE];
-    log_info("size -> %d", BCRYPT_HASHSIZE);
-    int ret = bcrypt_gensalt(10, salt);
-    log_info("gensalt ret -> %d", ret);
-    log_info("salt -> %s", salt);
-
-    char passwd[] = "dnomd343";
-    log_info("passwd -> %s", passwd);
-    char hash[BCRYPT_HASHSIZE];
-    ret = bcrypt_hashpw(passwd, salt, hash);
-    log_info("hashpw ret -> %d", ret);
-    log_info("hash -> %s", hash);
-
-    ret = bcrypt_checkpw(passwd, hash);
-    log_info("checkpw ret -> %d", ret);
+    char *ret = gen_bcrypt("dnomd343");
+    log_info("%s", ret);
 
 
 //    load_config("test.json");

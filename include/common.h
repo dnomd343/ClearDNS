@@ -47,6 +47,7 @@ uint8_t check_port(uint16_t port);
 uint16_t gen_rand_num(uint16_t limit);
 char* uint32_to_string(uint32_t number);
 
+char* gen_bcrypt(const char *data);
 int run_command(const char *command);
 
 char* string_init(const char *str);
