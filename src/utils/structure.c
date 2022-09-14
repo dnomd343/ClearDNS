@@ -37,6 +37,13 @@ char** string_list_update(char **base_list, char **update_list) {
     return base_list;
 }
 
+uint32_t** uint32_list_update(uint32_t **base_list, uint32_t **update_list) {
+    for (uint32_t **number = update_list; *number != NULL; ++number) {
+        base_list = uint32_list_append(base_list, **number);
+    }
+    return base_list;
+}
+
 void string_list_free(char **string_list) { // free string list
     for (char **string = string_list; *string != NULL; ++string) {
         free(*string);

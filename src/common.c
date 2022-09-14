@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <sys/time.h>
 #include "common.h"
 #include "logger.h"
@@ -58,6 +57,7 @@ uint16_t gen_rand_num(uint16_t limit) { // 0 ~ (limit - 1)
 }
 
 int run_command(const char *command) {
+    log_debug("Run command -> `%s`", command);
     return system(command) / 256;
 }
 

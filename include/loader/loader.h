@@ -5,12 +5,14 @@
 #include "dnsproxy.h"
 #include "overture.h"
 
-extern struct {
+struct cleardns {
     dnsproxy *domestic;
     dnsproxy *foreign;
     overture *diverter;
     adguard *filter;
-} loader;
+};
+
+extern struct cleardns loader;
 
 void load_config(const char *config_file);
 

@@ -43,8 +43,11 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     load_config("test.json");
 
-//    dnsproxy_load("Domestic", loader.domestic, "domestic.json");
-//    dnsproxy_load("Foreign", loader.foreign, "foreign.json");
+    dnsproxy_load("Domestic", loader.domestic, "domestic.json");
+    dnsproxy_load("Foreign", loader.foreign, "foreign.json");
+    overture_load(loader.diverter, "overture.json");
+    adguard_load(loader.filter, ADGUARD_DIR);
+
 
 //    char **temp = string_list_init();
 //    temp = string_list_append(temp, "123");

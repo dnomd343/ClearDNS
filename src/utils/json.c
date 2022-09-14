@@ -16,7 +16,7 @@ char* to_json(const char *file) {
     char *output_file = string_join("/tmp/tojson-", flag);
     char *to_json_cmd = (char *)malloc(strlen(file) + strlen(output_file) + 11);
     sprintf(to_json_cmd, "toJSON %s > %s", file, output_file);
-    log_debug("JSON format command -> `%s`", to_json_cmd);
+//    log_debug("JSON format command -> `%s`", to_json_cmd);
     if (run_command(to_json_cmd)) { // toJSON return non-zero code
         // TODO: try remove output file
         return NULL; // convert failed

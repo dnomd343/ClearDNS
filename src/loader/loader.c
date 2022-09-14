@@ -1,8 +1,12 @@
+#include <stdlib.h>
 #include "loader.h"
 #include "config.h"
 #include "parser.h"
 #include "dnsproxy.h"
 #include "structure.h"
+#include "common.h"
+
+struct cleardns loader;
 
 dnsproxy* load_domestic(cleardns_config *config) {
     dnsproxy *domestic = dnsproxy_init(config->domestic.port);
@@ -34,35 +38,45 @@ dnsproxy* load_foreign(cleardns_config *config) {
 
 overture* load_diverter(cleardns_config *config) {
     overture *diverter = overture_init();
+    diverter->port = config->diverter.port;
+    diverter->foreign_port = config->foreign.port;
+    diverter->domestic_port = config->domestic.port;
 
-    // ttl_file
-    // host_file
-    // foreign_port
-    // domestic_port
+    free(diverter->ttl_file);
+    free(diverter->host_file);
+    // TODO: load into ASSET_TTL
+    // TODO: load into ASSET_HOSTS
+    diverter->ttl_file = string_init(ASSET_TTL);
+    diverter->host_file = string_init(ASSET_HOSTS);
 
-    // reject_type
+    free(diverter->domestic_ip_file);
+    free(diverter->foreign_domain_file);
+    free(diverter->domestic_domain_file);
+    // TODO: load into ASSET_CHINA_IP
+    // TODO: load into ASSET_GFW_LIST
+    // TODO: load into ASSET_CHINA_LIST
+    diverter->domestic_ip_file = string_init(ASSET_CHINA_IP);
+    diverter->foreign_domain_file = string_init(ASSET_GFW_LIST);
+    diverter->domestic_domain_file = string_init(ASSET_CHINA_LIST);
 
-    // foreign_ip_file
-    // domestic_ip_file
-    // foreign_domain_file
-    // domestic_domain_file
+    // TODO: assets file append
 
-    // TODO: load assets file
-
+    diverter->reject_type = uint32_list_update(diverter->reject_type, config->reject);
     return diverter;
 }
 
 adguard* load_filter(cleardns_config *config) {
+    if (!config->adguard.enable) {
+        return NULL; // disable adguard
+    }
     adguard *filter = adguard_init();
-
-    // dns_port
-    // web_port
-
-    // upstream
-
-    // username
-    // password
-
+    filter->dns_port = config->port;
+    filter->web_port = config->adguard.port;
+    filter->username = config->adguard.username;
+    filter->password = config->adguard.password;
+    char *diverter_port = uint32_to_string(config->diverter.port);
+    filter->upstream = string_join("127.0.0.1:", diverter_port);
+    free(diverter_port);
     return filter;
 }
 
@@ -70,9 +84,9 @@ void load_config(const char *config_file) {
     cleardns_config *config = config_init();
     config_parser(config, config_file);
     config_dump(config);
-
-    // TODO: use dns port as diverter when adguard disabled
-
+    if (!config->adguard.enable) {
+        config->diverter.port = config->port; // override diverter port by dns port
+    }
     loader.domestic = load_domestic(config);
     loader.foreign = load_foreign(config);
     loader.diverter = load_diverter(config);

@@ -30,7 +30,15 @@
 #define OVERTURE_BIN "overture"
 #define ADGUARD_BIN  "AdGuardHome"
 
-#define WORK_DIR "/etc/cleardns/"
+#define WORK_DIR    "/etc/cleardns/"
+#define EXPOSE_DIR  "/cleardns/"
+#define ADGUARD_DIR "/cleardns/adguard/"
+
+#define ASSET_TTL        "ttl.txt"
+#define ASSET_HOSTS      "hosts.txt"
+#define ASSET_GFW_LIST   "gfwlist.txt"
+#define ASSET_CHINA_IP   "china-ip.txt"
+#define ASSET_CHINA_LIST "chinalist.txt"
 
 //extern char **adguard_command;
 //extern char **overture_command;
