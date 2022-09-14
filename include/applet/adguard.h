@@ -14,6 +14,7 @@ typedef struct {
 } adguard;
 
 adguard* adguard_init();
+void adguard_free(adguard *info);
 process* adguard_load(adguard *info, const char *dir);
 
 #endif

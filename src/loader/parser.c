@@ -4,75 +4,8 @@
 #include "common.h"
 #include "logger.h"
 #include "config.h"
-#include "structure.h"
 
-int json_int_value(char *key, cJSON *json) { // json int or string value -> int
-    if (cJSON_IsNumber(json)) {
-        return json->valueint;
-    } else if (cJSON_IsString(json)) {
-        char *p;
-        int int_ret = (int)strtol(json->valuestring, &p, 10);
-        if (int_ret == 0 && strcmp(json->valuestring, "0") != 0) { // invalid number in string
-            log_fatal("`%s` not a valid number", key);
-        }
-        return int_ret;
-    } else {
-        log_fatal("`%s` must be number or string", key);
-    }
-    return 0; // never reach
-}
-
-char* json_string_value(char* key, cJSON *json) {
-    if (!cJSON_IsString(json)) {
-        log_fatal("`%s` must be string", key);
-    }
-    return json->valuestring;
-}
-
-char** json_string_list_value(char *key, cJSON *json, char **string_list) {
-    if (cJSON_IsString(json)) {
-        string_list = string_list_append(string_list, json->valuestring);
-    } else if (cJSON_IsArray(json)) {
-        json = json->child;
-        while (json != NULL) {
-            if (!cJSON_IsString(json)) {
-                log_fatal("`%s` must be string array", key);
-            }
-            string_list = string_list_append(string_list, json->valuestring);
-            json = json->next; // next field
-        }
-    } else if (!cJSON_IsNull(json)) {
-        log_fatal("`%s` must be array or string", key);
-    }
-    return string_list;
-}
-
-uint32_t** json_uint32_list_value(char *key, cJSON *json, uint32_t **uint32_list) {
-    if (cJSON_IsNumber(json)) {
-        uint32_list = uint32_list_append(uint32_list, json->valueint);
-    } else if (cJSON_IsArray(json)) {
-        json = json->child;
-        while (json != NULL) {
-            if (!cJSON_IsNumber(json)) {
-                log_fatal("`%s` must be number array", key);
-            }
-            uint32_list = uint32_list_append(uint32_list, json->valueint);
-            json = json->next; // next field
-        }
-    } else if (!cJSON_IsNull(json)) {
-        log_fatal("`%s` must be array or number", key);
-    }
-    return uint32_list;
-}
-
-uint8_t json_bool_value(char *key, cJSON *json) { // json bool value -> bool
-    if (!cJSON_IsBool(json)) {
-        log_fatal("`%s` must be boolean", key);
-    }
-    return json->valueint;
-}
-
-void json_cache_parser(cache_config *config, cJSON *json) { // cache options parser
+void cache_parser(cache_config *config, cJSON *json) { // cache options parser
     if (!cJSON_IsObject(json)) {
         log_fatal("`cache` must be object");
     }
@@ -91,7 +24,7 @@ void json_cache_parser(cache_config *config, cJSON *json) { // cache options par
     }
 }
 
-void json_upstream_parser(char *caption, upstream_config *config, cJSON *json) {
+void upstream_parser(char *caption, upstream_config *config, cJSON *json) { // upstream options parser
     if (!cJSON_IsObject(json)) {
         log_fatal("`%s` must be object", caption);
     }
@@ -132,7 +65,7 @@ void json_upstream_parser(char *caption, upstream_config *config, cJSON *json) {
     }
 }
 
-void json_diverter_parser(diverter_config *config, cJSON *json) { // diverter options parser
+void diverter_parser(diverter_config *config, cJSON *json) { // diverter options parser
     if (!cJSON_IsObject(json)) {
         log_fatal("`diverter` must be object");
     }
@@ -154,7 +87,7 @@ void json_diverter_parser(diverter_config *config, cJSON *json) { // diverter op
     }
 }
 
-void json_adguard_parser(adguard_config *config, cJSON *json) { // adguard options parser
+void adguard_parser(adguard_config *config, cJSON *json) { // adguard options parser
     if (!cJSON_IsObject(json)) {
         log_fatal("`adguard` must be array");
     }
@@ -167,19 +100,21 @@ void json_adguard_parser(adguard_config *config, cJSON *json) { // adguard optio
             config->enable = json_bool_value("adguard.enable", json);
         }
         if (!strcmp(json->string, "username")) {
+            free(config->username);
             config->username = json_string_value("adguard.username", json);
         }
         if (!strcmp(json->string, "password")) {
+            free(config->password);
             config->password = json_string_value("adguard.password", json);
         }
         json = json->next; // next field
     }
 }
 
-void json_config_parser(cleardns_config *config, const char *config_content) { // JSON format configure
+void cleardns_parser(cleardns_config *config, const char *config_content) { // JSON format configure
     cJSON *json = cJSON_Parse(config_content);
     if (json == NULL) {
-        log_fatal("JSON configure format error");
+        log_fatal("ClearDNS configure format error");
     }
     json = json->child;
     while (json != NULL) {
@@ -187,19 +122,19 @@ void json_config_parser(cleardns_config *config, const char *config_content) { /
             config->port = json_int_value("port", json);
         }
         if (!strcmp(json->string, "cache")) {
-            json_cache_parser(&config->cache, json);
+            cache_parser(&config->cache, json);
         }
         if (!strcmp(json->string, "domestic")) {
-            json_upstream_parser("domestic", &config->domestic, json);
+            upstream_parser("domestic", &config->domestic, json);
         }
         if (!strcmp(json->string, "foreign")) {
-            json_upstream_parser("foreign", &config->foreign, json);
+            upstream_parser("foreign", &config->foreign, json);
         }
         if (!strcmp(json->string, "diverter")) {
-            json_diverter_parser(&config->diverter, json);
+            diverter_parser(&config->diverter, json);
         }
         if (!strcmp(json->string, "adguard")) {
-            json_adguard_parser(&config->adguard, json);
+            adguard_parser(&config->adguard, json);
         }
         if (!strcmp(json->string, "reject")) {
             config->reject = json_uint32_list_value("reject", json, config->reject);
@@ -215,31 +150,20 @@ void json_config_parser(cleardns_config *config, const char *config_content) { /
     cJSON_free(json); // free JSON struct
 }
 
-void yaml_config_parser(cleardns_config *config, const char *config_content) { // YAML format configure
-    // TODO: change YAML -> JSON
-    char *json_content = string_init(config_content); // just demo for now
-
-    json_config_parser(config, json_content);
-}
-
-uint8_t is_json_suffix(const char *file_name) {
-    if (strlen(file_name) <= 5) { // `.json`
-        return FALSE;
-    }
-    if (!strcmp(file_name + strlen(file_name) - 5, ".json")) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
 void config_parser(cleardns_config *config, const char *config_file) {
     char *config_content = read_file(config_file);
-    if (is_json_suffix(config_file)) {
+    if (is_json_suffix(config_file)) { // JSON format
         log_info("Start JSON configure parser");
-        json_config_parser(config, config_content);
-    } else {
-        log_info("Start YAML configure parser");
-        yaml_config_parser(config, config_content);
+        cleardns_parser(config, config_content); // configure parser
+    } else { // YAML or TOML format
+        log_info("Start configure parser");
+        char *json_content = to_json(config_content); // convert to json format
+        if (json_content == NULL) {
+            log_fatal("Configure parser error");
+        }
+        cleardns_parser(config, json_content); // configure parser
+        free(json_content);
     }
+    free(config_content);
     log_info("Configure parser success");
 }

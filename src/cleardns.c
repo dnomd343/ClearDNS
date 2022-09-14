@@ -41,8 +41,8 @@ int main(int argc, char *argv[]) { // ClearDNS server
     log_info("ClearDNS server start (%s)", VERSION);
 
 
-//    load_config("test.json");
-//
+    load_config("test.json");
+
 //    dnsproxy_load("Domestic", loader.domestic, "domestic.json");
 //    dnsproxy_load("Foreign", loader.foreign, "foreign.json");
 
@@ -110,20 +110,20 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    log_info("cwd -> %s", p->cwd);
 
 
-    adguard *filter = adguard_init();
-
-    filter->debug = TRUE;
-    filter->dns_port = 54;
-    filter->web_port = 8080;
-    filter->upstream = "127.0.0.1:5454";
-
-    filter->username = "dnomd343";
-    filter->password = "password";
-
-    process *p = adguard_load(filter, "/cleardns/adguard/");
-    log_info("cmd -> %s", string_list_dump(p->cmd));
-    log_info("env -> %s", string_list_dump(p->env));
-    log_info("cwd -> %s", p->cwd);
+//    adguard *filter = adguard_init();
+//
+//    filter->debug = TRUE;
+//    filter->dns_port = 54;
+//    filter->web_port = 8080;
+//    filter->upstream = "127.0.0.1:5454";
+//
+//    filter->username = "dnomd343";
+//    filter->password = "password";
+//
+//    process *p = adguard_load(filter, "/cleardns/adguard/");
+//    log_info("cmd -> %s", string_list_dump(p->cmd));
+//    log_info("env -> %s", string_list_dump(p->env));
+//    log_info("cwd -> %s", p->cwd);
 
 
 //    int debug_mode = 0;

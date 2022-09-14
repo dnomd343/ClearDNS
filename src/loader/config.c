@@ -1,13 +1,13 @@
 #include <stdlib.h>
-#include "common.h"
 #include "config.h"
+#include "common.h"
 #include "logger.h"
 #include "structure.h"
 
 cleardns_config* config_init() { // init config struct of cleardns
     cleardns_config *config = (cleardns_config *)malloc(sizeof(cleardns_config));
     config->port = DNS_PORT;
-    config->cache.size = 0;
+    config->cache.size = 0; // disable cache in default
     config->cache.enable = FALSE;
     config->cache.optimistic = FALSE;
 

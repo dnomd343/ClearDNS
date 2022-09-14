@@ -20,6 +20,7 @@ typedef struct {
 } overture;
 
 overture* overture_init();
+void overture_free(overture *info);
 process* overture_load(overture *info, const char *file);
 
 #endif

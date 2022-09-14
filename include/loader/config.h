@@ -1,7 +1,7 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-#include "common.h"
+#include <stdint.h>
 
 typedef struct {
     uint16_t port;

@@ -4,6 +4,7 @@
 #include "cJSON.h"
 #include "logger.h"
 #include "common.h"
+#include "structure.h"
 
 char* to_json(const char *file) {
     char flag[9];
@@ -36,6 +37,72 @@ void json_field_replace(cJSON *entry, const char *field, cJSON *content) {
     }
 }
 
+int json_int_value(char *key, cJSON *json) { // json int or string value -> int
+    if (cJSON_IsNumber(json)) {
+        return json->valueint;
+    } else if (cJSON_IsString(json)) {
+        char *p;
+        int int_ret = (int)strtol(json->valuestring, &p, 10);
+        if (int_ret == 0 && strcmp(json->valuestring, "0") != 0) { // invalid number in string
+            log_fatal("`%s` not a valid number", key);
+        }
+        return int_ret;
+    } else {
+        log_fatal("`%s` must be number or string", key);
+    }
+    return 0; // never reach
+}
+
+char* json_string_value(char* key, cJSON *json) {
+    if (!cJSON_IsString(json)) {
+        log_fatal("`%s` must be string", key);
+    }
+    return string_init(json->valuestring);
+}
+
+char** json_string_list_value(char *key, cJSON *json, char **string_list) {
+    if (cJSON_IsString(json)) {
+        string_list = string_list_append(string_list, json->valuestring);
+    } else if (cJSON_IsArray(json)) {
+        json = json->child;
+        while (json != NULL) {
+            if (!cJSON_IsString(json)) {
+                log_fatal("`%s` must be string array", key);
+            }
+            string_list = string_list_append(string_list, json->valuestring);
+            json = json->next; // next field
+        }
+    } else if (!cJSON_IsNull(json)) {
+        log_fatal("`%s` must be array or string", key);
+    }
+    return string_list;
+}
+
+uint32_t** json_uint32_list_value(char *key, cJSON *json, uint32_t **uint32_list) {
+    if (cJSON_IsNumber(json)) {
+        uint32_list = uint32_list_append(uint32_list, json->valueint);
+    } else if (cJSON_IsArray(json)) {
+        json = json->child;
+        while (json != NULL) {
+            if (!cJSON_IsNumber(json)) {
+                log_fatal("`%s` must be number array", key);
+            }
+            uint32_list = uint32_list_append(uint32_list, json->valueint);
+            json = json->next; // next field
+        }
+    } else if (!cJSON_IsNull(json)) {
+        log_fatal("`%s` must be array or number", key);
+    }
+    return uint32_list;
+}
+
+uint8_t json_bool_value(char *key, cJSON *json) { // json bool value -> bool
+    if (!cJSON_IsBool(json)) {
+        log_fatal("`%s` must be boolean", key);
+    }
+    return json->valueint;
+}
+
 cJSON* json_field_get(cJSON *entry, const char *field) {
     cJSON *sub = entry->child;
     while (sub != NULL) {
@@ -47,4 +114,14 @@ cJSON* json_field_get(cJSON *entry, const char *field) {
     cJSON *new = cJSON_CreateObject();
     cJSON_AddItemToObject(entry, field, new);
     return new;
+}
+
+uint8_t is_json_suffix(const char *file_name) {
+    if (strlen(file_name) <= 5) { // `.json`
+        return FALSE;
+    }
+    if (!strcmp(file_name + strlen(file_name) - 5, ".json")) {
+        return TRUE;
+    }
+    return FALSE;
 }

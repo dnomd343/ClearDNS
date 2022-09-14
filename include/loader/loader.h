@@ -1,14 +1,15 @@
 #ifndef _LOADER_H_
 #define _LOADER_H_
 
+#include "adguard.h"
 #include "dnsproxy.h"
 #include "overture.h"
 
-struct {
+extern struct {
     dnsproxy *domestic;
     dnsproxy *foreign;
     overture *diverter;
-    // adguard
+    adguard *filter;
 } loader;
 
 void load_config(const char *config_file);

@@ -20,6 +20,13 @@ void dnsproxy_add_bootstrap(dnsproxy *info, const char *server) { // add bootstr
     info->bootstrap = string_list_append(info->bootstrap, server);
 }
 
+void dnsproxy_free(dnsproxy *info) { // free dnsproxy options
+    string_list_free(info->bootstrap);
+    string_list_free(info->fallback);
+    string_list_free(info->primary);
+    free(info);
+}
+
 dnsproxy* dnsproxy_init(uint16_t port) { // init dnsproxy options
     dnsproxy *info = (dnsproxy *)malloc(sizeof(dnsproxy));
     info->port = port;
@@ -34,7 +41,7 @@ dnsproxy* dnsproxy_init(uint16_t port) { // init dnsproxy options
     return info;
 }
 
-void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy info in debug log
+void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy options in debug log
     char *str_dump;
     log_debug("%s port -> %u", caption, info->port);
     log_debug("%s cache -> %u", caption, info->cache);
@@ -56,7 +63,7 @@ void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy info 
     free(str_dump);
 }
 
-process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
+process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) { // load dnsproxy options
     dnsproxy_dump(caption, info);
     if (!check_port(info->port)) { // invalid server port
         log_fatal("Invalid port `%u`", info->port);
@@ -65,15 +72,15 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
         log_fatal("%s without primary dns server", caption);
     }
 
-    create_folder(WORK_DIR);
-    char *config = dnsproxy_config(info); // string config (JSON format)
+    create_folder(WORK_DIR); // ensure work dir exist
+    char *config = dnsproxy_config(info); // string config with json format
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config); // load dnsproxy configure
     free(config_file);
     free(config);
 
     char *option = string_join("--config-path=", file);
-    process *proc = process_init(caption, DNSPROXY_BIN);
+    process *proc = process_init(caption, DNSPROXY_BIN); // generate dnsproxy command
     process_add_arg(proc, option);
     if (info->debug) {
         process_add_arg(proc, "--verbose"); // dnsproxy enable debug mode

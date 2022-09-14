@@ -16,6 +16,7 @@ typedef struct {
     char **primary;
 } dnsproxy;
 
+void dnsproxy_free(dnsproxy *info);
 dnsproxy* dnsproxy_init(uint16_t port);
 void dnsproxy_add_primary(dnsproxy *info, const char *server);
 void dnsproxy_add_fallback(dnsproxy *info, const char *server);

@@ -8,11 +8,21 @@
 void overture_dump(overture *info);
 char* overture_config(overture *info);
 
+void overture_free(overture *info) { // free overture options
+    free(info->ttl_file); // free(NULL) is valid
+    free(info->host_file);
+    free(info->foreign_ip_file);
+    free(info->domestic_ip_file);
+    free(info->foreign_domain_file);
+    free(info->domestic_domain_file);
+    free(info);
+}
+
 overture* overture_init() { // init overture options
     overture *info = (overture *)malloc(sizeof(overture));
     info->port = DIVERTER_PORT;
     info->debug = FALSE;
-    info->timeout = DIVERTER_TIMEOUT; // default timeout -> 6s
+    info->timeout = DIVERTER_TIMEOUT; // default timeout
     info->ttl_file = NULL;
     info->host_file = NULL;
     info->foreign_port = FOREIGN_PORT;
@@ -25,7 +35,7 @@ overture* overture_init() { // init overture options
     return info;
 }
 
-void overture_dump(overture *info) { // show overture info in debug log
+void overture_dump(overture *info) { // show overture options in debug log
     char *reject_type = uint32_list_dump(info->reject_type);
     log_debug("Overture port -> %u", info->port);
     log_debug("Overture debug -> %s", show_bool(info->debug));
@@ -42,23 +52,23 @@ void overture_dump(overture *info) { // show overture info in debug log
     free(reject_type);
 }
 
-process* overture_load(overture *info, const char *file) {
+process* overture_load(overture *info, const char *file) { // load overture options
     overture_dump(info);
     if (!check_port(info->port)) { // invalid server port
         log_fatal("Invalid port `%u`", info->port);
     }
-    if (info->timeout == 0) {
+    if (info->timeout == 0) { // invalid timeout value
         log_fatal("Timeout of overture with invalid value 0");
     }
 
-    create_folder(WORK_DIR);
+    create_folder(WORK_DIR); // ensure work dir exist
     char *config = overture_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config);
     free(config_file);
     free(config);
 
-    process *proc = process_init("Overture", OVERTURE_BIN);
+    process *proc = process_init("Overture", OVERTURE_BIN); // generate overture command
     process_add_arg(proc, "-c");
     process_add_arg(proc, file);
     if (info->debug) {

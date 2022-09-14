@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "loader.h"
 #include "config.h"
 #include "parser.h"
@@ -34,9 +33,8 @@ dnsproxy* load_foreign(cleardns_config *config) {
 }
 
 overture* load_diverter(cleardns_config *config) {
-    overture *diverter = overture_init(config->diverter.port);
+    overture *diverter = overture_init();
 
-    // timeout
     // ttl_file
     // host_file
     // foreign_port
@@ -48,7 +46,24 @@ overture* load_diverter(cleardns_config *config) {
     // domestic_ip_file
     // foreign_domain_file
     // domestic_domain_file
+
+    // TODO: load assets file
+
     return diverter;
+}
+
+adguard* load_filter(cleardns_config *config) {
+    adguard *filter = adguard_init();
+
+    // dns_port
+    // web_port
+
+    // upstream
+
+    // username
+    // password
+
+    return filter;
 }
 
 void load_config(const char *config_file) {
@@ -61,6 +76,6 @@ void load_config(const char *config_file) {
     loader.domestic = load_domestic(config);
     loader.foreign = load_foreign(config);
     loader.diverter = load_diverter(config);
-    // load adguard
+    loader.filter = load_filter(config);
     config_free(config);
 }
