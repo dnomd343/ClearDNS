@@ -60,6 +60,12 @@ int bcrypt_hashpw(const char *passwd, const char salt[BCRYPT_HASHSIZE],
 int bcrypt_checkpw(const char *passwd, const char hash[BCRYPT_HASHSIZE]);
 
 /*
+ * This function expects a string and return bcrypt result (random salt)
+ */
+
+char* bcrypt_cal(const char *data);
+
+/*
  * Brief Example
  * -------------
  *

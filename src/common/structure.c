@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "structure.h"
 #include "common.h"
+#include "structure.h"
 
 uint32_t* uint32_init(uint32_t number) { // new uint32 (by malloc)
     uint32_t *data = (uint32_t *)malloc(sizeof(uint32_t));

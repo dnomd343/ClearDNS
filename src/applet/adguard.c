@@ -1,8 +1,11 @@
 #include <stdlib.h>
 #include "cJSON.h"
+#include "bcrypt.h"
 #include "common.h"
 #include "logger.h"
 #include "adguard.h"
+#include "system.h"
+#include "json.h"
 
 void adguard_dump(adguard *info);
 char *adguard_config(adguard *info, const char *raw_config);
@@ -44,7 +47,7 @@ char *adguard_config(adguard *info, const char *raw_config) { // modify adguard 
 
     cJSON *user_config = cJSON_CreateObject(); // setting up username and password
     cJSON *users_config = cJSON_CreateArray();
-    char *password = gen_bcrypt(info->password);
+    char *password = bcrypt_cal(info->password);
     cJSON_AddItemToObject(user_config, "name", cJSON_CreateString(info->username));
     cJSON_AddItemToObject(user_config, "password", cJSON_CreateString(password));
     cJSON_AddItemToArray(users_config, user_config);

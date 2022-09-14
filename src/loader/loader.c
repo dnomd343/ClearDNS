@@ -4,6 +4,7 @@
 #include "parser.h"
 #include "dnsproxy.h"
 #include "structure.h"
+#include "system.h"
 #include "common.h"
 
 struct cleardns loader;

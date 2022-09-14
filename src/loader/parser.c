@@ -4,6 +4,8 @@
 #include "common.h"
 #include "logger.h"
 #include "config.h"
+#include "system.h"
+#include "json.h"
 
 void cache_parser(cache_config *config, cJSON *json) { // cache options parser
     if (!cJSON_IsObject(json)) {

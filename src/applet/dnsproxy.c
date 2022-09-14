@@ -3,6 +3,7 @@
 #include "common.h"
 #include "logger.h"
 #include "dnsproxy.h"
+#include "system.h"
 #include "structure.h"
 
 char* dnsproxy_config(dnsproxy *info);

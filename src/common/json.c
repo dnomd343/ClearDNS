@@ -4,6 +4,7 @@
 #include "cJSON.h"
 #include "logger.h"
 #include "common.h"
+#include "system.h"
 #include "structure.h"
 
 char* to_json(const char *file) {
