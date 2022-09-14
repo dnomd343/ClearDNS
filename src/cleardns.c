@@ -34,11 +34,29 @@
 //    fprintf(stderr, "\"\n");
 //}
 
+#include "bcrypt.h"
 
 int main(int argc, char *argv[]) { // ClearDNS server
 
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
+
+
+    char salt[BCRYPT_HASHSIZE];
+    log_info("size -> %d", BCRYPT_HASHSIZE);
+    int ret = bcrypt_gensalt(10, salt);
+    log_info("gensalt ret -> %d", ret);
+    log_info("salt -> %s", salt);
+
+    char passwd[] = "dnomd343";
+    log_info("passwd -> %s", passwd);
+    char hash[BCRYPT_HASHSIZE];
+    ret = bcrypt_hashpw(passwd, salt, hash);
+    log_info("hashpw ret -> %d", ret);
+    log_info("hash -> %s", hash);
+
+    ret = bcrypt_checkpw(passwd, hash);
+    log_info("checkpw ret -> %d", ret);
 
 
 //    load_config("test.json");
@@ -109,20 +127,20 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    log_info("cwd -> %s", p->cwd);
 
 
-    adguard *filter = adguard_init();
-
-    filter->debug = TRUE;
-    filter->dns_port = 54;
-    filter->web_port = 8080;
-    filter->upstream = "127.0.0.1:5454";
-
-    filter->username = "dnomd343";
-    filter->password = "password";
-
-    process *p = adguard_load(filter, "/cleardns/adguard/");
-    log_info("cmd -> %s", string_list_dump(p->cmd));
-    log_info("env -> %s", string_list_dump(p->env));
-    log_info("cwd -> %s", p->cwd);
+//    adguard *filter = adguard_init();
+//
+//    filter->debug = TRUE;
+//    filter->dns_port = 54;
+//    filter->web_port = 8080;
+//    filter->upstream = "127.0.0.1:5454";
+//
+//    filter->username = "dnomd343";
+//    filter->password = "password";
+//
+//    process *p = adguard_load(filter, "/cleardns/adguard/");
+//    log_info("cmd -> %s", string_list_dump(p->cmd));
+//    log_info("env -> %s", string_list_dump(p->env));
+//    log_info("cwd -> %s", p->cwd);
 
 
 //    int debug_mode = 0;
