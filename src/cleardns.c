@@ -7,7 +7,6 @@
 #include "dnsproxy.h"
 #include "overture.h"
 #include "structure.h"
-#include "toJSON.h"
 #include "adguard.h"
 
 //#include <stdio.h>
@@ -40,9 +39,6 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
-
-    char *ret = gen_bcrypt("dnomd343");
-    log_info("%s", ret);
 
 
 //    load_config("test.json");
@@ -94,8 +90,9 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    log_info("cwd -> %s", p->cwd);
 
 
-//    overture *diverter = overture_init(DIVERTER_PORT);
+//    overture *diverter = overture_init();
 //
+//    diverter->port = 5454;
 //    diverter->timeout = 8;
 //    diverter->domestic_ip_file = "china-ip.txt";
 //    diverter->domestic_domain_file = "chinalist.txt";
@@ -113,20 +110,20 @@ int main(int argc, char *argv[]) { // ClearDNS server
 //    log_info("cwd -> %s", p->cwd);
 
 
-//    adguard *filter = adguard_init();
-//
-//    filter->debug = TRUE;
-//    filter->dns_port = 54;
-//    filter->web_port = 8080;
-//    filter->upstream = "127.0.0.1:5454";
-//
-//    filter->username = "dnomd343";
-//    filter->password = "password";
-//
-//    process *p = adguard_load(filter, "/cleardns/adguard/");
-//    log_info("cmd -> %s", string_list_dump(p->cmd));
-//    log_info("env -> %s", string_list_dump(p->env));
-//    log_info("cwd -> %s", p->cwd);
+    adguard *filter = adguard_init();
+
+    filter->debug = TRUE;
+    filter->dns_port = 54;
+    filter->web_port = 8080;
+    filter->upstream = "127.0.0.1:5454";
+
+    filter->username = "dnomd343";
+    filter->password = "password";
+
+    process *p = adguard_load(filter, "/cleardns/adguard/");
+    log_info("cmd -> %s", string_list_dump(p->cmd));
+    log_info("env -> %s", string_list_dump(p->env));
+    log_info("cwd -> %s", p->cwd);
 
 
 //    int debug_mode = 0;

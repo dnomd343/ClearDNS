@@ -12,7 +12,7 @@ overture* overture_init() { // init overture options
     overture *info = (overture *)malloc(sizeof(overture));
     info->port = DIVERTER_PORT;
     info->debug = FALSE;
-    info->timeout = 6; // default timeout -> 6s
+    info->timeout = DIVERTER_TIMEOUT; // default timeout -> 6s
     info->ttl_file = NULL;
     info->host_file = NULL;
     info->foreign_port = FOREIGN_PORT;
@@ -51,6 +51,7 @@ process* overture_load(overture *info, const char *file) {
         log_fatal("Timeout of overture with invalid value 0");
     }
 
+    create_folder(WORK_DIR);
     char *config = overture_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config);
@@ -63,6 +64,7 @@ process* overture_load(overture *info, const char *file) {
     if (info->debug) {
         process_add_arg(proc, "-v"); // overture enable debug mode
     }
+    log_info("Overture load success");
     return proc;
 }
 
@@ -124,7 +126,6 @@ char* overture_config(overture *info) { // generate json configure from overture
     }
     cJSON_AddStringToObject(host_file, "finder", "regex-list");
     cJSON_AddItemToObject(config, "hostsFile", host_file);
-
     if (info->ttl_file != NULL) {
         cJSON_AddStringToObject(config, "domainTTLFile", info->ttl_file);
     }

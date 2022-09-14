@@ -77,6 +77,13 @@ char* gen_bcrypt(const char *data) {
     return hash;
 }
 
+void create_folder(const char *folder) {
+    log_debug("Create folder -> %s", folder);
+    char *command = string_join("mkdir -p ", folder);
+    system(command);
+    free(command);
+}
+
 void save_file(const char *file, const char *content) { // save into file
     log_debug("Write into `%s` -> \n%s", file, content);
     FILE* fp = fopen(file , "w");

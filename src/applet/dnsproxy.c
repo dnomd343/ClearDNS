@@ -65,9 +65,10 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
         log_fatal("%s without primary dns server", caption);
     }
 
+    create_folder(WORK_DIR);
     char *config = dnsproxy_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
-    save_file(config_file, config);
+    save_file(config_file, config); // load dnsproxy configure
     free(config_file);
     free(config);
 
@@ -78,6 +79,7 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) {
         process_add_arg(proc, "--verbose"); // dnsproxy enable debug mode
     }
     free(option);
+    log_info("%s load success", caption);
     return proc;
 }
 

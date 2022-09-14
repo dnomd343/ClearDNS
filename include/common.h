@@ -21,6 +21,8 @@
 #define DOMESTIC_PORT 4053
 #define FOREIGN_PORT  6053
 
+#define DIVERTER_TIMEOUT 6
+
 #define ADGUARD_USER   "admin"
 #define ADGUARD_PASSWD "adguard"
 
@@ -49,8 +51,15 @@ char* uint32_to_string(uint32_t number);
 
 char* gen_bcrypt(const char *data);
 int run_command(const char *command);
+void create_folder(const char *folder);
 
 char* string_init(const char *str);
 char* string_join(const char *base, const char *add);
+
+#include "cJSON.h"
+
+char* to_json(const char *config_file);
+cJSON* json_field_get(cJSON *entry, const char *field);
+void json_field_replace(cJSON *entry, const char *field, cJSON *content);
 
 #endif
