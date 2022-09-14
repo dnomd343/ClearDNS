@@ -41,6 +41,15 @@ int main(int argc, char *argv[]) { // ClearDNS server
     log_info("ClearDNS server start (%s)", VERSION);
 
 
+//    char **temp = string_list_init();
+//
+//    temp = string_list_append(temp, "a");
+//    temp = string_list_append(temp, "b");
+//    temp = string_list_append(temp, "c");
+//
+//    save_string_list("test.txt", temp);
+
+
     load_config("test.json");
 
     dnsproxy_load("Domestic", loader.domestic, "domestic.json");

@@ -56,8 +56,11 @@ uint16_t gen_rand_num(uint16_t limit) { // 0 ~ (limit - 1)
     return rand() % limit; // NOLINT
 }
 
-int run_command(const char *command) {
+int run_command(const char *command) { // running command with system shell
     log_debug("Run command -> `%s`", command);
+
+    // TODO: add non-zero return code warning
+
     return system(command) / 256;
 }
 
@@ -113,4 +116,19 @@ char* read_file(const char *file) { // read file content
     fclose(fp);
     log_debug("File `%s` read success ->\n%s", file, content);
     return content;
+}
+
+void save_string_list(const char *file, char **string_list) { // save string list into file
+    log_debug("Write string list into `%s`", file);
+    FILE* fp = fopen(file , "w");
+    if (fp == NULL) {
+        log_fatal("Fail to open file -> %s", file);
+    }
+    for (char **string = string_list; *string != NULL; ++string) {
+        log_debug("File append -> `%s`", *string);
+        fputs(*string, fp);
+        fputs("\n", fp);
+    }
+    fclose(fp);
+    log_debug("Save `%s` success", file);
 }

@@ -32,6 +32,7 @@
 
 #define WORK_DIR    "/etc/cleardns/"
 #define EXPOSE_DIR  "/cleardns/"
+#define ASSETS_DIR  "/cleardns/assets/"
 #define ADGUARD_DIR "/cleardns/adguard/"
 
 #define ASSET_TTL        "ttl.txt"
@@ -56,6 +57,8 @@ void uint32_list_debug(char *describe, uint32_t **uint32_list);
 uint8_t check_port(uint16_t port);
 uint16_t gen_rand_num(uint16_t limit);
 char* uint32_to_string(uint32_t number);
+
+void save_string_list(const char *file, char **string_list);
 
 char* gen_bcrypt(const char *data);
 int run_command(const char *command);
