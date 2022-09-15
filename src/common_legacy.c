@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <strList.bak>
 #include "cJSON.h"
-#include "flag.h"
+#include "flag_legacy.h"
 
 char **adguard_command = NULL;
 char **overture_command = NULL;

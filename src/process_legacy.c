@@ -7,7 +7,7 @@
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include "constant.h"
-#include "flag.h"
+#include "flag_legacy.h"
 
 int exiting = 0;
 

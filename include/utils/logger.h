@@ -1,5 +1,5 @@
-#ifndef _LOGGER_H_
-#define _LOGGER_H_
+#ifndef LOGGER_H_
+#define LOGGER_H_
 
 #define LOG_PREFIX "ClearDNS"
 

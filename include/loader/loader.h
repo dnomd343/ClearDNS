@@ -1,5 +1,5 @@
-#ifndef _LOADER_H_
-#define _LOADER_H_
+#ifndef LOADER_H_
+#define LOADER_H_
 
 #include "adguard.h"
 #include "dnsproxy.h"

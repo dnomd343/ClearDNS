@@ -1,5 +1,5 @@
-#ifndef _PARSER_H_
-#define _PARSER_H_
+#ifndef PARSER_H_
+#define PARSER_H_
 
 #include "config.h"
 

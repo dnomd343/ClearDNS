@@ -1,5 +1,5 @@
-#ifndef _ADGUARD_H_
-#define _ADGUARD_H_
+#ifndef ADGUARD_H_
+#define ADGUARD_H_
 
 #include <stdint.h>
 #include "process.h"

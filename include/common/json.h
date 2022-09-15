@@ -1,5 +1,5 @@
-#ifndef _JSON_H_
-#define _JSON_H_
+#ifndef JSON_H_
+#define JSON_H_
 
 #include <stdint.h>
 #include "cJSON.h"

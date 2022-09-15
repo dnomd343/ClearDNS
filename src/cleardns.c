@@ -42,15 +42,6 @@ int main(int argc, char *argv[]) { // ClearDNS server
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-//    if (is_file_exist("/tmp/test")) {
-//        log_info("File exist");
-//    }
-
-//    create_folder("/tmp/test");
-//    run_command("exit 3");
-    run_command("exit");
-
-    return 0;
 
 //    char **temp = string_list_init();
 //

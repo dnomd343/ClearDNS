@@ -15,6 +15,12 @@ int run_command(const char *command) { // running command with system shell
     return ret;
 }
 
+void remove_file(const char *file) {
+    char *remove_cmd = string_join("rm -f ", file);
+    run_command(remove_cmd);
+    free(remove_cmd);
+}
+
 void create_folder(const char *folder) { // create folder
     if (!access(folder, 0)) { // target is file or folder
         struct stat buf;

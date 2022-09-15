@@ -1,5 +1,5 @@
-#ifndef _CONSTANT_H_
-#define _CONSTANT_H_
+#ifndef CONSTANT_H_
+#define CONSTANT_H_
 
 #define VERSION "1.3.0-dev"
 

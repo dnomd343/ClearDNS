@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "json.h"
 #include "bcrypt.h"
 #include "logger.h"
@@ -75,6 +76,12 @@ process* adguard_load(adguard *info, const char *dir) { // load adguard options
     }
     if (!check_port(info->web_port)) { // invalid web port
         log_fatal("Invalid web port `%u`", info->web_port);
+    }
+    if (!strcmp(info->username, "")) { // invalid username
+        log_fatal("Invalid AdGuardHome username");
+    }
+    if (!strcmp(info->password, "")) { // invalid password
+        log_fatal("Invalid AdGuardHome password");
     }
 
     create_folder(dir); // ensure adguard work dir exist

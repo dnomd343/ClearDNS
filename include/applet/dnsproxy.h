@@ -1,5 +1,5 @@
-#ifndef _DNSPROXY_H_
-#define _DNSPROXY_H_
+#ifndef DNSPROXY_H_
+#define DNSPROXY_H_
 
 #include <stdint.h>
 #include "process.h"

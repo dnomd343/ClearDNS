@@ -1,5 +1,5 @@
-#ifndef _SUNDRY_H_
-#define _SUNDRY_H_
+#ifndef SUNDRY_H_
+#define SUNDRY_H_
 
 #include <stdint.h>
 

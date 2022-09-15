@@ -26,20 +26,17 @@ char* to_json(const char *file) { // convert JSON / TOML / YAML to json format (
     }
     flag[8] = '\0';
 
-    char *output_file = string_join("/tmp/tojson-", flag);
+    char *output_file = string_join("/tmp/to-json-", flag);
     char *to_json_cmd = (char *)malloc(strlen(file) + strlen(output_file) + 11);
     sprintf(to_json_cmd, "toJSON %s > %s", file, output_file);
     int to_json_ret = run_command(to_json_cmd);
     free(to_json_cmd);
 
-    char *remove_cmd = string_join("rm -f ", output_file);
-    run_command(remove_cmd);
-    free(remove_cmd);
-    if (to_json_ret) { // toJSON return non-zero code
-        free(output_file);
-        return NULL; // convert failed
+    char *json_content = NULL;
+    if (!to_json_ret) { // toJSON return zero code (convert fine)
+        json_content = read_file(output_file);
     }
-    char *json_content = read_file(output_file);
+    remove_file(output_file);
     free(output_file);
     return json_content;
 }

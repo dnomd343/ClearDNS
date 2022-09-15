@@ -1,5 +1,5 @@
-#ifndef _OVERTURE_H_
-#define _OVERTURE_H_
+#ifndef OVERTURE_H_
+#define OVERTURE_H_
 
 #include <stdint.h>
 #include "process.h"

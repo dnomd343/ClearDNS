@@ -94,8 +94,8 @@ adguard* load_filter(cleardns_config *config) {
     adguard *filter = adguard_init();
     filter->dns_port = config->port;
     filter->web_port = config->adguard.port;
-    filter->username = config->adguard.username;
-    filter->password = config->adguard.password;
+    filter->username = string_init(config->adguard.username);
+    filter->password = string_init(config->adguard.password);
     char *diverter_port = uint32_to_string(config->diverter.port);
     filter->upstream = string_join("127.0.0.1:", diverter_port);
     free(diverter_port);
