@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
-#include "common.h"
+#include "constant.h"
 #include "flag.h"
 
 int exiting = 0;

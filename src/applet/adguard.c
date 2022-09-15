@@ -1,11 +1,11 @@
 #include <stdlib.h>
-#include "cJSON.h"
-#include "bcrypt.h"
-#include "common.h"
-#include "logger.h"
-#include "adguard.h"
-#include "system.h"
 #include "json.h"
+#include "bcrypt.h"
+#include "logger.h"
+#include "sundry.h"
+#include "system.h"
+#include "adguard.h"
+#include "constant.h"
 
 void adguard_dump(adguard *info);
 char *adguard_config(adguard *info, const char *raw_config);

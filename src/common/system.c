@@ -1,25 +1,48 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
 #include "logger.h"
-#include "common.h"
+#include "sundry.h"
+#include "constant.h"
 
 int run_command(const char *command) { // running command with system shell
     log_debug("Run command -> `%s`", command);
-
-    // TODO: add non-zero return code warning
-
-    return system(command) / 256;
+    int ret = system(command) / 256;
+    if (ret != 0) {
+        log_warn("Command `%s` return non-zero code -> %d", command, ret);
+    }
+    return ret;
 }
 
-void create_folder(const char *folder) {
+void create_folder(const char *folder) { // create folder
+    if (!access(folder, 0)) { // target is file or folder
+        struct stat buf;
+        stat(folder, &buf);
+        if (!(S_IFDIR & buf.st_mode)) { // target is not folder
+            log_error("Create folder failed -> target is file");
+        }
+        return;
+    }
     log_debug("Create folder -> %s", folder);
     char *command = string_join("mkdir -p ", folder);
-    system(command); // TODO: check if folder exist -> skip or continue
+    system(command);
     free(command);
 }
 
+uint8_t is_file_exist(const char *file) { // whether file exist
+    if (!access(file, 0)) { // target is file or folder
+        struct stat buf;
+        stat(file, &buf);
+        if (S_IFREG & buf.st_mode) { // target is file
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void save_file(const char *file, const char *content) { // save content into file
-    log_debug("Write into `%s` -> \n%s", file, content);
+    log_debug("Write into `%s` ->\n%s", file, content);
     FILE* fp = fopen(file , "w");
     if (fp == NULL) {
         log_fatal("Fail to open file -> %s", file);

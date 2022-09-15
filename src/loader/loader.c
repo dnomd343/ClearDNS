@@ -1,11 +1,12 @@
 #include <stdlib.h>
-#include "loader.h"
 #include "config.h"
+#include "loader.h"
 #include "parser.h"
-#include "dnsproxy.h"
-#include "structure.h"
+#include "sundry.h"
 #include "system.h"
-#include "common.h"
+#include "dnsproxy.h"
+#include "constant.h"
+#include "structure.h"
 
 struct cleardns loader;
 

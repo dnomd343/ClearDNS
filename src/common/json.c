@@ -3,38 +3,63 @@
 #include <string.h>
 #include "cJSON.h"
 #include "logger.h"
-#include "common.h"
+#include "sundry.h"
 #include "system.h"
+#include "constant.h"
 #include "structure.h"
 
-char* to_json(const char *file) {
+uint8_t is_json_suffix(const char *file_name) { // whether file name end with `.json` suffix
+    if (strlen(file_name) <= 5) { // file name shorter than `.json`
+        return FALSE;
+    }
+    if (!strcmp(file_name + strlen(file_name) - 5, ".json")) { // xxx.json
+        return TRUE;
+    }
+    return FALSE;
+}
+
+char* to_json(const char *file) { // convert JSON / TOML / YAML to json format (if failed -> return NULL)
     char flag[9];
     for (int i = 0; i < 8; ++i) { // generate 8-bits flag
         flag[i] = (char)gen_rand_num(10);
         flag[i] += 48;
     }
     flag[8] = '\0';
+
     char *output_file = string_join("/tmp/tojson-", flag);
     char *to_json_cmd = (char *)malloc(strlen(file) + strlen(output_file) + 11);
     sprintf(to_json_cmd, "toJSON %s > %s", file, output_file);
-//    log_debug("JSON format command -> `%s`", to_json_cmd);
-    if (run_command(to_json_cmd)) { // toJSON return non-zero code
-        // TODO: try remove output file
-        return NULL; // convert failed
-    }
+    int to_json_ret = run_command(to_json_cmd);
     free(to_json_cmd);
 
+    char *remove_cmd = string_join("rm -f ", output_file);
+    run_command(remove_cmd);
+    free(remove_cmd);
+    if (to_json_ret) { // toJSON return non-zero code
+        free(output_file);
+        return NULL; // convert failed
+    }
     char *json_content = read_file(output_file);
-    char *rm_cmd = string_join("rm -f ", output_file);
-    run_command(rm_cmd);
     free(output_file);
-    free(rm_cmd);
     return json_content;
 }
 
-void json_field_replace(cJSON *entry, const char *field, cJSON *content) {
-    if (!cJSON_ReplaceItemInObject(entry, field, content)) { // field not exist
-        cJSON_AddItemToObject(entry, field, content); // add new field
+cJSON* json_field_get(cJSON *entry, const char *key) { // fetch key from json map (create when key not exist)
+    cJSON *sub = entry->child;
+    while (sub != NULL) { // traverse all keys
+        if (!strcmp(sub->string, key)) { // target key found
+            return sub;
+        }
+        sub = sub->next;
+    }
+    cJSON *new = cJSON_CreateObject(); // create new json key
+    cJSON_AddItemToObject(entry, key, new);
+    return new;
+}
+
+void json_field_replace(cJSON *entry, const char *key, cJSON *content) {
+    if (!cJSON_ReplaceItemInObject(entry, key, content)) { // key not exist
+        cJSON_AddItemToObject(entry, key, content); // add new json key
     }
 }
 
@@ -54,14 +79,21 @@ int json_int_value(char *key, cJSON *json) { // json int or string value -> int
     return 0; // never reach
 }
 
-char* json_string_value(char* key, cJSON *json) {
+uint8_t json_bool_value(char *key, cJSON *json) { // json bool value -> bool
+    if (!cJSON_IsBool(json)) {
+        log_fatal("`%s` must be boolean", key);
+    }
+    return json->valueint;
+}
+
+char* json_string_value(char* key, cJSON *json) { // json string value -> string
     if (!cJSON_IsString(json)) {
         log_fatal("`%s` must be string", key);
     }
     return string_init(json->valuestring);
 }
 
-char** json_string_list_value(char *key, cJSON *json, char **string_list) {
+char** json_string_list_value(char *key, cJSON *json, char **string_list) { // json string array -> string list
     if (cJSON_IsString(json)) {
         string_list = string_list_append(string_list, json->valuestring);
     } else if (cJSON_IsArray(json)) {
@@ -71,15 +103,15 @@ char** json_string_list_value(char *key, cJSON *json, char **string_list) {
                 log_fatal("`%s` must be string array", key);
             }
             string_list = string_list_append(string_list, json->valuestring);
-            json = json->next; // next field
+            json = json->next; // next key
         }
-    } else if (!cJSON_IsNull(json)) {
+    } else if (!cJSON_IsNull(json)) { // allow null -> empty string list
         log_fatal("`%s` must be array or string", key);
     }
     return string_list;
 }
 
-uint32_t** json_uint32_list_value(char *key, cJSON *json, uint32_t **uint32_list) {
+uint32_t** json_uint32_list_value(char *key, cJSON *json, uint32_t **uint32_list) { // json uint32 array -> uint32 list
     if (cJSON_IsNumber(json)) {
         uint32_list = uint32_list_append(uint32_list, json->valueint);
     } else if (cJSON_IsArray(json)) {
@@ -89,40 +121,10 @@ uint32_t** json_uint32_list_value(char *key, cJSON *json, uint32_t **uint32_list
                 log_fatal("`%s` must be number array", key);
             }
             uint32_list = uint32_list_append(uint32_list, json->valueint);
-            json = json->next; // next field
+            json = json->next; // next key
         }
-    } else if (!cJSON_IsNull(json)) {
+    } else if (!cJSON_IsNull(json)) { // allow null -> empty uint32 list
         log_fatal("`%s` must be array or number", key);
     }
     return uint32_list;
-}
-
-uint8_t json_bool_value(char *key, cJSON *json) { // json bool value -> bool
-    if (!cJSON_IsBool(json)) {
-        log_fatal("`%s` must be boolean", key);
-    }
-    return json->valueint;
-}
-
-cJSON* json_field_get(cJSON *entry, const char *field) {
-    cJSON *sub = entry->child;
-    while (sub != NULL) {
-        if (!strcmp(sub->string, field)) {
-            return sub;
-        }
-        sub = sub->next; // next field
-    }
-    cJSON *new = cJSON_CreateObject();
-    cJSON_AddItemToObject(entry, field, new);
-    return new;
-}
-
-uint8_t is_json_suffix(const char *file_name) {
-    if (strlen(file_name) <= 5) { // `.json`
-        return FALSE;
-    }
-    if (!strcmp(file_name + strlen(file_name) - 5, ".json")) {
-        return TRUE;
-    }
-    return FALSE;
 }

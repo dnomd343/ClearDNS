@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include "cJSON.h"
-#include "common.h"
 #include "logger.h"
-#include "dnsproxy.h"
+#include "sundry.h"
 #include "system.h"
+#include "constant.h"
+#include "dnsproxy.h"
 #include "structure.h"
 
 char* dnsproxy_config(dnsproxy *info);

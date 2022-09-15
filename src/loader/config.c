@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include "config.h"
-#include "common.h"
 #include "logger.h"
+#include "sundry.h"
+#include "constant.h"
 #include "structure.h"
 
 cleardns_config* config_init() { // init config struct of cleardns
