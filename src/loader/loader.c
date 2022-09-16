@@ -1,21 +1,29 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "config.h"
 #include "loader.h"
 #include "parser.h"
 #include "sundry.h"
 #include "system.h"
+#include "default.h"
 #include "dnsproxy.h"
 #include "constant.h"
 #include "structure.h"
-#include "default.h"
-#include "logger.h"
 
 struct cleardns loader;
 
+void load_diverter_asset(const char *file) {
+    char *src_file = string_join(ASSETS_DIR, file);
+    char *dst_file = string_join(WORK_DIR, file);
+    file_append(dst_file, src_file);
+    free(dst_file);
+    free(src_file);
+}
+
 void load_diverter_assets() {
-    // ${ASSETS_DIR}${ASSET_GFW_LIST} >> ${WORK_DIR}${ASSET_GFW_LIST}
-    // ${ASSETS_DIR}${ASSET_CHINA_IP} >> ${WORK_DIR}${ASSET_CHINA_IP}
-    // ${ASSETS_DIR}${ASSET_CHINA_LIST} >> ${WORK_DIR}${ASSET_CHINA_LIST}
+    load_diverter_asset(ASSET_CHINA_IP);
+    load_diverter_asset(ASSET_GFW_LIST);
+    load_diverter_asset(ASSET_CHINA_LIST);
 }
 
 dnsproxy* load_domestic(cleardns_config *config) {
@@ -106,9 +114,7 @@ adguard* load_filter(cleardns_config *config) {
 
 void load_config(const char *config_file) {
     cleardns_config *config = config_init();
-
     load_default_config(config_file);
-
     config_parser(config, config_file);
     config_dump(config);
 

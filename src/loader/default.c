@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include "json.h"
 #include "logger.h"
-#include "system.h"
 #include "sundry.h"
+#include "system.h"
 
 #define DEFAULT_CONFIG "\
 port: 53\n\

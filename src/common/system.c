@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <string.h>
 #include "logger.h"
 #include "sundry.h"
 #include "constant.h"
@@ -56,6 +57,13 @@ void save_file(const char *file, const char *content) { // save content into fil
     fputs(content, fp);
     fclose(fp);
     log_debug("Save `%s` success", file);
+}
+
+void file_append(const char *base_file, const char *append_file) { // append_file >> base_file
+    char *append_cmd = (char *)malloc(strlen(base_file) + strlen(append_file) + 9);
+    sprintf(append_cmd, "cat %s >> %s", append_file, base_file);
+    run_command(append_cmd);
+    free(append_cmd);
 }
 
 char* read_file(const char *file) { // read file content
