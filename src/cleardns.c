@@ -10,6 +10,7 @@
 #include "structure.h"
 #include "adguard.h"
 #include "system.h"
+#include "assets.h"
 
 //#include <stdio.h>
 //#include <string.h>
@@ -35,7 +36,7 @@
 //    fprintf(stderr, "\"\n");
 //}
 
-
+// TODO: load `--debug`, `--config ...`, `--version`
 
 int main(int argc, char *argv[]) { // ClearDNS server
 
@@ -43,13 +44,10 @@ int main(int argc, char *argv[]) { // ClearDNS server
     log_info("ClearDNS server start (%s)", VERSION);
 
 
-//    char **temp = string_list_init();
-//
-//    temp = string_list_append(temp, "a");
-//    temp = string_list_append(temp, "b");
-//    temp = string_list_append(temp, "c");
-//
-//    save_string_list("test.txt", temp);
+    // TODO: load assets -> extract `/assets.tar.xz` -> ${ASSETS_DIR}*.txt
+
+    load_assets();
+    return 0;
 
 
     load_config("test.json");
@@ -58,86 +56,6 @@ int main(int argc, char *argv[]) { // ClearDNS server
     dnsproxy_load("Foreign", loader.foreign, "foreign.json");
     overture_load(loader.diverter, "overture.json");
     adguard_load(loader.filter, ADGUARD_DIR);
-
-
-//    char **temp = string_list_init();
-//    temp = string_list_append(temp, "123");
-//    temp = string_list_append(temp, "abc");
-//    temp = string_list_append(temp, "ok");
-//
-//    char *str = string_list_dump(temp);
-//    log_info("`%s`", str);
-//    free(str);
-//    string_list_free(temp);
-
-//    uint32_t **temp = uint32_list_init();
-//    temp = uint32_list_append(temp, 123);
-//    temp = uint32_list_append(temp, 456);
-//    temp = uint32_list_append(temp, 789);
-//
-//    char *str = uint32_list_dump(temp);
-//    log_info("`%s`\n", str);
-//    free(str);
-//    uint32_list_free(temp);
-
-
-//    dnsproxy *domestic = dnsproxy_init(DOMESTIC_PORT);
-//
-//    dnsproxy_add_bootstrap(domestic, "1.1.1.1");
-//    dnsproxy_add_bootstrap(domestic, "8.8.8.8");
-//
-//    dnsproxy_add_primary(domestic, "223.5.5.5");
-//    dnsproxy_add_primary(domestic, "tls://dns.pub");
-//
-//    dnsproxy_add_fallback(domestic, "tls://223.6.6.6");
-//    dnsproxy_add_fallback(domestic, "tls://120.53.53.53");
-//
-//    domestic->verify = FALSE;
-//    domestic->parallel = FALSE;
-//    domestic->optimistic = TRUE;
-//    domestic->debug = TRUE;
-//    domestic->cache = 4194304; // 4MiB
-//
-//    process *p = dnsproxy_load("Domestic", domestic, "domestic.json");
-//    log_info("cmd -> %s", string_list_dump(p->cmd));
-//    log_info("env -> %s", string_list_dump(p->env));
-//    log_info("cwd -> %s", p->cwd);
-
-
-//    overture *diverter = overture_init();
-//
-//    diverter->port = 5454;
-//    diverter->timeout = 8;
-//    diverter->domestic_ip_file = "china-ip.txt";
-//    diverter->domestic_domain_file = "chinalist.txt";
-//    diverter->foreign_domain_file = "gfwlist.txt";
-//
-//    diverter->debug = TRUE;
-//    diverter->ttl_file = "domain_ttl.txt";
-//    diverter->host_file = "hosts.txt";
-//    diverter->reject_type = uint32_list_append(diverter->reject_type, 255);
-//    diverter->reject_type = uint32_list_append(diverter->reject_type, 254);
-//
-//    process *p = overture_load(diverter, "overture.json");
-//    log_info("cmd -> %s", string_list_dump(p->cmd));
-//    log_info("env -> %s", string_list_dump(p->env));
-//    log_info("cwd -> %s", p->cwd);
-
-
-//    adguard *filter = adguard_init();
-//
-//    filter->debug = TRUE;
-//    filter->dns_port = 54;
-//    filter->web_port = 8080;
-//    filter->upstream = "127.0.0.1:5454";
-//
-//    filter->username = "dnomd343";
-//    filter->password = "password";
-//
-//    process *p = adguard_load(filter, "/cleardns/adguard/");
-//    log_info("cmd -> %s", string_list_dump(p->cmd));
-//    log_info("env -> %s", string_list_dump(p->env));
-//    log_info("cwd -> %s", p->cwd);
 
 
 //    int debug_mode = 0;

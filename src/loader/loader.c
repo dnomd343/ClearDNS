@@ -104,10 +104,12 @@ adguard* load_filter(cleardns_config *config) {
 
 void load_config(const char *config_file) {
     cleardns_config *config = config_init();
+
+    // TODO: load default configure
+
     config_parser(config, config_file);
     config_dump(config);
 
-    // TODO: extract assets file
     // TODO: mkdir -p ${WORK_DIR}
 
     if (!config->adguard.enable) {

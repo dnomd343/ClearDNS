@@ -152,6 +152,9 @@ void cleardns_parser(cleardns_config *config, const char *config_content) { // J
 }
 
 void config_parser(cleardns_config *config, const char *config_file) {
+
+    // TODO: load custom script
+
     char *config_content = read_file(config_file);
     if (is_json_suffix(config_file)) { // JSON format
         log_info("Start JSON configure parser");

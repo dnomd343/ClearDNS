@@ -20,9 +20,10 @@
 #define DNSPROXY_BIN "dnsproxy"
 #define OVERTURE_BIN "overture"
 #define ADGUARD_BIN  "AdGuardHome"
+#define ASSETS_PKG   "/assets.tar.xz"
 
-#define WORK_DIR    "/etc/cleardns/"
 #define EXPOSE_DIR  "/cleardns/"
+#define WORK_DIR    "/etc/cleardns/"
 #define ASSETS_DIR  "/cleardns/assets/"
 #define ADGUARD_DIR "/cleardns/adguard/"
 
