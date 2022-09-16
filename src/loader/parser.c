@@ -155,19 +155,18 @@ void config_parser(cleardns_config *config, const char *config_file) {
 
     // TODO: load custom script
 
-    char *config_content = read_file(config_file);
+    char *config_content;
     if (is_json_suffix(config_file)) { // JSON format
         log_info("Start JSON configure parser");
-        cleardns_parser(config, config_content); // configure parser
+        config_content = read_file(config_file);
     } else { // YAML or TOML format
         log_info("Start configure parser");
-        char *json_content = to_json(config_content); // convert to json format
-        if (json_content == NULL) {
+        config_content = to_json(config_file); // convert to json format
+        if (config_content == NULL) {
             log_fatal("Configure parser error");
         }
-        cleardns_parser(config, json_content); // configure parser
-        free(json_content);
     }
+    cleardns_parser(config, config_content); // configure parser
     free(config_content);
     log_info("Configure parser success");
 }

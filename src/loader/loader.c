@@ -7,6 +7,8 @@
 #include "dnsproxy.h"
 #include "constant.h"
 #include "structure.h"
+#include "default.h"
+#include "logger.h"
 
 struct cleardns loader;
 
@@ -105,12 +107,10 @@ adguard* load_filter(cleardns_config *config) {
 void load_config(const char *config_file) {
     cleardns_config *config = config_init();
 
-    // TODO: load default configure
+    load_default_config(config_file);
 
     config_parser(config, config_file);
     config_dump(config);
-
-    // TODO: mkdir -p ${WORK_DIR}
 
     if (!config->adguard.enable) {
         config->diverter.port = config->port; // override diverter port by dns port

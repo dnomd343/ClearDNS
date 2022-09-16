@@ -67,6 +67,8 @@ int main(int argc, char *argv[]) { // ClearDNS server
     LOG_LEVEL = LOG_DEBUG; // TODO: dev only
     log_info("ClearDNS server start (%s)", VERSION);
 
+    create_folder(WORK_DIR);
+
     load_config(config_file);
     free(config_file);
 
