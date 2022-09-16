@@ -39,6 +39,7 @@ cleardns_config* config_init() { // init config struct of cleardns
     config->reject = uint32_list_init();
     config->hosts = string_list_init();
     config->ttl = string_list_init();
+    config->script = string_list_init();
     return config;
 }
 
@@ -75,6 +76,7 @@ void config_dump(cleardns_config *config) { // dump config info of cleardns
     uint32_list_debug("DNS reject type", config->reject);
     string_list_debug("Domain TTL", config->ttl);
     string_list_debug("Hosts", config->hosts);
+    string_list_debug("Custom script", config->script);
 }
 
 void config_free(cleardns_config *config) { // free config struct of cleardns
@@ -93,6 +95,8 @@ void config_free(cleardns_config *config) { // free config struct of cleardns
     uint32_list_free(config->reject);
     string_list_free(config->hosts);
     string_list_free(config->ttl);
+    string_list_free(config->script);
+
     free(config->adguard.username);
     free(config->adguard.password);
     free(config);

@@ -42,6 +42,7 @@ typedef struct {
     uint32_t **reject;
     char **hosts;
     char **ttl;
+    char **script;
 } cleardns_config;
 
 cleardns_config* config_init();

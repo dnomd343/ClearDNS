@@ -1,25 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
 #include <string.h>
 #include "loader.h"
 #include "logger.h"
 #include "constant.h"
 #include "dnsproxy.h"
 #include "overture.h"
-#include "structure.h"
 #include "adguard.h"
 #include "system.h"
-#include "assets.h"
 #include "sundry.h"
-
-//char *init_script = "/usr/bin/load";
-//char *custom_script = "/etc/cleardns/custom.sh";
-//
-//char *adguard_workdir = "/etc/cleardns/AdGuardHome";
-//char *overture_config = "/etc/overture/config.yml";
-//char *upstream_config = "/etc/cleardns/upstream.json";
 
 #define HELP_MSG "\
 ClearDNS usage \n\
@@ -29,8 +18,6 @@ ClearDNS usage \n\
 "
 
 #define CONFIG_FILE "test.json"
-
-// TODO: load `--debug`, `--config ...`, `--version`, `--help`
 
 char* init(int argc, char *argv[]) { // return config file
     char *config = string_init(CONFIG_FILE);
@@ -64,7 +51,6 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     char *config_file = init(argc, argv);
 
-    LOG_LEVEL = LOG_DEBUG; // TODO: dev only
     log_info("ClearDNS server start (%s)", VERSION);
 
     create_folder(WORK_DIR);
@@ -72,12 +58,17 @@ int main(int argc, char *argv[]) { // ClearDNS server
     load_config(config_file);
     free(config_file);
 
-    dnsproxy_load("Domestic", loader.domestic, "domestic.json");
-    dnsproxy_load("Foreign", loader.foreign, "foreign.json");
-    overture_load(loader.diverter, "overture.json");
-    adguard_load(loader.filter, ADGUARD_DIR);
+    process_list_init();
+    process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
+    process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
+    process_list_append(overture_load(loader.diverter, "overture.json"));
+    if (loader.filter != NULL) {
+        process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
+    }
 
     // TODO: running custom script
+
+    process_list_run();
 
 
 //    init_server(init_script, custom_script); // run init script and custom script

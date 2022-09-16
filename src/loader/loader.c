@@ -9,6 +9,7 @@
 #include "dnsproxy.h"
 #include "constant.h"
 #include "structure.h"
+#include "logger.h"
 
 struct cleardns loader;
 
@@ -114,16 +115,23 @@ adguard* load_filter(cleardns_config *config) {
 
 void load_config(const char *config_file) {
     cleardns_config *config = config_init();
-    load_default_config(config_file);
-    config_parser(config, config_file);
+    load_default_config(config_file); // load default configure
+    config_parser(config, config_file); // configure parser
     config_dump(config);
 
+    log_info("Loading configure options");
     if (!config->adguard.enable) {
         config->diverter.port = config->port; // override diverter port by dns port
     }
     loader.domestic = load_domestic(config);
+    log_debug("Domestic options parser success");
     loader.foreign = load_foreign(config);
+    log_debug("Foreign options parser success");
     loader.diverter = load_diverter(config);
+    log_debug("Diverter options parser success");
     loader.filter = load_filter(config);
+    log_debug("Filter options parser success");
+    loader.script = string_list_init();
+    loader.script = string_list_update(loader.script, config->script);
     config_free(config);
 }

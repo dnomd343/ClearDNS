@@ -10,6 +10,7 @@ struct cleardns {
     dnsproxy *foreign;
     overture *diverter;
     adguard *filter;
+    char **script;
 };
 
 extern struct cleardns loader;

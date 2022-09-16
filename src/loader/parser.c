@@ -146,15 +146,15 @@ void cleardns_parser(cleardns_config *config, const char *config_content) { // J
         if (!strcmp(json->string, "ttl")) {
             config->ttl = json_string_list_value("ttl", json, config->ttl);
         }
+        if (!strcmp(json->string, "custom")) {
+            config->script = json_string_list_value("custom", json, config->script);
+        }
         json = json->next; // next field
     }
     cJSON_free(json); // free JSON struct
 }
 
 void config_parser(cleardns_config *config, const char *config_file) {
-
-    // TODO: load custom script
-
     char *config_content;
     if (is_json_suffix(config_file)) { // JSON format
         log_info("Start JSON configure parser");
