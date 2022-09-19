@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include "loader.h"
 #include "logger.h"
 #include "constant.h"
@@ -51,20 +52,37 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     char *config_file = init(argc, argv);
 
+    LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
+
+//    process *test = process_init("TEST", "lls");
+    process *test = process_init("TEST", "ls");
+
+    process_add_arg(test, "-al");
+
+//    test->cwd = "/etc/cleardns/fuck";
+
+    int pid = process_exec(test);
+
+    log_info("PID = %d", pid);
+
+    int status;
+    wait(&status);
+
+    return 0;
 
     create_folder(WORK_DIR);
 
-    load_config(config_file);
-    free(config_file);
-
-    process_list_init();
-    process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
-    process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
-    process_list_append(overture_load(loader.diverter, "overture.json"));
-    if (loader.filter != NULL) {
-        process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
-    }
+//    load_config(config_file);
+//    free(config_file);
+//
+//    process_list_init();
+//    process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
+//    process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
+//    process_list_append(overture_load(loader.diverter, "overture.json"));
+//    if (loader.filter != NULL) {
+//        process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
+//    }
 
     // TODO: running custom script
 

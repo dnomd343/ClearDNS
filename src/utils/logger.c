@@ -51,9 +51,21 @@ void log_printf(int level, const char *fmt, ...) {
     }
 }
 
-void log_perror(char *prefix) {
+//void log_perror(char *prefix) {
+//    fprint_prefix();
+//    fprintf(stderr, " %s%s\x1b[0m ", log_color[LOG_ERROR], log_string[LOG_ERROR]);
+//    fflush(stderr);
+//    perror(prefix);
+//}
+
+// TODO: update perror logger
+
+void log_perror(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
     fprint_prefix();
     fprintf(stderr, " %s%s\x1b[0m ", log_color[LOG_ERROR], log_string[LOG_ERROR]);
+    vfprintf(stderr, fmt, ap); // output log content
     fflush(stderr);
-    perror(prefix);
+    perror("");
 }
