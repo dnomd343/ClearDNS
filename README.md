@@ -8,6 +8,218 @@ ClearDNS可以在DNS层面上实现去广告与防跟踪功能，按需求配置
 
 ClearDNS可部署在主路由器上，但需要路由器刷入支持Docker的固件；对于性能较低或不支持刷机的路由器，建议部署在内网一台长期开机的设备上（树莓派、小主机、旁路由等）。
 
+TODO: add structure of cleardns here (input -> adguard -> overture -> domestic/foreign)
+
+TODO: plain dns / dns over http / dns over tls / dns over quic / dnscrypt
+
+TODO: about assets (gfwlist, chinalist, china-ip)
+
+## Configure Demo
+
+We use YAML format for ClearDNS.
+
+```yaml
+port: 53
+
+cache:
+  ···
+
+adguard:
+  ···
+
+diverter:
+  ···
+
+domestic:
+  ···
+
+foreign:
+  ···
+
+assets:
+  ···
+
+reject:
+  ···
+
+hosts:
+  ···
+
+ttl:
+  ···
+```
+
+### Port
+
+DNS 服务端口，支持 TCP 与 UDP 查询，默认为 53
+
+### Cache
+
+DNS 缓存配置，此处与 AdGuardHome 中的缓存不相关，建议打开一个即可
+
+```yaml
+cache:
+  size: 0
+  enable: false
+  optimistic: false
+```
+
++ `enable` ：是否开启 DNS 缓存，默认为 `false`
+
++ `size` ：DNS 缓存容量，单位为字节，开启时建议设置在 `64k` 到 `4m` 量级，默认为 0
+
++ `optimistic` ：DNS 乐观缓存，开启后在记录超过 TTL 后，仍然返回原数据（TTL 修改为 10），同时立即发起查询（绝大多数 DNS 记录在 TTL 期限内未发生变化）
+
+### AdGuard
+
+AdGuardHome 配置选项
+
+```yaml
+adguard:
+  enable: true
+  port: 80
+  username: admin
+  password: cleardns
+```
+
++ `enable` ：是否开启 AdGuardHome 功能，默认为 `false`
+
++ `port` ：AdGuardHome 网页服务端口，默认为 `80`
+
++ `username` ：AdGuardHome 登录用户名，默认为 `admin`
+
++ `password` ：AdGuardHome 登录密码，默认为 `cleardns`
+
+### Diverter
+
+DNS 分流选项，将数据
+
+```yaml
+diverter:
+  port: 5353
+  gfwlist: []
+  china_ip: []
+  chinalist: []
+```
+
++ `port` ：DNS 分流器端口，若 AdGuardHome 未开启，本选项将失效，默认为 `5353`
+
+> 以下选项用于添加自定义规则，将覆盖在资源文件上
+
++ `gfwlist` ：自定义的 GFW 拦截域名列表，针对该域名的查询将屏蔽 `domestic` 组结果
+
++ `chinalist` ：...
+
++ `china-ip` ：...
+
+### Domestic
+
+国内 DNS 配置选项
+
+```yaml
+domestic:
+  port: 4053
+  verify: true
+  parallel: true
+  bootstrap: "..."
+  primary:
+    - ...
+    - ...
+  fallback:
+    - ...
+    - ...
+```
+
++ `port` ：国内组 DNS 端口，默认为 `4053`
+
++ `verify` ：是否验证证书合法性，关闭后允许无效的 TLS 证书，默认为 `true`
+
++ `parallel` ：是否对多个上游进行并行查询，默认为 `true`
+
++ `bootstrap` ：引导 DNS 服务器，用于 `primary` 与 `fallback` 中 DNS 服务器域名的查询，必须为 `Plain DNS` ，此处可为一个字符串或字符串数组
+
++ `primary` ：主 DNS 列表，用于默认情况下的查询
+
++ `fallback` ：备用 DNS 服务器，当 `primary` 中 DNS 服务器无效时回落到此处再次查询
+
+### Foreign
+
+```yaml
+domestic:
+  port: 6053
+  verify: true
+  parallel: true
+  bootstrap: "..."
+  primary:
+    - ...
+    - ...
+  fallback:
+    - ...
+    - ...
+```
+
++ `port` ：国外组 DNS 端口，默认为 `6053`
+
+其余选项同上
+
+### Reject
+
+DNS 拒绝类型，指定屏蔽的 DNS 记录类型
+
+TODO: add dns record type (wiki)
+
+```yaml
+reject:
+  - 255
+```
+
+### Hosts
+
+Hosts 记录，指定域名对应 IP 地址
+
+```yaml
+hosts:
+  - "..."
+  - "..."
+```
+
+### TTL
+
+配置特定域名的 ttl 时长，支持正则表达式匹配
+
+```yaml
+ttl:
+  - "..."
+  - "..."
+```
+
+### Custom
+
+自定义脚本，在启动前执行
+
+> use ash of alpine
+
+```yaml
+custom:
+  - "..."
+```
+
+### Assets
+
+分流资源升级配置，用于自动更新资源文件
+
+```
+assets:
+  cron: "..."
+  url:
+    gfwlist.txt: https://res.dnomd343.top/Share/...
+    ...
+```
+
++ `cron` ：指定触发升级的 Crontab 表达式
+
++ `url` ：指定资源升级的 URL 链接
+
 ## 部署教程
 
 ### 1. 网络配置
