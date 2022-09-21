@@ -48,6 +48,9 @@ int main(int argc, char *argv[]) { // ClearDNS service
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
+//    remove_file("/tmp/test.txt");
+    create_folder("/tmp/test");
+    return 0;
 
 //    process *test = process_init("TEST", "lls");
 //    process *test = process_init("TEST", "ls");

@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <string.h>
 #include "logger.h"
 #include "sundry.h"
+#include "system.h"
 #include "constant.h"
 
 int run_command(const char *command) { // running command under system shell
@@ -17,10 +18,13 @@ int run_command(const char *command) { // running command under system shell
 }
 
 void remove_file(const char *file) { // delete file
-    // TODO: use system interface (not `rm` command)
-    char *remove_cmd = string_join("rm -f ", file);
-    run_command(remove_cmd);
-    free(remove_cmd);
+    if (!is_file_exist(file)) { // file not found
+        log_debug("Delete file `%s` skip -> file not exist", file);
+    } else if (remove(file)) { // remove failed
+        log_perror("Delete file `%s` failed -> ", file);
+    } else { // remove success
+        log_debug("Delete file `%s` success", file);
+    }
 }
 
 void create_folder(const char *folder) { // create folder
@@ -28,15 +32,15 @@ void create_folder(const char *folder) { // create folder
         struct stat buf;
         stat(folder, &buf);
         if (!(S_IFDIR & buf.st_mode)) { // target is not folder
-            log_error("Create folder failed -> target is file");
+            log_error("Create folder `%s` failed -> target is file", folder);
+        } else {
+            log_debug("Create folder `%s` skip -> folder exist", folder);
         }
-        return;
+    } else if (mkdir(folder, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) { // folder -> 755
+        log_perror("Create folder `%s` failed -> ", folder);
+    } else {
+        log_debug("Create folder `%s` success", folder);
     }
-    log_debug("Create folder -> %s", folder);
-    // TODO: use system command (not `mkdir` command)
-    char *command = string_join("mkdir -p ", folder);
-    system(command);
-    free(command);
 }
 
 uint8_t is_file_exist(const char *file) { // whether file exist
