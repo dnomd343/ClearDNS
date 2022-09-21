@@ -4,6 +4,7 @@
 #include <string.h>
 #include "sundry.h"
 #include "constant.h"
+#include "structure.h"
 
 char** string_list_init() { // init string list
     char **string_list = (char **)malloc(sizeof(char *));
@@ -18,19 +19,36 @@ uint32_t string_list_len(char **string_list) { // get len of string list
 }
 
 // TODO: use char *** with void return
-char** string_list_append(char **string_list, const char *string) { // add new string at the end of list
-    uint32_t len = string_list_len(string_list);
-    string_list = (char **)realloc(string_list, sizeof(char *) * (len + 2)); // extend string list
-    string_list[len] = string_init(string);
-    string_list[len + 1] = NULL; // list end sign
-    return string_list;
+//char** string_list_append(char **string_list, const char *string) { // add new string at the end of list
+//    uint32_t len = string_list_len(string_list);
+//    string_list = (char **)realloc(string_list, sizeof(char *) * (len + 2)); // extend string list
+//    string_list[len] = string_init(string);
+//    string_list[len + 1] = NULL; // list end sign
+//    return string_list;
+//}
+
+void string_list_append(char ***string_list, const char *string) {
+    uint32_t len = string_list_len(*string_list);
+    *string_list = (char **)realloc(*string_list, sizeof(char *) * (len + 2)); // extend string list
+    (*string_list)[len] = string_init(string);
+    (*string_list)[len + 1] = NULL; // list end sign
+//    return string_list;
 }
 
-char** string_list_update(char **base_list, char **update_list) { // combine two string list
+//char** string_list_update(char **base_list, char **update_list) { // combine two string list
+//    for (char **string = update_list; *string != NULL; ++string) {
+////        base_list = string_list_append(base_list, *string);
+//        string_list_append(&base_list, *string);
+//    }
+//    return base_list;
+//}
+
+void string_list_update(char ***base_list, char **update_list) { // combine two string list
     for (char **string = update_list; *string != NULL; ++string) {
-        base_list = string_list_append(base_list, *string);
+//        base_list = string_list_append(base_list, *string);
+        string_list_append(base_list, *string);
     }
-    return base_list;
+//    return base_list;
 }
 
 void string_list_free(char **string_list) { // free string list

@@ -92,14 +92,14 @@ char* json_string_value(char* key, cJSON *json) { // json string value -> string
 
 char** json_string_list_value(char *key, cJSON *json, char **string_list) { // json string array -> string list
     if (cJSON_IsString(json)) {
-        string_list = string_list_append(string_list, json->valuestring);
+        string_list_append(&string_list, json->valuestring);
     } else if (cJSON_IsArray(json)) {
         json = json->child;
         while (json != NULL) {
             if (!cJSON_IsString(json)) {
                 log_fatal("`%s` must be string array", key);
             }
-            string_list = string_list_append(string_list, json->valuestring);
+            string_list_append(&string_list, json->valuestring);
             json = json->next; // next key
         }
     } else if (!cJSON_IsNull(json)) { // allow null -> empty string list

@@ -11,15 +11,15 @@ char* dnsproxy_config(dnsproxy *info);
 void dnsproxy_dump(const char *caption, dnsproxy *info);
 
 void dnsproxy_add_primary(dnsproxy *info, const char *server) { // add primary dns server
-    info->primary = string_list_append(info->primary, server);
+    string_list_append(&info->primary, server);
 }
 
 void dnsproxy_add_fallback(dnsproxy *info, const char *server) { // add fallback dns server
-    info->fallback = string_list_append(info->fallback, server);
+    string_list_append(&info->fallback, server);
 }
 
 void dnsproxy_add_bootstrap(dnsproxy *info, const char *server) { // add bootstrap dns server
-    info->bootstrap = string_list_append(info->bootstrap, server);
+    string_list_append(&info->bootstrap, server);
 }
 
 void dnsproxy_free(dnsproxy *info) { // free dnsproxy options

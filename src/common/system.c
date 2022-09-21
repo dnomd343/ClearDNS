@@ -7,16 +7,17 @@
 #include "sundry.h"
 #include "constant.h"
 
-int run_command(const char *command) { // running command with system shell
+int run_command(const char *command) { // running command under system shell
     log_debug("Run command -> `%s`", command);
-    int ret = system(command) / 256;
-    if (ret != 0) {
-        log_warn("Command `%s` return non-zero code -> %d", command, ret);
+    int ret_code = system(command) / 256;
+    if (ret_code != 0) {
+        log_warn("Command `%s` return non-zero code %d", command, ret_code);
     }
-    return ret;
+    return ret_code;
 }
 
-void remove_file(const char *file) {
+void remove_file(const char *file) { // delete file
+    // TODO: use system interface (not `rm` command)
     char *remove_cmd = string_join("rm -f ", file);
     run_command(remove_cmd);
     free(remove_cmd);
@@ -32,6 +33,7 @@ void create_folder(const char *folder) { // create folder
         return;
     }
     log_debug("Create folder -> %s", folder);
+    // TODO: use system command (not `mkdir` command)
     char *command = string_join("mkdir -p ", folder);
     system(command);
     free(command);

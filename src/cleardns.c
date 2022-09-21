@@ -10,6 +10,7 @@
 #include "adguard.h"
 #include "system.h"
 #include "sundry.h"
+#include "structure.h"
 
 char* init(int argc, char *argv[]) { // return config file
     char *config = string_init(CONFIG_FILE);
@@ -45,6 +46,27 @@ int main(int argc, char *argv[]) { // ClearDNS service
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
+    char **test = string_list_init();
+    log_info("len -> %u", string_list_len(test));
+    string_list_append(&test, "test1");
+    string_list_append(&test, "test2");
+    string_list_append(&test, "test3");
+    log_info("len -> %u", string_list_len(test));
+
+    char *temp = string_list_dump(test);
+    log_info("content -> %s", temp);
+    free(temp);
+
+    char **add = string_list_init();
+    string_list_append(&add, "test4");
+    string_list_append(&add, "test5");
+
+    string_list_update(&test, add);
+    log_info("len -> %d", string_list_len(test));
+    temp = string_list_dump(test);
+    log_info("content -> %s", temp);
+    free(temp);
+
 //    process *test = process_init("TEST", "lls");
 //    process *test = process_init("TEST", "ls");
 //    process_add_arg(test, "-al");
@@ -56,11 +78,11 @@ int main(int argc, char *argv[]) { // ClearDNS service
 //    wait(&status);
 //    return 0;
 
-    create_folder(WORK_DIR);
+//    create_folder(WORK_DIR);
 
     // TODO: load assets first
-    load_config(config_file);
-    free(config_file);
+//    load_config(config_file);
+//    free(config_file);
 
 //    process_list_init();
 //    process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));

@@ -35,9 +35,9 @@ dnsproxy* load_domestic(cleardns_config *config) {
         domestic->cache = config->cache.size;
         domestic->optimistic = config->cache.optimistic;
     }
-    domestic->bootstrap = string_list_update(domestic->bootstrap, config->domestic.bootstrap);
-    domestic->fallback = string_list_update(domestic->fallback, config->domestic.fallback);
-    domestic->primary = string_list_update(domestic->primary, config->domestic.primary);
+    string_list_update(&domestic->bootstrap, config->domestic.bootstrap);
+    string_list_update(&domestic->fallback, config->domestic.fallback);
+    string_list_update(&domestic->primary, config->domestic.primary);
     return domestic;
 }
 
@@ -49,9 +49,9 @@ dnsproxy* load_foreign(cleardns_config *config) {
         foreign->cache = config->cache.size;
         foreign->optimistic = config->cache.optimistic;
     }
-    foreign->bootstrap = string_list_update(foreign->bootstrap, config->foreign.bootstrap);
-    foreign->fallback = string_list_update(foreign->fallback, config->foreign.fallback);
-    foreign->primary = string_list_update(foreign->primary, config->foreign.primary);
+    string_list_update(&foreign->bootstrap, config->foreign.bootstrap);
+    string_list_update(&foreign->fallback, config->foreign.fallback);
+    string_list_update(&foreign->primary, config->foreign.primary);
     return foreign;
 }
 
@@ -119,8 +119,8 @@ void load_config(const char *config_file) {
     config_parser(config, config_file); // configure parser
 
     // insert code (remove after test)
-    config->assets.update_file = string_list_append(config->assets.update_file, "geoip.dat");
-    config->assets.update_url = string_list_append(config->assets.update_url, "https://test.net/geoip.dat");
+    string_list_append(&config->assets.update_file, "geoip.dat");
+    string_list_append(&config->assets.update_url, "https://test.net/geoip.dat");
     config_dump(config);
 
     log_info("Loading configure options");
@@ -136,6 +136,6 @@ void load_config(const char *config_file) {
     loader.filter = load_filter(config);
     log_debug("Filter options parser success");
     loader.script = string_list_init();
-    loader.script = string_list_update(loader.script, config->script);
+    string_list_update(&loader.script, config->script);
     config_free(config);
 }
