@@ -102,12 +102,15 @@ void config_free(cleardns_config *config) { // free config struct of cleardns
     string_list_free(config->diverter.china_ip);
     string_list_free(config->diverter.chinalist);
 
+    string_list_free(config->assets.update_file);
+    string_list_free(config->assets.update_url);
+
     uint32_list_free(config->reject);
     string_list_free(config->hosts);
     string_list_free(config->ttl);
     string_list_free(config->script);
-
     free(config->adguard.username);
     free(config->adguard.password);
+    free(config->assets.cron);
     free(config);
 }

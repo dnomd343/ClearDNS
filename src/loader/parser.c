@@ -113,7 +113,6 @@ void adguard_parser(adguard_config *config, cJSON *json) { // adguard options pa
 }
 
 void assets_parser(assets_config *config, cJSON *json) { // assets options parser
-
     if (!cJSON_IsObject(json)) {
         log_fatal("`assets` must be array");
     }
@@ -123,8 +122,7 @@ void assets_parser(assets_config *config, cJSON *json) { // assets options parse
             config->cron = json_string_value("assets.cron", json);
         }
         if (!strcmp(json->string, "update")) {
-            log_warn("GET UPDATE KEY");
-            // TODO: get string map
+            json_string_map_value("assets.update", json, &config->update_file, &config->update_url);
         }
         json = json->next; // next field
     }

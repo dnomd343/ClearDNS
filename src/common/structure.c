@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sundry.h"
-#include "constant.h"
 #include "structure.h"
 
 char** string_list_init() { // init string list
@@ -18,37 +17,17 @@ uint32_t string_list_len(char **string_list) { // get len of string list
     return num - 1;
 }
 
-// TODO: use char *** with void return
-//char** string_list_append(char **string_list, const char *string) { // add new string at the end of list
-//    uint32_t len = string_list_len(string_list);
-//    string_list = (char **)realloc(string_list, sizeof(char *) * (len + 2)); // extend string list
-//    string_list[len] = string_init(string);
-//    string_list[len + 1] = NULL; // list end sign
-//    return string_list;
-//}
-
 void string_list_append(char ***string_list, const char *string) {
     uint32_t len = string_list_len(*string_list);
     *string_list = (char **)realloc(*string_list, sizeof(char *) * (len + 2)); // extend string list
     (*string_list)[len] = string_init(string);
     (*string_list)[len + 1] = NULL; // list end sign
-//    return string_list;
 }
-
-//char** string_list_update(char **base_list, char **update_list) { // combine two string list
-//    for (char **string = update_list; *string != NULL; ++string) {
-////        base_list = string_list_append(base_list, *string);
-//        string_list_append(&base_list, *string);
-//    }
-//    return base_list;
-//}
 
 void string_list_update(char ***base_list, char **update_list) { // combine two string list
     for (char **string = update_list; *string != NULL; ++string) {
-//        base_list = string_list_append(base_list, *string);
         string_list_append(base_list, *string);
     }
-//    return base_list;
 }
 
 void string_list_free(char **string_list) { // free string list
@@ -90,14 +69,12 @@ void uint32_list_append(uint32_t ***uint32_list, uint32_t number) { // add new u
     (*uint32_list)[len] = (uint32_t *)malloc(sizeof(uint32_t));
     *(*uint32_list)[len] = number;
     (*uint32_list)[len + 1] = NULL; // list end sign
-//    return uint32_list;
 }
 
 void uint32_list_update(uint32_t ***base_list, uint32_t **update_list) { // combine two uint32 list
     for (uint32_t **number = update_list; *number != NULL; ++number) {
         uint32_list_append(base_list, **number);
     }
-//    return base_list;
 }
 
 void uint32_list_free(uint32_t **uint32_list) { // free uint32 list

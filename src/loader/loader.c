@@ -113,14 +113,15 @@ adguard* load_filter(cleardns_config *config) {
     return filter;
 }
 
-void load_config(const char *config_file) {
+assets_config* load_assets(cleardns_config *config) {
+    // TODO: load assets
+    return NULL;
+}
+
+void load_config(const char *config_file) { // parser and load cleardns configure
     cleardns_config *config = config_init();
     load_default_config(config_file); // load default configure
     config_parser(config, config_file); // configure parser
-
-    // insert code (remove after test)
-    string_list_append(&config->assets.update_file, "geoip.dat");
-    string_list_append(&config->assets.update_url, "https://test.net/geoip.dat");
     config_dump(config);
 
     log_info("Loading configure options");
@@ -135,7 +136,10 @@ void load_config(const char *config_file) {
     log_debug("Diverter options parser success");
     loader.filter = load_filter(config);
     log_debug("Filter options parser success");
+    loader.assets = load_assets(config);
+    log_debug("Assets options parser success");
     loader.script = string_list_init();
     string_list_update(&loader.script, config->script);
+    log_debug("Custom script parser success");
     config_free(config);
 }
