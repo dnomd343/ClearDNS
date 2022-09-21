@@ -40,6 +40,13 @@ foreign:\n\
   fallback:\n\
     - 1.1.1.1\n\
     - 8.8.4.4\n\
+\n\
+assets:\n\
+  cron: \"0 4 * * *\"\n\
+  update:\n\
+    gfwlist.txt: https://res.dnomd343.top/Share/gfwlist/gfwlist.txt\n\
+    china-ip.txt: https://res.dnomd343.top/Share/chinalist/china-ip.txt\n\
+    chinalist.txt: https://res.dnomd343.top/Share/chinalist/chinalist.txt\n\
 "
 
 void load_default_config(const char *config_file) {

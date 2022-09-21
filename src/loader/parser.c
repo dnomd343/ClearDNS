@@ -112,6 +112,24 @@ void adguard_parser(adguard_config *config, cJSON *json) { // adguard options pa
     }
 }
 
+void assets_parser(assets_config *config, cJSON *json) { // assets options parser
+
+    if (!cJSON_IsObject(json)) {
+        log_fatal("`assets` must be array");
+    }
+    json = json->child;
+    while (json != NULL) {
+        if (!strcmp(json->string, "cron")) {
+            config->cron = json_string_value("assets.cron", json);
+        }
+        if (!strcmp(json->string, "update")) {
+            log_warn("GET UPDATE KEY");
+            // TODO: get string map
+        }
+        json = json->next; // next field
+    }
+}
+
 void cleardns_parser(cleardns_config *config, const char *config_content) { // JSON format configure
     cJSON *json = cJSON_Parse(config_content);
     if (json == NULL) {
@@ -136,6 +154,9 @@ void cleardns_parser(cleardns_config *config, const char *config_content) { // J
         }
         if (!strcmp(json->string, "adguard")) {
             adguard_parser(&config->adguard, json);
+        }
+        if (!strcmp(json->string, "assets")) {
+            assets_parser(&config->assets, json);
         }
         if (!strcmp(json->string, "reject")) {
             config->reject = json_uint32_list_value("reject", json, config->reject);

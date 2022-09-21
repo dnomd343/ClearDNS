@@ -11,15 +11,6 @@
 #include "system.h"
 #include "sundry.h"
 
-#define HELP_MSG "\
-ClearDNS usage \n\
---debug ...\n\
---config ...\n\
---help ...\n\
-"
-
-#define CONFIG_FILE "test.json"
-
 char* init(int argc, char *argv[]) { // return config file
     char *config = string_init(CONFIG_FILE);
     for (int i = 0; i < argc; ++i) {
@@ -47,8 +38,7 @@ char* init(int argc, char *argv[]) { // return config file
     return config;
 }
 
-
-int main(int argc, char *argv[]) { // ClearDNS server
+int main(int argc, char *argv[]) { // ClearDNS service
 
     char *config_file = init(argc, argv);
 
@@ -56,26 +46,22 @@ int main(int argc, char *argv[]) { // ClearDNS server
     log_info("ClearDNS server start (%s)", VERSION);
 
 //    process *test = process_init("TEST", "lls");
-    process *test = process_init("TEST", "ls");
-
-    process_add_arg(test, "-al");
-
+//    process *test = process_init("TEST", "ls");
+//    process_add_arg(test, "-al");
 //    test->cwd = "/etc/cleardns/fuck";
+//    int pid = process_exec(test);
+//    log_info("PID = %d", pid);
 
-    int pid = process_exec(test);
-
-    log_info("PID = %d", pid);
-
-    int status;
-    wait(&status);
-
-    return 0;
+//    int status;
+//    wait(&status);
+//    return 0;
 
     create_folder(WORK_DIR);
 
-//    load_config(config_file);
-//    free(config_file);
-//
+    // TODO: load assets first
+    load_config(config_file);
+    free(config_file);
+
 //    process_list_init();
 //    process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
 //    process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
@@ -86,7 +72,7 @@ int main(int argc, char *argv[]) { // ClearDNS server
 
     // TODO: running custom script
 
-    process_list_run();
+//    process_list_run();
 
 
 //    init_server(init_script, custom_script); // run init script and custom script

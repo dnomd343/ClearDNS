@@ -36,6 +36,10 @@ cleardns_config* config_init() { // init config struct of cleardns
     config->adguard.username = string_init(ADGUARD_USER);
     config->adguard.password = string_init(ADGUARD_PASSWD);
 
+    config->assets.cron = string_init(UPDATE_CRON);
+    config->assets.update_file = string_list_init();
+    config->assets.update_url = string_list_init();
+
     config->reject = uint32_list_init();
     config->hosts = string_list_init();
     config->ttl = string_list_init();
@@ -72,6 +76,12 @@ void config_dump(cleardns_config *config) { // dump config info of cleardns
     log_debug("AdGuardHome enable -> %s", show_bool(config->adguard.enable));
     log_debug("AdGuardHome username -> %s", config->adguard.username);
     log_debug("AdGuardHome password -> %s", config->adguard.password);
+
+    log_debug("Assets update cron -> `%s`", config->assets.cron);
+    for (char **file = config->assets.update_file; *file != NULL; ++file) { // show string mapping
+        char **url = file - config->assets.update_file + config->assets.update_url;
+        log_debug("Assets file `%s` -> %s", *file, *url);
+    }
 
     uint32_list_debug("DNS reject type", config->reject);
     string_list_debug("Domain TTL", config->ttl);

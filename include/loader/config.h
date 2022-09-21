@@ -33,12 +33,19 @@ typedef struct {
 } adguard_config;
 
 typedef struct {
+    char *cron;
+    char **update_file;
+    char **update_url;
+} assets_config;
+
+typedef struct {
     uint16_t port;
     cache_config cache;
     upstream_config domestic;
     upstream_config foreign;
     diverter_config diverter;
     adguard_config adguard;
+    assets_config assets;
     uint32_t **reject;
     char **hosts;
     char **ttl;

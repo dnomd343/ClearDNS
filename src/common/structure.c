@@ -17,6 +17,7 @@ uint32_t string_list_len(char **string_list) { // get len of string list
     return num - 1;
 }
 
+// TODO: use char *** with void return
 char** string_list_append(char **string_list, const char *string) { // add new string at the end of list
     uint32_t len = string_list_len(string_list);
     string_list = (char **)realloc(string_list, sizeof(char *) * (len + 2)); // extend string list

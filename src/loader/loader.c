@@ -117,6 +117,10 @@ void load_config(const char *config_file) {
     cleardns_config *config = config_init();
     load_default_config(config_file); // load default configure
     config_parser(config, config_file); // configure parser
+
+    // insert code (remove after test)
+    config->assets.update_file = string_list_append(config->assets.update_file, "geoip.dat");
+    config->assets.update_url = string_list_append(config->assets.update_url, "https://test.net/geoip.dat");
     config_dump(config);
 
     log_info("Loading configure options");
