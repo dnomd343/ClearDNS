@@ -14,6 +14,7 @@ process **process_list;
 
 process* process_init(const char *caption, const char *bin) { // init process struct
     process *proc = (process *)malloc(sizeof(process));
+    proc->pid = 0; // process not running
     proc->name = string_init(caption); // process caption
     proc->cmd = string_list_init();
     string_list_append(&proc->cmd, bin); // argv[0] normally be process file name
@@ -41,16 +42,42 @@ void process_list_append(process *proc) { // add new process into process list
     log_debug("%s process added", proc->name);
 }
 
-void process_list_run() {
-    for (process **p = process_list; *p != NULL; ++p) {
-        log_warn("proc -> %s", (*p)->name);
-    }
-}
+void server_exit(int exit_code) { // kill sub process and exit
+    log_info("Kill subprocess");
 
-void server_exit() {
     // TODO: kill subprocess and exit cleardns
+
+    exit(exit_code);
 }
 
+void get_exit_signal() { // get SIGINT or SIGTERM signal
+    log_info("Get exit signal");
+
+    server_exit(EXIT_NORMAL);
+}
+
+void get_sub_exit() { // catch child process exit
+
+    log_debug("Get SIGCHLD signal");
+
+    // TODO: check exit subprocess and restart it
+}
+
+void process_list_run() {
+
+    signal(SIGINT, get_exit_signal); // catch Ctrl + C (2)
+    signal(SIGTERM, get_exit_signal); // catch exit signal (15)
+    signal(SIGCHLD, get_sub_exit); // callback when child process die
+
+    for (process **p = process_list; *p != NULL; ++p) {
+
+        process_exec(*p);
+
+    }
+
+    log_warn("Process list start complete");
+
+}
 
 void process_dump(process *proc) {
     char *process_cmd = string_list_dump(proc->cmd);
@@ -63,17 +90,19 @@ void process_dump(process *proc) {
     free(process_cmd);
 }
 
-pid_t process_exec(process *proc) {
+void process_exec(process *proc) {
     pid_t pid;
 
     process_dump(proc);
 
-    if ((pid = fork()) < 0) { // fork error
-        log_perror("Fork error");
-        server_exit();
-    } else if (pid == 0) { // child process
-        // TODO: new process group
+    log_info("%s start", proc->name);
 
+    if ((pid = fork()) < 0) { // fork error
+        log_perror("%s fork error", proc->name);
+        server_exit(EXIT_FORK_ERROR);
+    } else if (pid == 0) { // child process
+
+        // TODO: new process group
         if (proc->is_group) {
             setpgrp(); // new process group
         }
@@ -90,7 +119,8 @@ pid_t process_exec(process *proc) {
         }
     }
 
-    return pid;
+    proc->pid = pid;
+    log_info("%s running success -> PID = %d", proc->name, proc->pid);
 
 }
 

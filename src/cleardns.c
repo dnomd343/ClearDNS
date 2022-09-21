@@ -48,9 +48,6 @@ int main(int argc, char *argv[]) { // ClearDNS service
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
-//    remove_file("/tmp/test.txt");
-    create_folder("/tmp/test");
-    return 0;
 
 //    process *test = process_init("TEST", "lls");
 //    process *test = process_init("TEST", "ls");
@@ -65,14 +62,11 @@ int main(int argc, char *argv[]) { // ClearDNS service
 
     create_folder(WORK_DIR);
 
-    // TODO: load assets first
     extract_assets();
     load_config(config_file);
     free(config_file);
 
     assets_load(loader.assets);
-
-    return 0;
 
     if (LOG_LEVEL == LOG_DEBUG) { // debug mode enabled
         loader.filter->debug = TRUE;
@@ -82,7 +76,9 @@ int main(int argc, char *argv[]) { // ClearDNS service
     }
 
     process_list_init();
+
     // TODO: crontab of assets
+//    process_list_append(assets_load(loader.assets));
 
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
@@ -90,25 +86,15 @@ int main(int argc, char *argv[]) { // ClearDNS service
     if (loader.filter != NULL) {
         process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
     }
-    // TODO: running custom script
     for (char **script = loader.script; *script != NULL; ++script) {
         log_info("Run custom script -> `%s`", *script);
+        run_command(*script);
     }
 
-//    process_list_run();
+    process_list_run();
 
+    int status;
+    wait(&status);
 
-//    init_server(init_script, custom_script); // run init script and custom script
-//
-//    load_start_command(adguard_workdir, overture_config, upstream_config, debug_mode); // generate commands
-//    if (debug_mode) { // show exec command
-//        fprintf(stderr, "[ClearDNS] Debug mode.\n");
-//        show_command("[ClearDNS] adguard", adguard_command);
-//        show_command("[ClearDNS] overture", overture_command);
-//        show_command("[ClearDNS] dnsproxy (domestic)", domestic_dnsproxy_command);
-//        show_command("[ClearDNS] dnsproxy (foreign)", foreign_dnsproxy_command);
-//    }
-//
-//    server_daemon(); // run as daemon to manage process in docker
     return 0;
 }

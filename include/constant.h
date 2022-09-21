@@ -36,6 +36,12 @@
 #define ASSET_CHINA_IP   "china-ip.txt"
 #define ASSET_CHINA_LIST "chinalist.txt"
 
+#define EXIT_NORMAL 0
+#define EXIT_FILE_ERROR 1
+#define EXIT_FORK_ERROR 2
+#define EXIT_EXEC_ERROR 3
+#define EXIT_WAIT_ERROR 4
+
 #define HELP_MSG "\
 ClearDNS usage \n\
 --debug ...\n\

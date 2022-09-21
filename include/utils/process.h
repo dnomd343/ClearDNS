@@ -4,10 +4,12 @@
 #include <stdint.h>
 
 typedef struct {
+    int pid;
     char *name;
     char **cmd;
     char **env;
     char *cwd;
+    // TODO: add is_daemon option
     int8_t is_group; // bool value
 } process;
 
@@ -18,6 +20,6 @@ void process_add_arg(process *proc, const char *arg);
 process* process_init(const char *caption, const char *bin);
 
 #include <unistd.h>
-pid_t process_exec(process *proc);
+void process_exec(process *proc);
 
 #endif
