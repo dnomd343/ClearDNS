@@ -79,17 +79,23 @@ int main(int argc, char *argv[]) { // ClearDNS service
 
     // TODO: crontab of assets
 //    process_list_append(assets_load(loader.assets));
+    // TODO: free assets_config
 
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
     process_list_append(overture_load(loader.diverter, "overture.json"));
+    overture_free(loader.diverter);
+    dnsproxy_free(loader.domestic);
+    dnsproxy_free(loader.foreign);
     if (loader.filter != NULL) {
         process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
+        adguard_free(loader.filter);
     }
     for (char **script = loader.script; *script != NULL; ++script) {
         log_info("Run custom script -> `%s`", *script);
         run_command(*script);
     }
+    string_list_free(loader.script);
 
     process_list_run();
 

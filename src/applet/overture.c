@@ -97,12 +97,15 @@ char* overture_config(overture *info) { // generate json configure from overture
 
     cJSON *primary = cJSON_CreateObject();
     cJSON *primary_dns = cJSON_CreateArray();
+    cJSON *primary_edns = cJSON_CreateObject();
     port_str = uint32_to_string(info->domestic_port);
     char *domestic_port = string_join("127.0.0.1:", port_str);
     cJSON_AddStringToObject(primary, "name", "Domestic");
     cJSON_AddStringToObject(primary, "address", domestic_port);
     cJSON_AddStringToObject(primary, "protocol", "udp");
     cJSON_AddNumberToObject(primary, "timeout", info->timeout);
+    cJSON_AddStringToObject(primary_edns, "policy", "disable");
+    cJSON_AddItemToObject(primary, "ednsClientSubnet", primary_edns);
     cJSON_AddItemToArray(primary_dns, primary);
     cJSON_AddItemToObject(config, "primaryDNS", primary_dns);
     free(domestic_port);
@@ -110,12 +113,15 @@ char* overture_config(overture *info) { // generate json configure from overture
 
     cJSON *alternative = cJSON_CreateObject();
     cJSON *alternative_dns = cJSON_CreateArray();
+    cJSON *alternative_edns = cJSON_CreateObject();
     port_str = uint32_to_string(info->foreign_port);
     char *foreign_addr = string_join("127.0.0.1:", port_str);
     cJSON_AddStringToObject(alternative, "name", "Foreign");
     cJSON_AddStringToObject(alternative, "address", foreign_addr);
     cJSON_AddStringToObject(alternative, "protocol", "udp");
     cJSON_AddNumberToObject(alternative, "timeout", info->timeout);
+    cJSON_AddStringToObject(alternative_edns, "policy", "disable");
+    cJSON_AddItemToObject(alternative, "ednsClientSubnet", alternative_edns);
     cJSON_AddItemToArray(alternative_dns, alternative);
     cJSON_AddItemToObject(config, "alternativeDNS", alternative_dns);
     free(foreign_addr);
