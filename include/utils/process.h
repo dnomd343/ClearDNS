@@ -1,6 +1,8 @@
 #ifndef PROCESS_H_
 #define PROCESS_H_
 
+#include <stdint.h>
+
 typedef struct {
     char *name;
     char **cmd;

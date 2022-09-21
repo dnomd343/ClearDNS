@@ -12,6 +12,7 @@
 #include "sundry.h"
 #include "structure.h"
 #include "assets.h"
+#include "crontab.h"
 
 char* init(int argc, char *argv[]) { // return config file
     char *config = string_init(CONFIG_FILE);
@@ -66,6 +67,10 @@ int main(int argc, char *argv[]) { // ClearDNS service
     load_config(config_file);
     free(config_file);
 
+    assets_load(loader.assets);
+
+    return 0;
+
     if (LOG_LEVEL == LOG_DEBUG) { // debug mode enabled
         loader.filter->debug = TRUE;
         loader.diverter->debug = TRUE;
@@ -75,6 +80,7 @@ int main(int argc, char *argv[]) { // ClearDNS service
 
     process_list_init();
     // TODO: crontab of assets
+
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
     process_list_append(overture_load(loader.diverter, "overture.json"));
