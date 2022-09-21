@@ -6,20 +6,20 @@
 #include "system.h"
 #include "constant.h"
 
-void load_asset(const char *file);
+void extract_asset(const char *file);
 
 // TODO: assets update -> crontab task
 
-void load_assets() {
+void extract_assets() {
     log_info("Start loading assets");
     create_folder(ASSETS_DIR);
-    load_asset(ASSET_GFW_LIST);
-    load_asset(ASSET_CHINA_IP);
-    load_asset(ASSET_CHINA_LIST);
+    extract_asset(ASSET_GFW_LIST);
+    extract_asset(ASSET_CHINA_IP);
+    extract_asset(ASSET_CHINA_LIST);
     log_info("Assets loaded complete");
 }
 
-void load_asset(const char *file) {
+void extract_asset(const char *file) {
     log_debug("Start extract `%s`", file);
     char *output_file = string_join(ASSETS_DIR, file);
     if (is_file_exist(output_file)) {

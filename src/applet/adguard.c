@@ -87,6 +87,9 @@ process* adguard_load(adguard *info, const char *dir) { // load adguard options
     create_folder(dir); // ensure adguard work dir exist
     char *adguard_config_ret;
     char *adguard_config_file = string_join(dir, "AdGuardHome.yaml");
+
+    // TODO: skip to-json if AdGuardHome configure not exist
+
     char *adguard_config_raw = to_json(adguard_config_file);
     if (adguard_config_raw == NULL) { // configure not exist
         log_info("Create AdGuardHome configure");

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "config.h"
 #include "loader.h"
+#include "logger.h"
 #include "parser.h"
 #include "sundry.h"
 #include "system.h"
@@ -9,7 +10,6 @@
 #include "dnsproxy.h"
 #include "constant.h"
 #include "structure.h"
-#include "logger.h"
 
 struct cleardns loader;
 
@@ -114,8 +114,13 @@ adguard* load_filter(cleardns_config *config) {
 }
 
 assets_config* load_assets(cleardns_config *config) {
-    // TODO: load assets
-    return NULL;
+    assets_config *assets = (assets_config *)malloc(sizeof(assets_config));
+    assets->update_url = string_list_init();
+    assets->update_file = string_list_init();
+    assets->cron = string_init(config->assets.cron);
+    string_list_update(&assets->update_url, config->assets.update_url);
+    string_list_update(&assets->update_file, config->assets.update_file);
+    return assets;
 }
 
 void load_config(const char *config_file) { // parser and load cleardns configure

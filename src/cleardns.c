@@ -11,6 +11,7 @@
 #include "system.h"
 #include "sundry.h"
 #include "structure.h"
+#include "assets.h"
 
 char* init(int argc, char *argv[]) { // return config file
     char *config = string_init(CONFIG_FILE);
@@ -61,18 +62,29 @@ int main(int argc, char *argv[]) { // ClearDNS service
     create_folder(WORK_DIR);
 
     // TODO: load assets first
+    extract_assets();
     load_config(config_file);
     free(config_file);
 
-//    process_list_init();
-//    process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
-//    process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
-//    process_list_append(overture_load(loader.diverter, "overture.json"));
-//    if (loader.filter != NULL) {
-//        process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
-//    }
+    if (LOG_LEVEL == LOG_DEBUG) { // debug mode enabled
+        loader.filter->debug = TRUE;
+        loader.diverter->debug = TRUE;
+        loader.domestic->debug = TRUE;
+        loader.foreign->debug = TRUE;
+    }
 
+    process_list_init();
+    // TODO: crontab of assets
+    process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
+    process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
+    process_list_append(overture_load(loader.diverter, "overture.json"));
+    if (loader.filter != NULL) {
+        process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
+    }
     // TODO: running custom script
+    for (char **script = loader.script; *script != NULL; ++script) {
+        log_info("Run custom script -> `%s`", *script);
+    }
 
 //    process_list_run();
 
