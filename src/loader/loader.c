@@ -93,7 +93,7 @@ overture* load_diverter(cleardns_config *config) {
     free(china_ip);
     free(gfwlist);
 
-    diverter->reject_type = uint32_list_update(diverter->reject_type, config->reject);
+    uint32_list_update(&diverter->reject_type, config->reject);
     load_diverter_assets();
     return diverter;
 }

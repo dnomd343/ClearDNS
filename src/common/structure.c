@@ -84,20 +84,20 @@ uint32_t uint32_list_len(uint32_t **uint32_list) { // get len of uint32 list
     return num - 1;
 }
 
-uint32_t** uint32_list_append(uint32_t **uint32_list, uint32_t number) { // add new uint32 at the end of list
-    uint32_t len = uint32_list_len(uint32_list);
-    uint32_list = (uint32_t **)realloc(uint32_list, sizeof(uint32_t *) * (len + 2));
-    uint32_list[len] = (uint32_t *)malloc(sizeof(uint32_t));
-    *uint32_list[len] = number;
-    uint32_list[len + 1] = NULL; // list end sign
-    return uint32_list;
+void uint32_list_append(uint32_t ***uint32_list, uint32_t number) { // add new uint32 at the end of list
+    uint32_t len = uint32_list_len(*uint32_list);
+    *uint32_list = (uint32_t **)realloc(*uint32_list, sizeof(uint32_t *) * (len + 2));
+    (*uint32_list)[len] = (uint32_t *)malloc(sizeof(uint32_t));
+    *(*uint32_list)[len] = number;
+    (*uint32_list)[len + 1] = NULL; // list end sign
+//    return uint32_list;
 }
 
-uint32_t** uint32_list_update(uint32_t **base_list, uint32_t **update_list) { // combine two uint32 list
+void uint32_list_update(uint32_t ***base_list, uint32_t **update_list) { // combine two uint32 list
     for (uint32_t **number = update_list; *number != NULL; ++number) {
-        base_list = uint32_list_append(base_list, **number);
+        uint32_list_append(base_list, **number);
     }
-    return base_list;
+//    return base_list;
 }
 
 void uint32_list_free(uint32_t **uint32_list) { // free uint32 list

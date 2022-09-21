@@ -16,7 +16,9 @@ uint32_t** uint32_list_init();
 char* uint32_list_dump(uint32_t **int_list);
 void uint32_list_free(uint32_t **uint32_list);
 uint32_t uint32_list_len(uint32_t **int_list);
-uint32_t** uint32_list_append(uint32_t **int_list, uint32_t number);
-uint32_t** uint32_list_update(uint32_t **base_list, uint32_t **update_list);
+void uint32_list_append(uint32_t ***uint32_list, uint32_t number);
+//uint32_t** uint32_list_append(uint32_t **int_list, uint32_t number);
+void uint32_list_update(uint32_t ***base_list, uint32_t **update_list);
+//uint32_t** uint32_list_update(uint32_t **base_list, uint32_t **update_list);
 
 #endif

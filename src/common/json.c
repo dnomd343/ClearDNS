@@ -110,14 +110,14 @@ char** json_string_list_value(char *key, cJSON *json, char **string_list) { // j
 
 uint32_t** json_uint32_list_value(char *key, cJSON *json, uint32_t **uint32_list) { // json uint32 array -> uint32 list
     if (cJSON_IsNumber(json)) {
-        uint32_list = uint32_list_append(uint32_list, json->valueint);
+        uint32_list_append(&uint32_list, json->valueint);
     } else if (cJSON_IsArray(json)) {
         json = json->child;
         while (json != NULL) {
             if (!cJSON_IsNumber(json)) {
                 log_fatal("`%s` must be number array", key);
             }
-            uint32_list = uint32_list_append(uint32_list, json->valueint);
+            uint32_list_append(&uint32_list, json->valueint);
             json = json->next; // next key
         }
     } else if (!cJSON_IsNull(json)) { // allow null -> empty uint32 list
