@@ -41,6 +41,10 @@ char* init(int argc, char *argv[]) { // return config file
     return config;
 }
 
+void signal_test() {
+    log_info("Get alarm signal");
+}
+
 int main(int argc, char *argv[]) { // ClearDNS service
 
     char *config_file = init(argc, argv);
@@ -48,6 +52,17 @@ int main(int argc, char *argv[]) { // ClearDNS service
     LOG_LEVEL = LOG_DEBUG;
     log_info("ClearDNS server start (%s)", VERSION);
 
+    signal(SIGALRM, signal_test);
+
+    assets_config demo;
+    demo.cron = "* * * * *";
+    process *crontab = assets_load(&demo);
+    process_exec(crontab);
+
+    for (;;) {
+        pause();
+    }
+    return 0;
 
 //    process *test = process_init("TEST", "lls");
 //    process *test = process_init("TEST", "ls");
