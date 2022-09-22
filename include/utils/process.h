@@ -9,8 +9,6 @@ typedef struct {
     char **cmd;
     char **env;
     char *cwd;
-    // TODO: add is_daemon option
-    int8_t is_group; // bool value
 } process;
 
 void process_list_run();
@@ -21,5 +19,6 @@ process* process_init(const char *caption, const char *bin);
 
 #include <unistd.h>
 void process_exec(process *proc);
+void process_list_daemon();
 
 #endif

@@ -41,47 +41,16 @@ char* init(int argc, char *argv[]) { // return config file
     return config;
 }
 
-void signal_test() {
-    log_info("Get alarm signal");
-}
-
 int main(int argc, char *argv[]) { // ClearDNS service
-
     char *config_file = init(argc, argv);
 
     LOG_LEVEL = LOG_DEBUG;
+
     log_info("ClearDNS server start (%s)", VERSION);
-
-    signal(SIGALRM, signal_test);
-
-    assets_config demo;
-    demo.cron = "* * * * *";
-    process *crontab = assets_load(&demo);
-    process_exec(crontab);
-
-    for (;;) {
-        pause();
-    }
-    return 0;
-
-//    process *test = process_init("TEST", "lls");
-//    process *test = process_init("TEST", "ls");
-//    process_add_arg(test, "-al");
-//    test->cwd = "/etc/cleardns/fuck";
-//    int pid = process_exec(test);
-//    log_info("PID = %d", pid);
-
-//    int status;
-//    wait(&status);
-//    return 0;
-
     create_folder(WORK_DIR);
-
     extract_assets();
     load_config(config_file);
     free(config_file);
-
-    assets_load(loader.assets);
 
     if (LOG_LEVEL == LOG_DEBUG) { // debug mode enabled
         loader.filter->debug = TRUE;
@@ -91,31 +60,27 @@ int main(int argc, char *argv[]) { // ClearDNS service
     }
 
     process_list_init();
-
-    // TODO: crontab of assets
-//    process_list_append(assets_load(loader.assets));
-    // TODO: free assets_config
-
+    process_list_append(assets_load(loader.assets));
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
     process_list_append(overture_load(loader.diverter, "overture.json"));
     overture_free(loader.diverter);
     dnsproxy_free(loader.domestic);
     dnsproxy_free(loader.foreign);
+    assets_free(loader.assets);
     if (loader.filter != NULL) {
         process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
         adguard_free(loader.filter);
     }
-    for (char **script = loader.script; *script != NULL; ++script) {
+
+    for (char **script = loader.script; *script != NULL; ++script) { // run custom script
         log_info("Run custom script -> `%s`", *script);
         run_command(*script);
     }
     string_list_free(loader.script);
 
     process_list_run();
-
-    int status;
-    wait(&status);
-
+    kill(1, SIGALRM); // send alarm signal to itself
+    process_list_daemon();
     return 0;
 }

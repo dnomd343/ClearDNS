@@ -3,7 +3,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/prctl.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include "sundry.h"
 #include "process.h"
 #include "constant.h"
@@ -20,7 +20,6 @@ process* process_init(const char *caption, const char *bin) { // init process st
     string_list_append(&proc->cmd, bin); // argv[0] normally be process file name
     proc->env = string_list_init(); // empty environment variable
     proc->cwd = WORK_DIR; // current working directory
-    proc->is_group = FALSE; // create new process group
     return proc;
 }
 
@@ -85,7 +84,7 @@ void process_dump(process *proc) {
     log_debug("%s cwd -> %s", proc->name, proc->cwd);
     log_debug("%s command -> %s", proc->name, process_cmd);
     log_debug("%s env variable -> %s", proc->name, process_env);
-    log_debug("%s new group -> %s", proc->name, show_bool(proc->is_group));
+//    log_debug("%s new group -> %s", proc->name, show_bool(proc->is_group));
     free(process_env);
     free(process_cmd);
 }
@@ -103,9 +102,9 @@ void process_exec(process *proc) {
     } else if (pid == 0) { // child process
 
         // TODO: new process group
-        if (proc->is_group) {
-            setpgrp(); // new process group
-        }
+//        if (proc->is_group) {
+//            setpgrp(); // new process group
+//        }
 
         if (chdir(proc->cwd)) { // change working directory
             log_perror("%s with invalid cwd `%s` -> ", proc->name, proc->cwd);
@@ -122,5 +121,10 @@ void process_exec(process *proc) {
     proc->pid = pid;
     log_info("%s running success -> PID = %d", proc->name, proc->pid);
 
+}
+
+void process_list_daemon() {
+    int status;
+    wait(&status);
 }
 

@@ -8,8 +8,6 @@
 
 void extract_asset(const char *file);
 
-// TODO: assets update -> crontab task
-
 void extract_assets() {
     log_info("Start loading assets");
     create_folder(ASSETS_DIR);
