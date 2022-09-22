@@ -4,15 +4,15 @@
 #include <sys/wait.h>
 #include "loader.h"
 #include "logger.h"
+#include "sundry.h"
+#include "system.h"
+#include "assets.h"
+#include "adguard.h"
+#include "crontab.h"
 #include "constant.h"
 #include "dnsproxy.h"
 #include "overture.h"
-#include "adguard.h"
-#include "system.h"
-#include "sundry.h"
 #include "structure.h"
-#include "assets.h"
-#include "crontab.h"
 
 char* init(int argc, char *argv[]) { // return config file
     char *config = string_init(CONFIG_FILE);
@@ -43,10 +43,8 @@ char* init(int argc, char *argv[]) { // return config file
 
 int main(int argc, char *argv[]) { // ClearDNS service
     char *config_file = init(argc, argv);
-
-    LOG_LEVEL = LOG_DEBUG;
-
     log_info("ClearDNS server start (%s)", VERSION);
+    create_folder(EXPOSE_DIR);
     create_folder(WORK_DIR);
     extract_assets();
     load_config(config_file);

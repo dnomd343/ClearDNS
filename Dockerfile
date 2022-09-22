@@ -64,4 +64,4 @@ COPY --from=cleardns /tmp/toJSON /asset/usr/bin/
 
 FROM ${ALPINE_IMG}
 COPY --from=asset /asset/ /
-#ENTRYPOINT ["cleardns"]
+ENTRYPOINT ["cleardns"]

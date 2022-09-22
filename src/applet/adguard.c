@@ -88,13 +88,11 @@ process* adguard_load(adguard *info, const char *dir) { // load adguard options
     char *adguard_config_ret;
     char *adguard_config_file = string_join(dir, "AdGuardHome.yaml");
 
-    // TODO: skip to-json if AdGuardHome configure not exist
-
-    char *adguard_config_raw = to_json(adguard_config_file);
-    if (adguard_config_raw == NULL) { // configure not exist
+    if (!is_file_exist(adguard_config_file)) { // AdGuardHome configure not exist
         log_info("Create AdGuardHome configure");
         adguard_config_ret = adguard_config(info, "{}"); // begin with empty json
-    } else {
+    } else { // configure exist -> modify
+        char *adguard_config_raw = to_json(adguard_config_file);
         adguard_config_ret = adguard_config(info, adguard_config_raw);
         free(adguard_config_raw);
     }
