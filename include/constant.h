@@ -5,7 +5,7 @@
 #define FALSE 0
 
 #define VERSION "1.3.0-dev"
-#define CONFIG_FILE "test.yml"
+#define CONFIG_FILE "cleardns.yml"
 
 #define DNS_PORT      53
 #define ADGUARD_PORT  80

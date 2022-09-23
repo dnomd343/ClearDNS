@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <signal.h>
+#include <stdio.h>
 #include "config.h"
 #include "logger.h"
 #include "sundry.h"
@@ -15,10 +16,14 @@ void assets_update() { // update all assets
     for (char **file = update_file; *file != NULL; ++file) {
         char **url = file - update_file + update_url;
         log_info("Update asset `%s` -> %s", *file, *url);
+        download_file(*file, *url); // download asset from url
     }
+    log_info("Restart overture");
+    run_command("pgrep overture | xargs kill"); // restart overture
+    log_info("Assets update complete");
 }
 
-void assets_free(assets_config *info) {
+void assets_free(assets_config *info) { // free assets config
     string_list_free(info->update_file);
     string_list_free(info->update_url);
     free(info->cron);

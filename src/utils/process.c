@@ -11,6 +11,9 @@
 
 process **process_list;
 
+uint8_t EXITING = FALSE;
+uint8_t EXITED = FALSE;
+
 void get_sub_exit();
 void get_exit_signal();
 void server_exit(int exit_code);
@@ -91,12 +94,18 @@ void process_list_run() { // start process list
 }
 
 void process_list_daemon() {
-    int status;
-    wait(&status);
+    while (!EXITED) {
+        pause();
+    }
 }
 
 void server_exit(int exit_code) { // kill sub process and exit
-    log_info("Kill subprocess");
+    while (EXITING) { // only run once
+        pause();
+    }
+    EXITING = TRUE;
+
+    log_info("ClearDNS exiting");
 
     // TODO: kill subprocess and exit cleardns
 
@@ -105,7 +114,7 @@ void server_exit(int exit_code) { // kill sub process and exit
 
 void get_exit_signal() { // get SIGINT or SIGTERM signal
     log_info("Get exit signal");
-    server_exit(EXIT_NORMAL);
+    server_exit(EXIT_NORMAL); // normally exit
 }
 
 void get_sub_exit() { // catch child process exit
