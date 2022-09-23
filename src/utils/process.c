@@ -14,11 +14,19 @@ process **process_list;
 uint8_t EXITING = FALSE;
 uint8_t EXITED = FALSE;
 
+typedef struct {
+    int pid;
+    int exit_code;
+    int exit_signal;
+} exit_info;
+
 void get_sub_exit();
 void get_exit_signal();
 void server_exit(int exit_code);
 void process_dump(process *proc);
 void process_exec(process *proc);
+exit_info get_exit_info(int status, pid_t pid);
+void show_exit_info(exit_info info, char *prefix);
 
 process* process_init(const char *caption, const char *bin) { // init process struct
     process *proc = (process *)malloc(sizeof(process));
@@ -98,6 +106,29 @@ void process_list_daemon() {
     }
 }
 
+void show_exit_info(exit_info info, char *prefix) { // show info of child process death
+    if (info.exit_code != -1) { // exit normally
+        log_warn("%s (PID = %d) -> Exit code %d", prefix, info.pid, info.exit_code);
+    } else if (info.exit_signal != -1) { // abnormal exit
+        log_warn("%s (PID = %d) -> Killed by signal %d", prefix, info.pid, info.exit_signal);
+    } else {
+        log_warn("%s (PID = %d) -> Unknown reason", prefix, info.pid);
+    }
+}
+
+exit_info get_exit_info(int status, pid_t pid) { // get why the child process death
+    exit_info temp;
+    temp.pid = pid;
+    temp.exit_code = temp.exit_signal = -1;
+    if (WIFEXITED(status)) { // exit normally (with an exit-code)
+        temp.exit_code = WEXITSTATUS(status);
+    }
+    if (WIFSIGNALED(status)) { // abnormal exit (with a signal)
+        temp.exit_signal = WTERMSIG(status);
+    }
+    return temp;
+}
+
 void server_exit(int exit_code) { // kill sub process and exit
     while (EXITING) { // only run once
         pause();
@@ -140,10 +171,7 @@ void get_sub_exit() { // catch child process exit
             log_perror("%s waitpid error -> ", (*proc)->name);
             server_exit(EXIT_WAIT_ERROR);
         } else if (wait_ret) { // catch process exit
-            log_warn("%s exit", (*proc)->name);
-
-            // TODO: get exit reason
-
+            show_exit_info(get_exit_info(status, (*proc)->pid), (*proc)->name);
             sleep(3); // reduce restart frequency
             process_exec(*proc);
             usleep(200 * 1000); // delay 200ms
@@ -156,7 +184,7 @@ void get_sub_exit() { // catch child process exit
         log_perror("Waitpid error");
         server_exit(EXIT_WAIT_ERROR);
     } else if (wait_ret) { // process exit
-        log_warn("Catch subprocess exit -> PID = %d", wait_ret);
+        show_exit_info(get_exit_info(status, wait_ret), "Sub-process");
     }
     log_debug("Handle sub-process complete");
 }
