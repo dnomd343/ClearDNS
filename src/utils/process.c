@@ -86,8 +86,8 @@ void process_list_run() { // start process list
     signal(SIGINT, get_exit_signal); // catch Ctrl + C (2)
     signal(SIGTERM, get_exit_signal); // catch exit signal (15)
     signal(SIGCHLD, get_sub_exit); // callback when child process die
-    for (process **p = process_list; *p != NULL; ++p) {
-        process_exec(*p);
+    for (process **proc = process_list; *proc != NULL; ++proc) {
+        process_exec(*proc);
         usleep(100 * 1000); // delay 100ms
     }
     log_info("Process start complete");
@@ -104,11 +104,17 @@ void server_exit(int exit_code) { // kill sub process and exit
         pause();
     }
     EXITING = TRUE;
-
-    log_info("ClearDNS exiting");
-
-    // TODO: kill subprocess and exit cleardns
-
+    log_info("ClearDNS start exit process");
+    for (process **proc = process_list; *proc != NULL; ++proc) { // send SIGTERM to all subprocess
+        log_info("%s send kill signal -> PID = %d", (*proc)->name, (*proc)->pid);
+        kill((*proc)->pid, SIGTERM);
+    }
+    for (process **proc = process_list; *proc != NULL; ++proc) { // ensure all subprocess exited
+        int status;
+        int ret = waitpid((*proc)->pid, &status, 0); // blocking wait
+        log_info("%s exit -> PID = %d", (*proc)->name, ret);
+    }
+    log_info("All sub-process exited");
     exit(exit_code);
 }
 
@@ -121,4 +127,5 @@ void get_sub_exit() { // catch child process exit
     log_debug("Get SIGCHLD signal");
 
     // TODO: check exit subprocess and restart it
+
 }

@@ -11,8 +11,6 @@ typedef struct {
     char *cwd; // working directory
 } process;
 
-//extern process **process_list;
-
 void process_list_run();
 void process_list_init();
 void process_list_daemon();
