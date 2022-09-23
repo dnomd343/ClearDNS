@@ -45,7 +45,6 @@ void process_exec(process *proc) {
     pid_t pid;
     process_dump(proc);
     log_info("%s start", proc->name);
-
     if ((pid = fork()) < 0) { // fork error
         log_perror("%s fork error", proc->name);
         server_exit(EXIT_FORK_ERROR);
@@ -111,9 +110,11 @@ void server_exit(int exit_code) { // kill sub process and exit
     }
     for (process **proc = process_list; *proc != NULL; ++proc) { // ensure all subprocess exited
         int status;
+        log_debug("%s start blocking wait", (*proc)->name);
         int ret = waitpid((*proc)->pid, &status, 0); // blocking wait
         log_info("%s exit -> PID = %d", (*proc)->name, ret);
     }
+    EXITED = TRUE;
     log_info("All sub-process exited");
     exit(exit_code);
 }
@@ -124,8 +125,38 @@ void get_exit_signal() { // get SIGINT or SIGTERM signal
 }
 
 void get_sub_exit() { // catch child process exit
-    log_debug("Get SIGCHLD signal");
+    if (EXITING) {
+        log_debug("Skip SIGCHLD signal");
+        return;
+    }
+    int status;
+    log_debug("Handle sub-process exit");
+    for (process **proc = process_list; *proc != NULL; ++proc) {
+        if ((*proc)->pid == 0) {
+            continue; // skip not running process
+        }
+        int wait_ret = waitpid((*proc)->pid, &status, WNOHANG); // non-blocking wait
+        if (wait_ret == -1) { // process wait error
+            log_perror("%s waitpid error -> ", (*proc)->name);
+            server_exit(EXIT_WAIT_ERROR);
+        } else if (wait_ret) { // catch process exit
+            log_warn("%s exit", (*proc)->name);
 
-    // TODO: check exit subprocess and restart it
+            // TODO: get exit reason
 
+            sleep(3); // reduce restart frequency
+            process_exec(*proc);
+            usleep(200 * 1000); // delay 200ms
+            log_info("%s restart complete", (*proc)->name);
+            return; // skip following check
+        }
+    }
+    int wait_ret = waitpid(-1, &status, WNOHANG); // waitpid for all sub-process (non-blocking)
+    if (wait_ret == -1) {
+        log_perror("Waitpid error");
+        server_exit(EXIT_WAIT_ERROR);
+    } else if (wait_ret) { // process exit
+        log_warn("Catch subprocess exit -> PID = %d", wait_ret);
+    }
+    log_debug("Handle sub-process complete");
 }
