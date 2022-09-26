@@ -1,12 +1,24 @@
 # ClearDNS
 
-> 容器化的无污染DNS服务，同时兼具广告拦截与防跟踪功能
++ 无污染的 DNS 解析，避开运营商和防火长城的污染与劫持
 
-ClearDNS基于Docker容器运行，用于提供纯净的DNS服务，避开运营商与防火长城的DNS污染与劫持，连接到路由器的内网设备无需任何改动即可使用，它还会记录所有解析请求，用于查询哪些设备都访问了哪些域名。
++ 支持多种加密协议，包括 DoH 、DoT 、DoQ 与 DNSCrypt
 
-ClearDNS可以在DNS层面上实现去广告与防跟踪功能，按需求配置自定义的拦截规则，无论APP、网页还是机顶盒、IoT设备等，只要接入到同个网络下均有效。同时兼具强制host功能，将指定域名直接解析到指定IP上，也可用于屏蔽特定的应用，如QQ、微信、微博等。
++ 部署后更改 DHCP 选项即可生效，无需配置内网设备
 
-ClearDNS可部署在主路由器上，但需要路由器刷入支持Docker的固件；对于性能较低或不支持刷机的路由器，建议部署在内网一台长期开机的设备上（树莓派、小主机、旁路由等）。
++ DNS 请求审计，记录不同设备的查询日志
+
++ 自定义拦截规则，可屏蔽指定应用，如 QQ 、微信、微博等
+
++ 在 DNS 层面上实现去广告与防跟踪功能，按需求配置自定义的拦截规则
+
++ 无论 APP 、网页还是机顶盒、IoT 设备等均可拦截
+
+同时兼具强制 hosts 功能，将指定域名直接解析到指定 IP 上
+
+ClearDNS 可部署在主路由器上，但需要路由器刷入支持 Docker 的固件；对于性能较低或不支持刷机的路由器，建议部署在内网一台长期开机的设备上（树莓派、小主机、旁路由等）。
+
+## 设计架构
 
 TODO: add structure of cleardns here (input -> adguard -> overture -> domestic/foreign)
 
@@ -14,39 +26,69 @@ TODO: plain dns / dns over http / dns over tls / dns over quic / dnscrypt
 
 TODO: about assets (gfwlist, chinalist, china-ip)
 
-## Configure Demo
+```mermaid
+  graph LR
+    input{{Input}} -.-> adguard(AdGuardHome)
+    subgraph ClearDNS
+      adguard --> diverter(Diverter)
+      diverter --> domestic(Domestic)
+      diverter --> foreign(Foreign)
+    end
+    domestic -. Plain DNS .-> domestic_1(223.5.5.5)
+    domestic -. DNS over TLS .-> domestic_2(tls://223.5.5.5)
+    foreign -. DNS over QUIC .-> foreign_1(Private Server)
+    foreign -. DNS over HTTPS .-> foreign_2(Private Server)
+```
 
-We use YAML format for ClearDNS.
+## 配置格式
+
+ClearDNS 使用 YAML 作为默认配置格式，默认配置文件如下：
+
+ClearDNS 兼容 JSON 与 TOML 格式配置文件
 
 ```yaml
 port: 53
 
 cache:
-  ···
-
-adguard:
-  ···
+  enable: true
+  size: 4194304
+  optimistic: true
 
 diverter:
-  ···
+  port: 5353
+
+adguard:
+  enable: true
+  port: 80
+  username: admin
+  password: cleardns
 
 domestic:
-  ···
+  port: 4053
+  bootstrap: 223.5.5.5
+  primary:
+    - tls://dns.alidns.com
+    - https://doh.pub/dns-query
+  fallback:
+    - 223.6.6.6
+    - 119.29.29.29
 
 foreign:
-  ···
+  port: 6053
+  bootstrap: 8.8.8.8
+  primary:
+    - tls://dns.google
+    - https://dns.cloudflare.com/dns-query
+  fallback:
+    - 1.1.1.1
+    - 8.8.4.4
 
 assets:
-  ···
-
-reject:
-  ···
-
-hosts:
-  ···
-
-ttl:
-  ···
+  cron: "0 4 * * *"
+  update:
+    gfwlist.txt: https://res.dnomd343.top/Share/gfwlist/gfwlist.txt
+    china-ip.txt: https://res.dnomd343.top/Share/chinalist/china-ip.txt
+    chinalist.txt: https://res.dnomd343.top/Share/chinalist/chinalist.txt
 ```
 
 ### Port

@@ -7,6 +7,11 @@
 #define DEFAULT_CONFIG "\
 port: 53\n\
 \n\
+cache:\n\
+  enable: true\n\
+  size: 4194304\n\
+  optimistic: true\n\
+\n\
 diverter:\n\
   port: 5353\n\
 \n\
@@ -15,11 +20,6 @@ adguard:\n\
   port: 80\n\
   username: admin\n\
   password: cleardns\n\
-\n\
-cache:\n\
-  enable: true\n\
-  size: 4194304\n\
-  optimistic: true\n\
 \n\
 domestic:\n\
   port: 4053\n\
