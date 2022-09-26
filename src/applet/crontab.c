@@ -13,7 +13,7 @@ void crontab_free(crontab *info) { // free crontab options
     free(info);
 }
 
-crontab* crontab_init(char *cron) { // init crontab options
+crontab* crontab_init() { // init crontab options
     crontab *info = (crontab *)malloc(sizeof(crontab));
     info->debug = FALSE;
     info->cron = string_init(UPDATE_CRON);

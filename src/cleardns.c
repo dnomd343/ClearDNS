@@ -46,9 +46,9 @@ int main(int argc, char *argv[]) { // ClearDNS service
     char *config_file = init(argc, argv);
     log_info("ClearDNS server start (%s)", VERSION);
     create_folder(EXPOSE_DIR);
-    // TODO: cd WORK_DIR
     create_folder(WORK_DIR);
-    assets_init();
+    // TODO: cd EXPOSE_DIR
+    assets_extract(); // extract built-in resource
 
     load_config(config_file);
     free(config_file);
@@ -57,20 +57,25 @@ int main(int argc, char *argv[]) { // ClearDNS service
         loader.diverter->debug = TRUE;
         loader.domestic->debug = TRUE;
         loader.foreign->debug = TRUE;
+        loader.crond->debug = TRUE;
     }
 
     process_list_init();
-    process_list_append(assets_load(loader.assets));
+    assets_load(loader.resource);
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
     process_list_append(overture_load(loader.diverter, "overture.json"));
     overture_free(loader.diverter);
     dnsproxy_free(loader.domestic);
     dnsproxy_free(loader.foreign);
-    assets_free(loader.assets);
+    assets_free(loader.resource);
     if (loader.filter != NULL) {
         process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
         adguard_free(loader.filter);
+    }
+    if (loader.crond != NULL) {
+        process_list_append(crontab_load(loader.crond));
+        crontab_free(loader.crond);
     }
 
     for (char **script = loader.script; *script != NULL; ++script) { // run custom script

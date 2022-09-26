@@ -33,6 +33,7 @@ typedef struct {
 } adguard_config;
 
 typedef struct {
+    uint8_t disable; // bool value
     char *cron;
     char **update_file;
     char **update_url;

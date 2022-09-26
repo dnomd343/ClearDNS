@@ -5,6 +5,8 @@
 #include "adguard.h"
 #include "dnsproxy.h"
 #include "overture.h"
+#include "crontab.h"
+#include "assets.h"
 
 struct cleardns {
     char **script;
@@ -12,7 +14,8 @@ struct cleardns {
     dnsproxy *foreign;
     overture *diverter;
     adguard *filter;
-    assets_config *assets;
+    crontab *crond;
+    assets *resource;
 };
 
 extern struct cleardns loader;

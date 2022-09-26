@@ -9,8 +9,8 @@ typedef struct {
     char *cron; // cron expression
 } crontab;
 
+crontab* crontab_init();
 void crontab_free(crontab *info);
-crontab* crontab_init(char *cron);
 process* crontab_load(crontab *info);
 
 #endif

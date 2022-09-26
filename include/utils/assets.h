@@ -1,7 +1,15 @@
 #ifndef ASSETS_H_
 #define ASSETS_H_
 
-void assets_init();
-//void assets_update();
+typedef struct {
+    char **update_file;
+    char **update_url;
+} assets;
+
+assets* assets_init();
+void assets_free(assets *info);
+void assets_load(assets *info);
+
+void assets_extract();
 
 #endif

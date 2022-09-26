@@ -94,7 +94,11 @@ overture* load_diverter(cleardns_config *config) {
     free(gfwlist);
 
     uint32_list_update(&diverter->reject_type, config->reject);
-    load_diverter_assets();
+    if (!config->assets.disable) {
+        // TODO: extract assets
+
+        load_diverter_assets();
+    }
     return diverter;
 }
 
@@ -113,14 +117,20 @@ adguard* load_filter(cleardns_config *config) {
     return filter;
 }
 
-assets_config* load_assets(cleardns_config *config) {
-    assets_config *assets = (assets_config *)malloc(sizeof(assets_config));
-    assets->update_url = string_list_init();
-    assets->update_file = string_list_init();
-    assets->cron = string_init(config->assets.cron);
-    string_list_update(&assets->update_url, config->assets.update_url);
-    string_list_update(&assets->update_file, config->assets.update_file);
-    return assets;
+crontab* load_crond(cleardns_config *config) {
+    if (config->assets.disable) {
+        return NULL; // disable crond
+    }
+    crontab *crond = crontab_init();
+    crond->cron = string_init(config->assets.cron);
+    return crond;
+}
+
+assets* load_assets(cleardns_config *config) {
+    assets *resource = assets_init();
+    string_list_update(&resource->update_file, config->assets.update_file);
+    string_list_update(&resource->update_url, config->assets.update_url);
+    return resource;
 }
 
 void load_config(const char *config_file) { // parser and load cleardns configure
@@ -133,18 +143,28 @@ void load_config(const char *config_file) { // parser and load cleardns configur
     if (!config->adguard.enable) {
         config->diverter.port = config->port; // override diverter port by dns port
     }
+
     loader.domestic = load_domestic(config);
     log_debug("Domestic options parser success");
+
     loader.foreign = load_foreign(config);
     log_debug("Foreign options parser success");
+
     loader.diverter = load_diverter(config);
     log_debug("Diverter options parser success");
+
     loader.filter = load_filter(config);
     log_debug("Filter options parser success");
-    loader.assets = load_assets(config);
+
+    loader.crond = load_crond(config);
+    log_debug("Crond options parser success");
+
+    loader.resource = load_assets(config);
     log_debug("Assets options parser success");
+
     loader.script = string_list_init();
     string_list_update(&loader.script, config->script);
     log_debug("Custom script parser success");
+
     config_free(config);
 }

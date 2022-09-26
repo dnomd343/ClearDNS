@@ -118,6 +118,9 @@ void assets_parser(assets_config *config, cJSON *json) { // assets options parse
     }
     json = json->child;
     while (json != NULL) {
+        if (!strcmp(json->string, "disable")) {
+            config->disable = json_bool_value("assets.disable", json);
+        }
         if (!strcmp(json->string, "cron")) {
             config->cron = json_string_value("assets.cron", json);
         }

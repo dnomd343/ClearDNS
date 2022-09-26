@@ -7,32 +7,50 @@
 #include "system.h"
 #include "constant.h"
 #include "structure.h"
+#include "assets.h"
 
-char **update_file;
-char **update_url;
+assets update;
 
 void assets_update();
-void extract_asset(const char *file);
+void assets_dump(assets *info);
+void extract(const char *file);
 
-void assets_init() { // init assets and load update process
-    log_info("Start loading assets");
-    create_folder(ASSETS_DIR);
-    extract_asset(ASSET_GFW_LIST);
-    extract_asset(ASSET_CHINA_IP);
-    extract_asset(ASSET_CHINA_LIST);
-    log_info("Assets loaded complete");
-
-    update_url = string_list_init();
-    update_file = string_list_init();
-    signal(SIGALRM, assets_update); // receive SIGALRM signal
+void assets_free(assets *info) { // free assets mapping
+    string_list_free(info->update_file);
+    string_list_free(info->update_url);
+    free(info);
 }
 
-// TODO: inject update file and url
+assets* assets_init() { // init assets mapping
+    assets *info = (assets *)malloc(sizeof(assets));
+    info->update_file = string_list_init();
+    info->update_url = string_list_init();
+    return info;
+}
+
+void assets_dump(assets *info) { // show assets mapping in debug log
+    for (char **file = info->update_file; *file != NULL; ++file) {
+        char **url = file - info->update_file + info->update_url;
+        log_info("Asset `%s` -> %s", *file, *url);
+    }
+}
+
+void assets_load(assets *info) { // load assets mapping
+    update.update_file = string_list_init();
+    update.update_url = string_list_init();
+    string_list_update(&update.update_file, info->update_file);
+    string_list_update(&update.update_url, info->update_url);
+    signal(SIGALRM, assets_update); // receive SIGALRM signal
+    assets_dump(&update);
+}
 
 void assets_update() { // update all assets
+
+    // TODO: skip when assets map is empty
+
     log_info("Start assets update");
-    for (char **file = update_file; *file != NULL; ++file) {
-        char **url = file - update_file + update_url;
+    for (char **file = update.update_file; *file != NULL; ++file) {
+        char **url = file - update.update_file + update.update_url;
         log_info("Update asset `%s` -> %s", *file, *url);
         download_file(*file, *url); // download asset from url
     }
@@ -41,7 +59,16 @@ void assets_update() { // update all assets
     log_info("Assets update complete");
 }
 
-void extract_asset(const char *file) {
+void assets_extract() { // init assets and load update process
+    log_info("Start loading assets");
+    create_folder(ASSETS_DIR);
+    extract(ASSET_GFW_LIST);
+    extract(ASSET_CHINA_IP);
+    extract(ASSET_CHINA_LIST);
+    log_info("Assets loaded complete");
+}
+
+void extract(const char *file) { // extract one asset file from `.tar.xz` file
     log_debug("Start extract `%s`", file);
     char *output_file = string_join(ASSETS_DIR, file);
     if (is_file_exist(output_file)) {
