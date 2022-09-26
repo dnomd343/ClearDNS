@@ -84,9 +84,9 @@ process* adguard_load(adguard *info, const char *dir) { // load adguard options
         log_fatal("Invalid AdGuardHome password");
     }
 
-    create_folder(dir); // ensure adguard work dir exist
     char *adguard_config_ret;
     char *adguard_config_file = string_join(dir, "AdGuardHome.yaml");
+    create_folder(dir); // ensure adguard work dir exist
 
     if (!is_file_exist(adguard_config_file)) { // AdGuardHome configure not exist
         log_info("Create AdGuardHome configure");

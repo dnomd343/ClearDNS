@@ -45,9 +45,10 @@ void assets_load(assets *info) { // load assets mapping
 }
 
 void assets_update() { // update all assets
-
-    // TODO: skip when assets map is empty
-
+    if (!string_list_len(update.update_file)) { // empty assets mapping
+        log_info("Skip update assets");
+        return;
+    }
     log_info("Start assets update");
     for (char **file = update.update_file; *file != NULL; ++file) {
         char **url = file - update.update_file + update.update_url;
@@ -65,7 +66,7 @@ void assets_extract() { // init assets and load update process
     extract(ASSET_GFW_LIST);
     extract(ASSET_CHINA_IP);
     extract(ASSET_CHINA_LIST);
-    log_info("Assets loaded complete");
+    log_info("Assets loading complete");
 }
 
 void extract(const char *file) { // extract one asset file from `.tar.xz` file

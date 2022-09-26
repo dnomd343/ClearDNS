@@ -63,7 +63,6 @@ process* overture_load(overture *info, const char *file) { // load overture opti
         log_fatal("Timeout of overture with invalid value 0");
     }
 
-    create_folder(WORK_DIR); // ensure work dir exist
     char *config = overture_config(info); // string config (JSON format)
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config);

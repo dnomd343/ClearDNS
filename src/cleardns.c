@@ -47,8 +47,7 @@ int main(int argc, char *argv[]) { // ClearDNS service
     log_info("ClearDNS server start (%s)", VERSION);
     create_folder(EXPOSE_DIR);
     create_folder(WORK_DIR);
-    // TODO: cd EXPOSE_DIR
-    assets_extract(); // extract built-in resource
+    chdir(EXPOSE_DIR);
 
     load_config(config_file);
     free(config_file);
@@ -69,13 +68,13 @@ int main(int argc, char *argv[]) { // ClearDNS service
     dnsproxy_free(loader.domestic);
     dnsproxy_free(loader.foreign);
     assets_free(loader.resource);
-    if (loader.filter != NULL) {
-        process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
-        adguard_free(loader.filter);
-    }
     if (loader.crond != NULL) {
         process_list_append(crontab_load(loader.crond));
         crontab_free(loader.crond);
+    }
+    if (loader.filter != NULL) {
+        process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
+        adguard_free(loader.filter);
     }
 
     for (char **script = loader.script; *script != NULL; ++script) { // run custom script

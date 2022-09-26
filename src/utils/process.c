@@ -42,17 +42,17 @@ process* process_init(const char *caption, const char *bin) { // init process st
 void process_dump(process *proc) { // output process options into debug log
     char *process_cmd = string_list_dump(proc->cmd);
     char *process_env = string_list_dump(proc->env);
+    log_debug("%s env variable -> %s", proc->name, process_env);
     log_debug("%s cwd -> %s", proc->name, proc->cwd);
     log_debug("%s command -> %s", proc->name, process_cmd);
-    log_debug("%s env variable -> %s", proc->name, process_env);
     free(process_env);
     free(process_cmd);
 }
 
 void process_exec(process *proc) {
     pid_t pid;
-    process_dump(proc);
     log_info("%s start", proc->name);
+    process_dump(proc);
     if ((pid = fork()) < 0) { // fork error
         log_perror("%s fork error", proc->name);
         server_exit(EXIT_FORK_ERROR);
@@ -95,7 +95,7 @@ void process_list_run() { // start process list
     signal(SIGCHLD, get_sub_exit); // callback when child process die
     for (process **proc = process_list; *proc != NULL; ++proc) {
         process_exec(*proc);
-        usleep(100 * 1000); // delay 100ms
+        usleep(200 * 1000); // delay 200ms
     }
     log_info("Process start complete");
 }
@@ -147,6 +147,7 @@ void server_exit(int exit_code) { // kill sub process and exit
     }
     EXITED = TRUE;
     log_info("All sub-process exited");
+    log_warn("ClearDNS exit");
     exit(exit_code);
 }
 

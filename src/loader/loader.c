@@ -95,8 +95,7 @@ overture* load_diverter(cleardns_config *config) {
 
     uint32_list_update(&diverter->reject_type, config->reject);
     if (!config->assets.disable) {
-        // TODO: extract assets
-
+        assets_extract(); // extract built-in resource
         load_diverter_assets();
     }
     return diverter;

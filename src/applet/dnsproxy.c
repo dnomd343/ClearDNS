@@ -74,7 +74,6 @@ process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file) { 
         log_fatal("%s without primary dns server", caption);
     }
 
-    create_folder(WORK_DIR); // ensure work dir exist
     char *config = dnsproxy_config(info); // string config with json format
     char *config_file = string_join(WORK_DIR, file);
     save_file(config_file, config); // load dnsproxy configure
