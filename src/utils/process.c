@@ -91,6 +91,7 @@ void process_list_append(process *proc) { // add new process into process list
 
 void process_list_run() { // start process list
     signal(SIGINT, get_exit_signal); // catch Ctrl + C (2)
+    signal(SIGQUIT, get_exit_signal); // catch Ctrl + \ (3)
     signal(SIGTERM, get_exit_signal); // catch exit signal (15)
     signal(SIGCHLD, get_sub_exit); // callback when child process die
     for (process **proc = process_list; *proc != NULL; ++proc) {
