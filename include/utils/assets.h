@@ -1,6 +1,7 @@
 #ifndef ASSETS_H_
 #define ASSETS_H_
 
-void extract_assets();
+void assets_init();
+//void assets_update();
 
 #endif

@@ -46,11 +46,12 @@ int main(int argc, char *argv[]) { // ClearDNS service
     char *config_file = init(argc, argv);
     log_info("ClearDNS server start (%s)", VERSION);
     create_folder(EXPOSE_DIR);
+    // TODO: cd WORK_DIR
     create_folder(WORK_DIR);
-    extract_assets();
+    assets_init();
+
     load_config(config_file);
     free(config_file);
-
     if (LOG_LEVEL == LOG_DEBUG) { // debug mode enabled
         loader.filter->debug = TRUE;
         loader.diverter->debug = TRUE;

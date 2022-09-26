@@ -1,47 +1,41 @@
 #include <stdlib.h>
-#include <signal.h>
-#include <stdio.h>
-#include "config.h"
 #include "logger.h"
 #include "sundry.h"
 #include "system.h"
+#include "crontab.h"
 #include "process.h"
-#include "structure.h"
+#include "constant.h"
 
-char **update_file;
-char **update_url;
+void crontab_dump(crontab *info);
 
-void assets_update() { // update all assets
-    log_info("Start assets update");
-    for (char **file = update_file; *file != NULL; ++file) {
-        char **url = file - update_file + update_url;
-        log_info("Update asset `%s` -> %s", *file, *url);
-        download_file(*file, *url); // download asset from url
-    }
-    log_info("Restart overture");
-    run_command("pgrep overture | xargs kill"); // restart overture
-    log_info("Assets update complete");
-}
-
-void assets_free(assets_config *info) { // free assets config
-    string_list_free(info->update_file);
-    string_list_free(info->update_url);
+void crontab_free(crontab *info) { // free crontab options
     free(info->cron);
     free(info);
 }
 
-process* assets_load(assets_config *info) { // load assets update options
-    update_url = string_list_init();
-    update_file = string_list_init();
-    string_list_update(&update_url, info->update_url);
-    string_list_update(&update_file, info->update_file);
-    signal(SIGALRM, assets_update); // receive SIGALRM signal
+crontab* crontab_init(char *cron) { // init crontab options
+    crontab *info = (crontab *)malloc(sizeof(crontab));
+    info->debug = FALSE;
+    info->cron = string_init(UPDATE_CRON);
+    return info;
+}
 
-    char *cron = string_join(info->cron, " kill -14 1");
-    save_file("/var/spool/cron/crontabs/root", cron);
-    free(cron);
+void crontab_dump(crontab *info) { // show crontab options in debug log
+    log_debug("Crontab debug -> %s", show_bool(info->debug));
+    log_debug("Crontab expression -> `%s`", info->cron);
+}
+
+process* crontab_load(crontab *info) { // load crontab options
+    // TODO: avoid the case that PID of cleardns is not 1 (docker --pid)
+    char *cron_cmd = string_join(info->cron, " kill -14 1"); // SIGALRM -> 14
+    save_file("/var/spool/cron/crontabs/root", cron_cmd);
+    free(cron_cmd);
 
     process *proc = process_init("Crontab", "crond");
     process_add_arg(proc, "-f"); // foreground
+    if (info->debug) {
+        process_add_arg(proc, "-l");
+        process_add_arg(proc, "0"); // verbose mode
+    }
     return proc;
 }

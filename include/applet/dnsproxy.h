@@ -18,9 +18,10 @@ typedef struct {
 
 void dnsproxy_free(dnsproxy *info);
 dnsproxy* dnsproxy_init(uint16_t port);
+process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file);
+
 void dnsproxy_add_primary(dnsproxy *info, const char *server);
 void dnsproxy_add_fallback(dnsproxy *info, const char *server);
 void dnsproxy_add_bootstrap(dnsproxy *info, const char *server);
-process* dnsproxy_load(const char *caption, dnsproxy *info, const char *file);
 
 #endif
