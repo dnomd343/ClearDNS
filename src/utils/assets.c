@@ -52,8 +52,10 @@ void assets_update() { // update all assets
     log_info("Start assets update");
     for (char **file = update.update_file; *file != NULL; ++file) {
         char **url = file - update.update_file + update.update_url;
-        log_info("Update asset `%s` -> %s", *file, *url);
-        download_file(*file, *url); // download asset from url
+        char *asset_file = string_join(ASSETS_DIR, *file);
+        log_info("Update asset `%s` -> %s", asset_file, *url);
+        download_file(asset_file, *url); // download asset from url
+        free(asset_file);
     }
     log_info("Restart overture");
     run_command("pgrep overture | xargs kill"); // restart overture
