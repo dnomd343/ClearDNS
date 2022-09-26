@@ -74,8 +74,7 @@ int main(int argc, char *argv[]) { // ClearDNS service
     dnsproxy_free(loader.foreign);
     assets_free(loader.resource);
     if (loader.crond != NULL) {
-        process_list_append(crontab_load(loader.crond));
-        crontab_free(loader.crond);
+        process_list_append(crontab_load(loader.crond)); // free crontab struct later
     }
     if (loader.filter != NULL) {
         process_list_append(adguard_load(loader.filter, ADGUARD_DIR));
@@ -89,7 +88,12 @@ int main(int argc, char *argv[]) { // ClearDNS service
     string_list_free(loader.script);
 
     process_list_run();
-    kill(1, SIGALRM); // send alarm signal to itself
+    if (loader.crond != NULL) { // assets not disabled
+        pid_t my_pid = getpid();
+        log_info("ClearDNS PID -> %d", my_pid);
+        kill(my_pid, SIGALRM); // send alarm signal to itself
+        crontab_free(loader.crond);
+    }
     process_list_daemon();
     return 0;
 }
