@@ -12,7 +12,7 @@
 
 #define DIVERTER_TIMEOUT 6
 
-#define VERSION     "1.3.0-beta"
+#define VERSION     "1.3.0-beta1"
 #define CONFIG_FILE "cleardns.yml"
 
 #define ADGUARD_USER   "admin"
@@ -42,10 +42,15 @@
 #define EXIT_WAIT_ERROR 3
 
 #define HELP_MSG "\
-ClearDNS usage \n\
---debug ...\n\
---config ...\n\
---help ...\n\
+ClearDNS usage:\n\
+\n\
+  Command: ./cleardns [OPTIONS]\n\
+\n\
+  Options:\n\
+    --debug   Enable debug mode.\n\
+    --config  Specify config file. (default: cleardns.yml)\n\
+    --version Show version information.\n\
+    --help    Print this message.\n\
 "
 
 #endif
