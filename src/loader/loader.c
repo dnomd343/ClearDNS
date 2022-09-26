@@ -127,6 +127,7 @@ crontab* load_crond(cleardns_config *config) {
 
 assets* load_assets(cleardns_config *config) {
     assets *resource = assets_init();
+    // TODO: use ASSETS_DIR
     string_list_update(&resource->update_file, config->assets.update_file);
     string_list_update(&resource->update_url, config->assets.update_url);
     return resource;

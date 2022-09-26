@@ -96,7 +96,7 @@ void process_list_run() { // start process list
     signal(SIGCHLD, get_sub_exit); // callback when child process die
     for (process **proc = process_list; *proc != NULL; ++proc) {
         process_exec(*proc);
-        usleep(200 * 1000); // delay 200ms
+        usleep(50 * 1000); // delay 50ms
     }
     log_info("Process start complete");
 }
@@ -173,9 +173,9 @@ void get_sub_exit() { // catch child process exit
             server_exit(EXIT_WAIT_ERROR);
         } else if (wait_ret) { // catch process exit
             show_exit_info(get_exit_info(status, (*proc)->pid), (*proc)->name);
-            sleep(3); // reduce restart frequency
+            sleep(1); // reduce restart frequency
             process_exec(*proc);
-            usleep(200 * 1000); // delay 200ms
+            usleep(50 * 1000); // delay 50ms
             log_info("%s restart complete", (*proc)->name);
             return; // skip following check
         }
