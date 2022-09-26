@@ -141,6 +141,7 @@ void load_config(const char *config_file) { // parser and load cleardns configur
     log_info("Loading configure options");
     if (!config->adguard.enable) {
         config->diverter.port = config->port; // override diverter port by dns port
+        log_warn("Diverter port change -> %u", config->diverter.port);
     }
 
     loader.domestic = load_domestic(config);

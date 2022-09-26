@@ -52,14 +52,19 @@ int main(int argc, char *argv[]) { // ClearDNS service
     load_config(config_file);
     free(config_file);
     if (LOG_LEVEL == LOG_DEBUG) { // debug mode enabled
-        loader.filter->debug = TRUE;
         loader.diverter->debug = TRUE;
         loader.domestic->debug = TRUE;
         loader.foreign->debug = TRUE;
-        loader.crond->debug = TRUE;
+        if (loader.crond != NULL) {
+            loader.crond->debug = TRUE;
+        }
+        if (loader.filter != NULL) {
+            loader.filter->debug = TRUE;
+        }
     }
 
     process_list_init();
+    log_info("Start loading process");
     assets_load(loader.resource);
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
