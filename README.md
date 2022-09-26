@@ -10,6 +10,8 @@
 
 + 自定义拦截规则，可屏蔽指定应用，如 QQ 、微信、微博等
 
++ IPv6支持，拦截特定的 DNS 请求类型，修改指定域名的 TTL
+
 + 在 DNS 层面上实现去广告与防跟踪功能，按需求配置自定义的拦截规则
 
 + 无论 APP 、网页还是机顶盒、IoT 设备等均可拦截
@@ -20,11 +22,7 @@ ClearDNS 可部署在主路由器上，但需要路由器刷入支持 Docker 的
 
 ## 设计架构
 
-TODO: add structure of cleardns here (input -> adguard -> overture -> domestic/foreign)
-
-TODO: plain dns / dns over http / dns over tls / dns over quic / dnscrypt
-
-TODO: about assets (gfwlist, chinalist, china-ip)
+ClearDNS 运行架构：
 
 ```mermaid
   graph LR
@@ -35,10 +33,30 @@ TODO: about assets (gfwlist, chinalist, china-ip)
       diverter --> foreign(Foreign)
     end
     domestic -. Plain DNS .-> domestic_1(223.5.5.5)
-    domestic -. DNS over TLS .-> domestic_2(tls://223.5.5.5)
+    domestic -. DNS over TLS .-> domestic_2(tls://dot.pub)
     foreign -. DNS over QUIC .-> foreign_1(Private Server)
     foreign -. DNS over HTTPS .-> foreign_2(Private Server)
 ```
+
+请求在通过 AdGuardHome 处理后（可选），发往分流器 Diverter ，在这里将对请求，通过国内组 Domestic 与国外组 Foreign 的请求，甄别出被污染的数据，返回正确的 DNS 。两组请求都可拥有多个上游服务器，ClearDNS 可以逐个查询，亦可同时发起请求。
+
+ClearDNS 支持多种协议，首先是常规 DNS ，即基于 UDP 或 TCP 的明文查询，该方式无法抵抗 DNS 污染，对部分运营商有效，仅建议用于国内无劫持的环境下使用；其次为 `DNS over HTTPS` 、`DNS over TLS` 、`DNS over QUIC` 与 `DNSCrypt` ，它们都是加密的 DNS 服务协议，格式为 ... ，在出境请求中，`DNS over TLS` 特别是标准端口的服务已经被大规模封杀，`DNSCrypt` 也基本无法使用，目前建议使用 `DNS over QUIC` 与非标准子路径的 `DNS over HTTPS`
+
+对于多种 DNS 加密协议的简述，可以参考 ...
+
+在分流器部分，ClearDNS 需要借助三个资源文件工作：
+
++ `gfwlist.txt` ：记录被墙的常见域名
+
++ `chinalist.txt` ：记录服务器在国内的创建域名
+
++ `china-ip.txt` ：记录国内 IP 列表（CIDR 格式）
+
+分流器接到请求时，如果在 `chinalist.txt` 中匹配，则只请求国内组，若与 `gfwlist.txt` 匹配，则请求国外组；未匹配的情况下，将同时请求两组查询，若国内组返回结果在 `china-ip.txt` 中，则证明 DNS 未被污染，采纳国内组结果，若返回非国内 IP ，则可能已经被污染，将返回国外组结果。
+
+由于这方面记录一直在变动，ClearDNS 内置了更新功能，可自动这些资源文件；数据从多个上游项目收集，每天进行一次合并整理，整合数据的源码为 ... ，您可以自由配置更新服务器，或者禁用更新。
+
+TODO: add update disable option
 
 ## 配置格式
 
@@ -266,6 +284,8 @@ assets:
 
 ### 1. 网络配置
 
+> 本项目基于 Docker 构建，在 [Docker Hub](https://hub.docker.com/repository/docker/dnomd343/cleardns) 或 [Github Package](https://github.com/dnomd343/ClearDNS/pkgs/container/cleardns) 可以查看已构建的各版本镜像。
+
 ClearDNS基于Docker网络有以下三种部署模式：
 
 | | host模式 | bridge模式 | macvlan模式 |
@@ -293,18 +313,15 @@ Docker version ···, build ···
 shell> wget -qO- https://get.docker.com/ | bash
 ```
 
-ClearDNS可以从多个镜像源获取，其数据完全相同，国内用户建议首选阿里云镜像。
+XProxy 同时发布在多个镜像源上：
 
-```
-# Docker Hub
-shell> docker pull docker.io/dnomd343/cleardns
++ `Docker Hub` ：`dnomd343/cleardns`
 
-# Github Package
-shell> docker pull ghcr.io/dnomd343/cleardns
++ `Github Package` ：`ghcr.io/dnomd343/cleardns`
 
-# 阿里云个人镜像
-shell> docker pull registry.cn-shenzhen.aliyuncs.com/dnomd343/cleardns
-```
++ `阿里云镜像` ：`registry.cn-shenzhen.aliyuncs.com/dnomd343/cleardns`
+
+> 下述命令中，容器路径可替换为上述其他源，国内网络建议首选阿里云仓库
 
 <details>
 
@@ -324,7 +341,7 @@ shell> netstat -tlnpu | grep -E ":53|:80"
 # 映射系统时间文件以同步容器内部时区
 shell> docker run --restart always \
 --name cleardns -d \
--v /etc/cleardns/:/etc/cleardns/ \
+-v /etc/cleardns/:/cleardns/ \
 -v /etc/timezone:/etc/timezone:ro \
 -v /etc/localtime:/etc/localtime:ro \
 -p 53:53/udp -p 53:53 -p 80:80 \
@@ -351,7 +368,7 @@ shell> netstat -tlnpu | grep -E ":53|:80|:4053|:5353|:6053"
 docker run --restart always \
 --name cleardns -d \
 --network host \
--v /etc/cleardns/:/etc/cleardns/ \
+-v /etc/cleardns/:/cleardns/ \
 -v /etc/timezone:/etc/timezone:ro \
 -v /etc/localtime:/etc/localtime:ro \
 dnomd343/cleardns
@@ -409,7 +426,7 @@ shell> docker run --restart always \
 --name cleardns \
 --network macvlan \
 --privileged -d \
--v /etc/cleardns/:/etc/cleardns/ \
+-v /etc/cleardns/:/cleardns/ \
 -v /etc/timezone:/etc/timezone:ro \
 -v /etc/localtime:/etc/localtime:ro \
 dnomd343/cleardns
