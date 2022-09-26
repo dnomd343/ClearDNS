@@ -59,12 +59,12 @@ void process_exec(process *proc) {
     } else if (pid == 0) { // child process
         if (chdir(proc->cwd)) { // change working directory
             log_perror("%s with invalid cwd `%s` -> ", proc->name, proc->cwd);
-            exit(2);
+            exit(EXIT_EXEC_ERROR);
         }
         prctl(PR_SET_PDEATHSIG, SIGKILL); // child process die with father process
         if (execvpe(*(proc->cmd), proc->cmd, proc->env) < 0) {
             log_perror("%s exec error -> ", proc->name);
-            exit(1);
+            exit(EXIT_EXEC_ERROR);
         }
     }
     proc->pid = pid;
@@ -146,7 +146,6 @@ void server_exit(int exit_code) { // kill sub process and exit
         log_info("%s exit -> PID = %d", (*proc)->name, ret);
     }
     EXITED = TRUE;
-    log_info("All sub-process exited");
     log_warn("ClearDNS exit");
     exit(exit_code);
 }

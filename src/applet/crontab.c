@@ -26,9 +26,9 @@ void crontab_dump(crontab *info) { // show crontab options in debug log
 }
 
 process* crontab_load(crontab *info) { // load crontab options
-    // TODO: avoid the case that PID of cleardns is not 1 (docker --pid)
-    char *cron_cmd = string_join(info->cron, " kill -14 1"); // SIGALRM -> 14
-    save_file("/var/spool/cron/crontabs/root", cron_cmd);
+    crontab_dump(info);
+    char *cron_cmd = string_join(info->cron, " kill -14 $(ps -o pid,comm | grep cleardns | awk '{print $1}')");
+    save_file("/var/spool/cron/crontabs/root", cron_cmd); // SIGALRM -> 14
     free(cron_cmd);
 
     process *proc = process_init("Crontab", "crond");

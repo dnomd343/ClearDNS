@@ -4,9 +4,6 @@
 #define TRUE  1
 #define FALSE 0
 
-#define VERSION "1.3.0-dev"
-#define CONFIG_FILE "cleardns.yml"
-
 #define DNS_PORT      53
 #define ADGUARD_PORT  80
 #define DIVERTER_PORT 5353
@@ -14,6 +11,9 @@
 #define FOREIGN_PORT  6053
 
 #define DIVERTER_TIMEOUT 6
+
+#define VERSION     "1.3.0-beta"
+#define CONFIG_FILE "cleardns.yml"
 
 #define ADGUARD_USER   "admin"
 #define ADGUARD_PASSWD "cleardns"
@@ -37,10 +37,9 @@
 #define ASSET_CHINA_LIST "chinalist.txt"
 
 #define EXIT_NORMAL 0
-#define EXIT_FILE_ERROR 1
-#define EXIT_FORK_ERROR 2
-#define EXIT_EXEC_ERROR 3
-#define EXIT_WAIT_ERROR 4
+#define EXIT_FORK_ERROR 1
+#define EXIT_EXEC_ERROR 2
+#define EXIT_WAIT_ERROR 3
 
 #define HELP_MSG "\
 ClearDNS usage \n\
