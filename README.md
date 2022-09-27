@@ -1,30 +1,22 @@
 # ClearDNS
 
-+ 无污染的 DNS 解析，避开运营商和防火长城的污染与劫持
++ ✅ 无污染的 DNS 解析，避开运营商和防火长城的污染与劫持
 
-+ 支持多种加密协议，包括 DoH 、DoT 、DoQ 与 DNSCrypt
++ ✅ 支持多种加密协议，包括 DoH 、DoT 、DoQ 与 DNSCrypt
 
-+ 部署后更改 DHCP 选项即可生效，无需配置内网设备
++ ✅ DNS 请求审计，记录不同设备的查询、拦截、返回等信息
 
-+ DNS 请求审计，记录不同设备的查询日志
++ ✅ 自定义拦截规则，可屏蔽指定应用，如 QQ 、微信、微博等
 
-+ 自定义拦截规则，可屏蔽指定应用，如 QQ 、微信、微博等
++ ✅ 强制 hosts 功能，将指定域名直接解析到指定 IP 上
 
-+ IPv6支持，拦截特定的 DNS 请求类型，修改指定域名的 TTL
++ ✅ IPv6 支持，拦截特定的 DNS 请求类型，修改指定域名的 TTL
 
-+ 在 DNS 层面上实现去广告与防跟踪功能，按需求配置自定义的拦截规则
++ ✅ 在 DNS 层面上实现去广告与防跟踪功能，按需求配置自定义规则
 
-+ 无论 APP 、网页还是机顶盒、IoT 设备等均可拦截
-
-同时兼具强制 hosts 功能，将指定域名直接解析到指定 IP 上
-
-ClearDNS 可部署在主路由器上，但需要路由器刷入支持 Docker 的固件；对于性能较低或不支持刷机的路由器，建议部署在内网一台长期开机的设备上（树莓派、小主机、旁路由等）。
-
-ClearDNS也可部署在公网服务器上，面向国内提供服务
+由于 ClearDNS 工作在 DNS 层面，无论 APP 、网页还是机顶盒、IoT 设备等均可生效；它可以部署在内网中，为局域网设备提供服务，建议运行在内网一台长期开机的设备上（主路由、树莓派、小主机、旁路由、NAS 设备等），同时 ClearDNS 也可部署在公网服务器上，面向国内网络提供无污染服务。
 
 ## 设计架构
-
-ClearDNS 运行架构：
 
 > AdGuardHome 用于加载拦截规则，可以自定义是否开启
 
@@ -64,7 +56,7 @@ ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 
 
 ## 配置格式
 
-ClearDNS 支持 JSON 、 YAML 与 TOML 格式的配置文件，默认配置如下：
+ClearDNS 支持 JSON 、YAML 与 TOML 格式的配置文件，默认配置如下：
 
 ```yaml
 port: 53
@@ -113,11 +105,11 @@ assets:
 
 ### Port
 
-DNS 服务端口，支持常规的 TCP 与 UDP 查询，默认为 `53` ；若您想开放 `DNS over TLS` 、`DNS over HTTPS` 等其他协议的服务，可以在 AdGuardHome 中进行配置。
+DNS 服务端口，支持常规的 TCP 与 UDP 查询，默认为 `53` ；若您想开放 `DNS over TLS` 、`DNS over HTTPS` 等其他协议的服务，可以在 AdGuardHome 中进行具体配置。
 
 ### Cache
 
-DNS 缓存配置，此处与 AdGuardHome 中的缓存不相关，建议打开其中一个即可
+DNS 缓存配置，此处与 AdGuardHome 中的缓存不相关，建议打开其中一个即可。
 
 ```yaml
 cache:
@@ -154,7 +146,7 @@ adguard:
 
 ### Diverter
 
-DNS 分流选项，将数据
+DNS 分流器选项，指定端口与分流规则
 
 ```yaml
 diverter:
@@ -292,25 +284,25 @@ assets:
 
 > 本项目基于 Docker 构建，在 [Docker Hub](https://hub.docker.com/repository/docker/dnomd343/cleardns) 或 [Github Package](https://github.com/dnomd343/ClearDNS/pkgs/container/cleardns) 可以查看已构建的各版本镜像。
 
-ClearDNS基于Docker网络有以下三种部署模式：
+ClearDNS 基于 Docker 网络有以下三种部署模式：
 
-| | host模式 | bridge模式 | macvlan模式 |
+| | host 模式 | bridge 模式 | macvlan 模式 |
 | :-: | :-: | :-: | :-: |
-| 网络原理 | 宿主机网络 | 桥接网络 | 虚拟独立mac网卡 |
-| 服务IP | 宿主机IP | 宿主机IP | 容器独立IP |
-| 宿主机IP | 静态IP地址 | 静态IP地址 | 静态/动态IP地址 |
-| 宿主机网络 | 无需改动网络配置 | Docker自动适配 | 手动修改底层网络配置 |
-| 宿主机端口 | 占用宿主机53,80,4053,5353,6053端口 | 占用宿主机53与80端口 | 不占用端口 |
+| 网络原理 | 宿主机网络 | 桥接网络 | 虚拟独立 mac 网卡 |
+| 服务 IP | 宿主机 IP | 宿主机 IP | 容器独立 IP |
+| 宿主机 IP | 静态 IP 地址 | 静态 IP 地址 | 静态/动态 IP 地址 |
+| 宿主机网络 | 无需改动网络配置 | Docker 自动适配 | 手动修改底层网络配置 |
+| 宿主机端口 | 占用宿主机 53, 80, 4053, 5353, 6053 端口 | 占用宿主机 53 与 80 端口 | 不占用端口 |
 | 管理完整性 | 完全 | 无法区分客户端 | 完全 |
 | 宿主机耦合 | 强耦合 | 一般耦合 | 链路层以上完全分离 |
 | 网络性能 | 相对较高 | 相对较低 | 相对适中 |
 | 部署难度 | 简单 | 简单 | 复杂 |
 
-> 不熟悉Linux网络配置请勿使用macvlan模式，新手建议首选host模式。
+> 不熟悉 Linux 网络配置请勿使用 macvlan 模式，新手建议首选 host 模式。
 
-以下操作均于root用户下执行
+以下操作均于 root 用户下执行
 
-```
+```bash
 # 检查Docker环境
 shell> docker --version
 Docker version ···, build ···
@@ -319,7 +311,7 @@ Docker version ···, build ···
 shell> wget -qO- https://get.docker.com/ | bash
 ```
 
-XProxy 同时发布在多个镜像源上：
+ClearDNS 同时发布在多个镜像源上：
 
 + `Docker Hub` ：`dnomd343/cleardns`
 
@@ -331,84 +323,89 @@ XProxy 同时发布在多个镜像源上：
 
 <details>
 
-<summary><b>bridge模式</b></summary>
+<summary><b>bridge 模式</b></summary>
 
 <br/>
 
-```
+```bash
 # 检查端口占用
 shell> netstat -tlnpu | grep -E ":53|:80"
 # 如果TCP/53或UDP/53已被占用，请先关闭对应进程
 # 如果TCP/80端口被占用，可以关闭对应进程，也可使用其他端口
 ```
 
-```
+> 映射系统时间文件以同步容器时区，容器内默认为 UTC0 时区
+
+```bash
 # 运行ClearDNS容器
-# 映射系统时间文件以同步容器内部时区
-shell> docker run --restart always \
---name cleardns -d \
--v /etc/cleardns/:/cleardns/ \
--v /etc/timezone:/etc/timezone:ro \
--v /etc/localtime:/etc/localtime:ro \
--p 53:53/udp -p 53:53 -p 80:80 \
+shell> docker run -dit \
+  --restart always \
+  --name cleardns --hostname cleardns \
+  --volume /etc/cleardns/:/cleardns/ \
+  --volume /etc/timezone:/etc/timezone:ro \
+  --volume /etc/localtime:/etc/localtime:ro \
+  --port 53:53/udp --port 53:53 --port 80:80 \
 dnomd343/cleardns
-# 此处为DockerHub镜像源，可按上文链接替换为其他源
 ```
 
 </details>
 
 <details>
 
-<summary><b>host模式</b></summary>
+<summary><b>host 模式</b></summary>
 
 <br/>
 
-```
+```bash
 # 检查端口占用
 shell> netstat -tlnpu | grep -E ":53|:80|:4053|:5353|:6053"
 # 如果UDP/53、UDP/4053、UDP/5353、UDP/6053、TCP/53、TCP/80、TCP/4053、TCP/5353、TCP/6053已被占用，请先关闭对应进程
 ```
 
-```
+> 映射系统时间文件以同步容器时区，容器内默认为 UTC0 时区
+
+```bash
 # 运行ClearDNS容器
-docker run --restart always \
---name cleardns -d \
---network host \
--v /etc/cleardns/:/cleardns/ \
--v /etc/timezone:/etc/timezone:ro \
--v /etc/localtime:/etc/localtime:ro \
-dnomd343/cleardns
-# 此处为DockerHub镜像源，可按上文链接替换为其他源
+docker run -dit --network host \
+  --restart always \
+  --name cleardns --hostname cleardns \
+  --volume /etc/cleardns/:/cleardns/ \
+  --volume /etc/timezone:/etc/timezone:ro \
+  --volume /etc/localtime:/etc/localtime:ro \
+  dnomd343/cleardns
 ```
 
 </details>
 
 <details>
 
-<summary><b>macvlan模式</b></summary>
+<summary><b>macvlan 模式</b></summary>
 
 <br/>
 
-启动容器前需要创建一个macvlan网络
+启动容器前需要创建 macvlan 网络
 
-```
+```bash
 # 开启网卡混杂模式
 shell> ip link set eth0 promisc on
 
 # 创建macvlan网络，按实际情况指定网络信息
 shell> docker network create -d macvlan \
---subnet=192.168.2.0/24 \
---gateway=192.168.2.1 \
--o parent=eth0 macvlan
+  --subnet=192.168.2.0/24 \
+  --gateway=192.168.2.1 \
+  -o parent=eth0 macvlan
 ```
 
 宿主机网络更改配置
 
-```
+```bash
 # Debian系示例
 shell> vim /etc/network/interfaces
+```
 
-# 添加以下内容，按实际情况指定网络信息
+添加以下内容，按实际情况指定网络信息
+
+```ini
 auto eth0
 iface eth0 inet manual
 
@@ -420,36 +417,36 @@ iface macvlan inet static
   dns-nameservers 192.168.2.3
   pre-up ip link add macvlan link eth0 type macvlan mode bridge
   post-down ip link del macvlan link eth0 type macvlan mode bridge
+```
 
+```bash
 # 重启宿主机
 shell> reboot
 ```
 
-运行容器
+> 映射系统时间文件以同步容器时区，容器内默认为 UTC0 时区
 
+```bash
+# 运行ClearDNS容器
+shell> docker run -dit --network macvlan \
+  --restart always --privileged \
+  --name cleardns --host cleardns \
+  --volume /etc/cleardns/:/cleardns/ \
+  --volume /etc/timezone:/etc/timezone:ro \
+  --volume /etc/localtime:/etc/localtime:ro \
+  dnomd343/cleardns
 ```
-shell> docker run --restart always \
---name cleardns \
---network macvlan \
---privileged -d \
--v /etc/cleardns/:/cleardns/ \
--v /etc/timezone:/etc/timezone:ro \
--v /etc/localtime:/etc/localtime:ro \
-dnomd343/cleardns
-# 此处为DockerHub镜像源，可按上文链接替换为其他源
+
+编辑 macvlan 网络的 IP 地址，修改 ClearDNS 配置文件，指定容器的IP与网关，应按实际网络情况配置
+
+```yaml
+custom:
+  - "ip addr flush dev eth0"
+  - "ip addr add 192.168.2.3/24 dev eth0"
+  - "ip route add default via 192.168.2.2"
 ```
 
-编辑macvlan网路的IP地址
-
-```
-# 编辑自定义初始化脚本
-shell> vim /etc/cleardns/custom.sh
-
-# 写入以下内容，修改容器的IP与网关，按实际网络情况指定
-ip addr flush dev eth0
-ip addr add 192.168.2.3/24 brd 192.168.2.255 dev eth0
-ip route add default via 192.168.2.2
-
+```bash
 # 重启容器生效
 shell> docker restart cleardns
 ```
@@ -458,17 +455,16 @@ shell> docker restart cleardns
 
 <hr/>
 
-```
-# ClearDNS会将数据持久化，以在重启Docker或宿主机后保留配置及日志
+ClearDNS 会将数据持久化，以在重启 Docker 或宿主机后保留配置及日志
+
+```bash
 # 使用以下命令清除之前的ClearDNS配置及数据
 shell> rm -rf /etc/cleardns
 ```
 
-### 2. 指定上游DNS服务器
+### 2. 修改配置文件
 
-上游DNS信息位于 `/etc/cleardns/upstream.json`，分为国内外两组，国内组可指定阿里DNS、DNSPod、114DNS等国内公共DNS服务，国外组需要指定可用的加密DNS服务，建议自行搭建DoH或DoT服务器。
-
-ClearDNS支持多种[DNS服务协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，包括常规DNS、DNS-over-TLS、DNS-over-HTTPS、DNS-over-QUIC、DNSCrypt。
+在 `cleardns.yml` 中指定上游 DNS 服务器，国内组可指定阿里 DNS 、DNSPod、114DNS 等国内公共 DNS 服务，国外组需要指定可用的加密 DNS 服务，建议自行搭建服务器，或使用共享的跨境服务器（例如 DH-DNS 与 LoopDNS 等）。
 
 > DNSCrypt使用DNS Stamp封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
 
@@ -494,66 +490,17 @@ quic://dns.adguard.com
 sdns://AQIAAAAAAAAAFDE3Ni4xMDMuMTMwLjEzMDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20
 ```
 
-ClearDNS默认配置了以下DNS服务器
-
-```
-# 此处指定的国外组服务器可能已被GFW屏蔽，强烈建议使用私有加密DNS服务器
-# bootstrap指定DNS服务器IP地址，用于解析加密DNS服务器域名，省略时使用系统DNS
-# 若指定多台服务器，DNS请求时将并发查询，因此不宜指定过多服务器
-# 当primary中DNS均不可用时，将自动尝试fallback中的DNS地址
-{
-  "domestic": {
-    "bootstrap": "223.5.5.5",
-    "primary": [
-      "tls://dns.alidns.com",
-      "https://doh.pub/dns-query"
-    ],
-    "fallback": [
-      "223.5.5.5",
-      "119.29.29.29"
-    ]
-  },
-  "foreign": {
-    "bootstrap": "8.8.8.8",
-    "primary": [
-      "tls://dns.google",
-      "https://dns.cloudflare.com/dns-query"
-    ],
-    "fallback": [
-      "1.1.1.1",
-      "8.8.8.8"
-    ]
-  }
-}
-```
-
-重启Docker容器生效
+修改配置文件后，重启 Docker 容器生效
 
 ```
 shell> docker restart cleardns
 ```
 
-### 3. 配置域名分流规则
+### 3. 配置 AdGuardHome
 
-ClearDNS依据规则列表分流解析，使用以下规则文件，位于文件夹 `/etc/cleardns/asset` 中
+浏览器打开 ClearDNS 服务，host 与 bridge 模式输入宿主机 IP 地址，macvlan 模式输入容器 IP，即可进入 AdGuardHome 配置界面，默认账号为 `admin` ，密码为 `cleardns`，可在配置文件中指定，登录后进入 AdGuardHome 管理界面。
 
-+ [`china-ip.txt`](https://res.343.re/Share/chinalist/china-ip.txt)：国内IP段
-
-+ [`chinalist.txt`](https://res.343.re/Share/chinalist/chinalist.txt)：国内常见域名
-
-+ [`gfwlist.txt`](https://res.343.re/Share/gfwlist/gfwlist.txt)：被GFW屏蔽的常见域名
-
-以上文件将在每天凌晨4点自动更新，如果不想启用该功能，创建 `/etc/cleardns/asset/no-update` 文件即可。
-
-规则文件默认从 `res.dnomd343.top` 拉取，若该域名被污染或屏蔽，你可以使用本项目 `asset/gfwlist/build` 与 `asset/chinalist/build` 下的构建脚本自行生成规则列表。
-
-> 构建脚本需要访问Github获取资源，手动构建时请注意网络连通性。
-
-### 4. 配置AdGuardHome
-
-浏览器打开ClearDNS服务，host与bridge模式输入宿主机IP地址，macvlan模式输入容器IP，进入AdGuardHome配置界面，设置账号和密码，登录进入AdGuardHome管理界面。
-
-进入 `设置` - `DNS设置`，修改上游DNS为 `127.0.0.1:5353`，其他选项保持默认。此外，下方其他设置中建议启用DNSSEC，内存允许的情况下适当拉大缓存大小，并开启乐观缓存。
+进入 `设置` - `DNS设置`，建议启用 DNSSEC ，若配置文件中禁用了出口缓存，可在此处配置缓存选项，内存允许的情况下适当拉大缓存大小，并开启乐观缓存。
 
 DNS封锁清单中，可配置以下规则：
 
@@ -567,9 +514,9 @@ DNS封锁清单中，可配置以下规则：
 
 > 配置过多的规则会导致设备负载变大，请酌情添加。
 
-### 5. 配置DHCP信息
+### 5. 配置 DHCP 信息
 
-为了使ClearDNS生效，需要在路由器DHCP服务中指定DNS服务器，host与bridge模式指定为宿主机IP，macvlan模式指定为容器IP。
+若您的服务部署在内网，为了使 ClearDNS 生效，需要在路由器 DHCP 服务中指定 DNS 服务器，host 与 bridge 模式指定为宿主机 IP ，macvlan 模式指定为容器 IP 即可。
 
 > 对于内网中一些固定IP信息的设备，需要手动更改其DNS为上述IP地址。
 
@@ -578,10 +525,8 @@ DNS封锁清单中，可配置以下规则：
 **本地构建**
 
 ```
-# 克隆仓库
 shell> git clone https://github.com/dnomd343/ClearDNS.git
-shell> cd ClearDNS
-# 构建镜像
+shell> cd ./ClearDNS/
 shell> docker build -t cleardns .
 ```
 
