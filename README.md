@@ -20,9 +20,13 @@
 
 ClearDNS 可部署在主路由器上，但需要路由器刷入支持 Docker 的固件；对于性能较低或不支持刷机的路由器，建议部署在内网一台长期开机的设备上（树莓派、小主机、旁路由等）。
 
+ClearDNS也可部署在公网服务器上，面向国内提供服务
+
 ## 设计架构
 
 ClearDNS 运行架构：
+
+> AdGuardHome 用于加载拦截规则，可以自定义是否开启
 
 ```mermaid
   graph LR
@@ -38,31 +42,29 @@ ClearDNS 运行架构：
     foreign -. DNS over HTTPS .-> foreign_2(Private Server)
 ```
 
-请求在通过 AdGuardHome 处理后（可选），发往分流器 Diverter ，在这里将对请求，通过国内组 Domestic 与国外组 Foreign 的请求，甄别出被污染的数据，返回正确的 DNS 。两组请求都可拥有多个上游服务器，ClearDNS 可以逐个查询，亦可同时发起请求。
+DNS 请求在通过 AdGuardHome 处理后，发往分流器 Diverter ，在这里将借助路由资源、国内组 Domestic 与国外组 Foreign 的返回结果，甄别出被污染的数据，返回正确的 DNS 解析；两组请求都可拥有多个上游服务器，ClearDNS 可以逐个对服务器进行请求，亦可同时发起查询。
 
-ClearDNS 支持多种协议，首先是常规 DNS ，即基于 UDP 或 TCP 的明文查询，该方式无法抵抗 DNS 污染，对部分运营商有效，仅建议用于国内无劫持的环境下使用；其次为 `DNS over HTTPS` 、`DNS over TLS` 、`DNS over QUIC` 与 `DNSCrypt` ，它们都是加密的 DNS 服务协议，格式为 ... ，在出境请求中，`DNS over TLS` 特别是标准端口的服务已经被大规模封杀，`DNSCrypt` 也基本无法使用，目前建议使用 `DNS over QUIC` 与非标准子路径的 `DNS over HTTPS`
+ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 的明文查询，该方式无法抵抗 DNS 污染，对部分运营商有效，仅建议用于国内无劫持的环境下使用；其次为 `DNS over HTTPS` 、`DNS over TLS` 、`DNS over QUIC` 与 `DNSCrypt` ，它们都是加密的 DNS 服务协议，可以抵抗污染与劫持行为，但可能被防火长城拦截；在出境请求中，`DNS over TLS` 特别是标准端口的服务已经被大规模封杀，`DNSCrypt` 也基本无法使用，目前建议使用 `DNS over QUIC` 与非标准路径的 `DNS over HTTPS` 服务。
 
-对于多种 DNS 加密协议的简述，可以参考 ...
+对于多种 DNS 加密协议的简述，可以参考[浅谈DNS协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，里面讲解了不同协议的区别与优缺点，以及服务器分享格式。
 
 在分流器部分，ClearDNS 需要借助三个资源文件工作：
 
-+ `gfwlist.txt` ：记录被墙的常见域名
++ `gfwlist.txt` ：记录常见的被墙域名
 
-+ `chinalist.txt` ：记录服务器在国内的创建域名
++ `chinalist.txt` ：记录服务器在国内的常见域名
 
-+ `china-ip.txt` ：记录国内 IP 列表（CIDR 格式）
++ `china-ip.txt` ：记录国内 IP 段数据（CIDR 格式）
 
-分流器接到请求时，如果在 `chinalist.txt` 中匹配，则只请求国内组，若与 `gfwlist.txt` 匹配，则请求国外组；未匹配的情况下，将同时请求两组查询，若国内组返回结果在 `china-ip.txt` 中，则证明 DNS 未被污染，采纳国内组结果，若返回非国内 IP ，则可能已经被污染，将返回国外组结果。
+> 防火长城的 DNS 污染有一个特点，被污染的结果必为境外 IP 地址
 
-由于这方面记录一直在变动，ClearDNS 内置了更新功能，可自动这些资源文件；数据从多个上游项目收集，每天进行一次合并整理，整合数据的源码为 ... ，您可以自由配置更新服务器，或者禁用更新。
+当分流器接到请求时，若在 `chinalist.txt` 中有所匹配，则只请求国内组，若在 `gfwlist.txt` 匹配，则仅请求国外组；两者均未未匹配的情况下，将同时请求国内组与国外组，若国内组返回结果在 `china-ip.txt` 中，则证明 DNS 未被污染，采纳国内组结果，若返回国外 IP 地址，则可能已经被污染，将返回国外组结果。
 
-TODO: add update disable option
+由于以上资源数据一直在变动，ClearDNS 内置了更新功能，可自动这些资源文件；数据从多个上游项目收集，每天进行一次合并整理，整合数据的源码可见[此处](./asset/)，您可以自由配置更新服务器，或者禁用更新。
 
 ## 配置格式
 
-ClearDNS 使用 YAML 作为默认配置格式，默认配置文件如下：
-
-ClearDNS 兼容 JSON 与 TOML 格式配置文件
+ClearDNS 支持 JSON 、 YAML 与 TOML 格式的配置文件，默认配置如下：
 
 ```yaml
 port: 53
@@ -111,11 +113,11 @@ assets:
 
 ### Port
 
-DNS 服务端口，支持 TCP 与 UDP 查询，默认为 53
+DNS 服务端口，支持常规的 TCP 与 UDP 查询，默认为 `53` ；若您想开放 `DNS over TLS` 、`DNS over HTTPS` 等其他协议的服务，可以在 AdGuardHome 中进行配置。
 
 ### Cache
 
-DNS 缓存配置，此处与 AdGuardHome 中的缓存不相关，建议打开一个即可
+DNS 缓存配置，此处与 AdGuardHome 中的缓存不相关，建议打开其中一个即可
 
 ```yaml
 cache:
@@ -126,13 +128,13 @@ cache:
 
 + `enable` ：是否开启 DNS 缓存，默认为 `false`
 
-+ `size` ：DNS 缓存容量，单位为字节，开启时建议设置在 `64k` 到 `4m` 量级，默认为 0
++ `size` ：DNS 缓存容量，单位为字节，开启时建议设置在 `64k` 到 `4m` 量级，默认为 `0`
 
-+ `optimistic` ：DNS 乐观缓存，开启后在记录超过 TTL 后，仍然返回原数据（TTL 修改为 10），同时立即发起查询（绝大多数 DNS 记录在 TTL 期限内未发生变化）
++ `optimistic` ：DNS 乐观缓存，开启后当数据 TTL 过期时，仍然返回原内容，但 TTL 修改为 10 ，同时立即向上游发起查询；由于绝大多数 DNS 记录在 TTL 期限内不会发生变化，这个机制可以显著减少请求平均延迟，但一旦出现变动，访问目标必须等待 10 秒后解析刷新才恢复正常。
 
 ### AdGuard
 
-AdGuardHome 配置选项
+AdGuardHome 配置选项，此处选项将在每次重启后覆盖 AdGuardHome 的网页端配置。
 
 ```yaml
 adguard:
@@ -164,17 +166,17 @@ diverter:
 
 + `port` ：DNS 分流器端口，若 AdGuardHome 未开启，本选项将失效，默认为 `5353`
 
-> 以下选项用于添加自定义规则，将覆盖在资源文件上
+> 以下选项用于添加自定义规则，将优先覆盖在资源文件上
 
 + `gfwlist` ：自定义的 GFW 拦截域名列表，针对该域名的查询将屏蔽 `domestic` 组结果
 
-+ `chinalist` ：...
++ `chinalist` ：自定义的国内域名列表，针对该域名的查询将屏蔽 `foreign` 组结果
 
-+ `china-ip` ：...
++ `china-ip` ：自定义的国内 IP 段，`domestic` 组返回内容若命中则采纳，否则使用 `foreign` 组结果
 
 ### Domestic
 
-国内 DNS 配置选项
+国内组 DNS 配置选项
 
 ```yaml
 domestic:
@@ -196,16 +198,18 @@ domestic:
 
 + `parallel` ：是否对多个上游进行并行查询，默认为 `true`
 
-+ `bootstrap` ：引导 DNS 服务器，用于 `primary` 与 `fallback` 中 DNS 服务器域名的查询，必须为 `Plain DNS` ，此处可为一个字符串或字符串数组
++ `bootstrap` ：引导 DNS 服务器，用于 `primary` 与 `fallback` 中 DNS 服务器域名的查询，必须为常规 DNS 服务 ，此处允许为字符串或字符串数组
 
 + `primary` ：主 DNS 列表，用于默认情况下的查询
 
-+ `fallback` ：备用 DNS 服务器，当 `primary` 中 DNS 服务器无效时回落到此处再次查询
++ `fallback` ：备用 DNS 服务器，当 `primary` 中 DNS 服务器无效时，回落到此处再次查询
 
 ### Foreign
 
+国外组 DNS 配置选项
+
 ```yaml
-domestic:
+foreign:
   port: 6053
   verify: true
   parallel: true
@@ -220,13 +224,11 @@ domestic:
 
 + `port` ：国外组 DNS 端口，默认为 `6053`
 
-其余选项同上
+> Foreign 选项意义与 Domestic 相同，可参考上文描述
 
 ### Reject
 
-DNS 拒绝类型，指定屏蔽的 DNS 记录类型
-
-TODO: add dns record type (wiki)
+DNS 拒绝类型，指定屏蔽的 DNS 记录类型，不同 DNS 类型编号可参考 [Wiki](https://en.wikipedia.org/wiki/List_of_DNS_record_types) ，默认为空。
 
 ```yaml
 reject:
@@ -235,21 +237,21 @@ reject:
 
 ### Hosts
 
-Hosts 记录，指定域名对应 IP 地址
+Hosts 记录，指定域名对应 IP 地址，支持正则匹配，默认为空。
 
 ```yaml
 hosts:
-  - "..."
+  - "10.0.0.1 example.com$"
   - "..."
 ```
 
 ### TTL
 
-配置特定域名的 ttl 时长，支持正则表达式匹配
+配置特定域名的 ttl 时长，支持正则表达式匹配，默认为空。
 
 ```yaml
 ttl:
-  - "..."
+  - "example.com$ 300"
   - "..."
 ```
 
@@ -257,7 +259,7 @@ ttl:
 
 自定义脚本，在启动前执行
 
-> use ash of alpine
+> 本功能用于注入自定义功能，基于 Alpine 的 ash 执行，可能不支持部分 bash 语法
 
 ```yaml
 custom:
@@ -268,13 +270,17 @@ custom:
 
 分流资源升级配置，用于自动更新资源文件
 
-```
+```yaml
 assets:
-  cron: "..."
-  url:
-    gfwlist.txt: https://res.dnomd343.top/Share/...
-    ...
+  disable: false
+  cron: "0 4 * * *"
+  update:
+    gfwlist.txt: https://res.dnomd343.top/Share/gfwlist/gfwlist.txt
+    china-ip.txt: https://res.dnomd343.top/Share/chinalist/china-ip.txt
+    chinalist.txt: https://res.dnomd343.top/Share/chinalist/chinalist.txt
 ```
+
++ `disable` ：是否关闭资源文件加载，默认为 `false`
 
 + `cron` ：指定触发升级的 Crontab 表达式
 
