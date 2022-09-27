@@ -12,7 +12,7 @@
 
 #define DIVERTER_TIMEOUT 6
 
-#define VERSION     "1.3.0-beta1"
+#define VERSION     "1.3.0-beta2"
 #define CONFIG_FILE "cleardns.yml"
 
 #define ADGUARD_USER   "admin"

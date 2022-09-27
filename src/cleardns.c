@@ -17,6 +17,12 @@
 
 char* init(int argc, char *argv[]) { // return config file
     char *config = string_init(CONFIG_FILE);
+    if (getenv("CONFIG") != NULL) {
+        config = string_init(getenv("CONFIG"));
+    }
+    if (getenv("DEBUG") != NULL && !strcmp(getenv("DEBUG"), "TRUE")) {
+        LOG_LEVEL = LOG_DEBUG; // enable debug mode
+    }
     for (int i = 0; i < argc; ++i) {
         if (!strcmp(argv[i], "--debug")) {
             LOG_LEVEL = LOG_DEBUG; // enable debug mode
