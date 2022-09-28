@@ -24,4 +24,7 @@ for script in source:
     domains.update(filter(None, raw))
 regex = r'^(?=^.{3,255}$)[a-zA-Z0-9][a-zA-Z0-9\-]{0,62}(.[a-zA-Z0-9][a-zA-Z0-9\-]{0,62})+$'
 domains = {x for x in domains if re.search(regex, str(x)) is not None}
-print('\n'.join(sorted(domains)))
+
+with open('gfwlist.txt', 'w') as fileObj:
+    fileObj.write('\n'.join(sorted(domains)) + '\n')
+os.system('xz -kf9 gfwlist.txt')

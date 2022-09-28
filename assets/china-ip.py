@@ -48,4 +48,6 @@ for ip in v4:
 for ip in v6:
     ips.append(str(ip) + ('' if '/' in str(ip) else '/128'))
 
-print('\n'.join(ips))
+with open('china-ip.txt', 'w') as fileObj:
+    fileObj.write('\n'.join(ips) + '\n')
+os.system('xz -kf9 china-ip.txt')
