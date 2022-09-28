@@ -15,8 +15,8 @@
 
 process **process_list;
 
-uint8_t EXITING = FALSE;
 uint8_t EXITED = FALSE;
+uint8_t EXITING = FALSE;
 
 void get_sub_exit();
 void get_exit_signal();
@@ -93,7 +93,6 @@ void process_list_run() { // start process list
     signal(SIGCHLD, get_sub_exit); // callback when child process die
     for (process **proc = process_list; *proc != NULL; ++proc) {
         process_exec(*proc);
-        usleep(50 * 1000); // delay 50ms
     }
     log_info("Process start complete");
 }
@@ -152,7 +151,7 @@ void get_sub_exit() { // catch child process exit
         return;
     }
     int status;
-    log_debug("Handle sub-process start");
+    log_debug("Handle SIGCHLD start");
     for (process **proc = process_list; *proc != NULL; ++proc) {
         if ((*proc)->pid == 0) {
             continue; // skip not running process
@@ -165,9 +164,9 @@ void get_sub_exit() { // catch child process exit
             char *exit_msg = get_exit_msg(status);
             log_warn("%s (PID = %d) -> %s", (*proc)->name, (*proc)->pid, exit_msg);
             free(exit_msg);
+            // TODO: delay with global const
             sleep(1); // reduce restart frequency
             process_exec(*proc);
-            usleep(50 * 1000); // delay 50ms
             log_info("%s restart complete", (*proc)->name);
             return; // skip following check
         }
@@ -181,5 +180,5 @@ void get_sub_exit() { // catch child process exit
         log_debug("Sub-process (PID = %d) -> %s", wait_ret, exit_msg);
         free(exit_msg);
     }
-    log_debug("Handle sub-process complete");
+    log_debug("Handle SIGCHLD complete");
 }

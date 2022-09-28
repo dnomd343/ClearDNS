@@ -27,6 +27,7 @@ void crontab_dump(crontab *info) { // show crontab options in debug log
 
 process* crontab_load(crontab *info) { // load crontab options
     crontab_dump(info);
+    // TODO: use getpid()
     char *cron_cmd = string_join(info->cron, " kill -14 $(ps -o pid,comm | grep cleardns | awk '{print $1}')");
     save_file("/var/spool/cron/crontabs/root", cron_cmd); // SIGALRM -> 14
     free(cron_cmd);

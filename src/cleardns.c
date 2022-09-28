@@ -108,9 +108,7 @@ void cleardns() { // cleardns service
 
     process_list_run(); // start all process
     if (loader.crond != NULL) { // assets not disabled
-        pid_t my_pid = getpid();
-        log_info("ClearDNS PID -> %d", my_pid);
-        kill(my_pid, SIGALRM); // send alarm signal to itself
+        kill(getpid(), SIGALRM); // send alarm signal to cleardns
         crontab_free(loader.crond);
     }
     process_list_daemon(); // daemon all process
