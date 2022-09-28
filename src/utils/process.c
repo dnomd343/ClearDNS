@@ -14,19 +14,12 @@ process **process_list;
 uint8_t EXITING = FALSE;
 uint8_t EXITED = FALSE;
 
-typedef struct {
-    int pid;
-    int exit_code;
-    int exit_signal;
-} exit_info;
-
 void get_sub_exit();
 void get_exit_signal();
+char* get_exit_msg(int status);
 void server_exit(int exit_code);
 void process_dump(process *proc);
 void process_exec(process *proc);
-exit_info get_exit_info(int status, pid_t pid);
-void show_exit_info(exit_info info, char *prefix);
 
 process* process_init(const char *caption, const char *bin) { // init process struct
     process *proc = (process *)malloc(sizeof(process));
@@ -107,27 +100,20 @@ void process_list_daemon() {
     }
 }
 
-void show_exit_info(exit_info info, char *prefix) { // show info of child process death
-    if (info.exit_code != -1) { // exit normally
-        log_warn("%s (PID = %d) -> Exit code %d", prefix, info.pid, info.exit_code);
-    } else if (info.exit_signal != -1) { // abnormal exit
-        log_warn("%s (PID = %d) -> Killed by signal %d", prefix, info.pid, info.exit_signal);
-    } else {
-        log_warn("%s (PID = %d) -> Unknown reason", prefix, info.pid);
-    }
-}
-
-exit_info get_exit_info(int status, pid_t pid) { // get why the child process death
-    exit_info temp;
-    temp.pid = pid;
-    temp.exit_code = temp.exit_signal = -1;
+char* get_exit_msg(int status) { // get why the child process death
     if (WIFEXITED(status)) { // exit normally (with an exit-code)
-        temp.exit_code = WEXITSTATUS(status);
+        char *exit_code = uint32_to_string(WEXITSTATUS(status));
+        char *exit_msg = string_join("Exit code ", exit_code);
+        free(exit_code);
+        return exit_msg;
     }
     if (WIFSIGNALED(status)) { // abnormal exit (with a signal)
-        temp.exit_signal = WTERMSIG(status);
+        char *exit_sig = uint32_to_string(WTERMSIG(status));
+        char *exit_msg = string_join("Killed by signal ", exit_sig);
+        free(exit_sig);
+        return exit_msg;
     }
-    return temp;
+    return string_init("Unknown reason");
 }
 
 void server_exit(int exit_code) { // kill sub process and exit
@@ -162,7 +148,7 @@ void get_sub_exit() { // catch child process exit
         return;
     }
     int status;
-    log_debug("Handle sub-process exit");
+    log_debug("Handle sub-process start");
     for (process **proc = process_list; *proc != NULL; ++proc) {
         if ((*proc)->pid == 0) {
             continue; // skip not running process
@@ -172,7 +158,9 @@ void get_sub_exit() { // catch child process exit
             log_perror("%s waitpid error -> ", (*proc)->name);
             server_exit(EXIT_WAIT_ERROR);
         } else if (wait_ret) { // catch process exit
-            show_exit_info(get_exit_info(status, (*proc)->pid), (*proc)->name);
+            char *exit_msg = get_exit_msg(status);
+            log_warn("%s (PID = %d) -> %s", (*proc)->name, (*proc)->pid, exit_msg);
+            free(exit_msg);
             sleep(1); // reduce restart frequency
             process_exec(*proc);
             usleep(50 * 1000); // delay 50ms
@@ -185,7 +173,9 @@ void get_sub_exit() { // catch child process exit
         log_perror("Waitpid error");
         server_exit(EXIT_WAIT_ERROR);
     } else if (wait_ret) { // process exit
-        show_exit_info(get_exit_info(status, wait_ret), "Sub-process");
+        char *exit_msg = get_exit_msg(status);
+        log_debug("Sub-process (PID = %d) -> %s", wait_ret, exit_msg);
+        free(exit_msg);
     }
     log_debug("Handle sub-process complete");
 }
