@@ -1,3 +1,7 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE // NOLINT
+#endif
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
