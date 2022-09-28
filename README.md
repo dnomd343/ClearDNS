@@ -338,7 +338,7 @@ shell> netstat -tlnpu | grep -E ":53|:80"
 
 ```bash
 # 运行ClearDNS容器
-shell> docker run -dit \
+shell> docker run -dt \
   --restart always \
   --name cleardns --hostname cleardns \
   --volume /etc/cleardns/:/cleardns/ \
@@ -366,7 +366,7 @@ shell> netstat -tlnpu | grep -E ":53|:80|:4053|:5353|:6053"
 
 ```bash
 # 运行ClearDNS容器
-docker run -dit --network host \
+docker run -dt --network host \
   --restart always \
   --name cleardns --hostname cleardns \
   --volume /etc/cleardns/:/cleardns/ \
@@ -428,7 +428,7 @@ shell> reboot
 
 ```bash
 # 运行ClearDNS容器
-shell> docker run -dit --network macvlan \
+shell> docker run -dt --network macvlan \
   --restart always --privileged \
   --name cleardns --host cleardns \
   --volume /etc/cleardns/:/cleardns/ \
