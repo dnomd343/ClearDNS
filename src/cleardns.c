@@ -15,17 +15,31 @@
 #include "overture.h"
 #include "structure.h"
 
-char* init(int argc, char *argv[]) { // return config file
-    char *config = string_init(CONFIG_FILE);
+struct {
+    char *config;
+    uint8_t debug;
+    uint8_t verbose;
+} settings;
+
+void init(int argc, char *argv[]) { // return config file
+    settings.config = string_init(CONFIG_FILE);
+    settings.debug = FALSE;
+    settings.verbose = FALSE;
+
     if (getenv("CONFIG") != NULL) {
-        config = string_init(getenv("CONFIG"));
+        free(settings.config);
+        settings.config = string_init(getenv("CONFIG"));
     }
     if (getenv("DEBUG") != NULL && !strcmp(getenv("DEBUG"), "TRUE")) {
-        LOG_LEVEL = LOG_DEBUG; // enable debug mode
+        settings.debug = TRUE;
     }
+    if (getenv("VERBOSE") != NULL && !strcmp(getenv("VERBOSE"), "TRUE")) {
+        settings.verbose = TRUE;
+    }
+
     for (int i = 0; i < argc; ++i) {
         if (!strcmp(argv[i], "--debug")) {
-            LOG_LEVEL = LOG_DEBUG; // enable debug mode
+            settings.debug = TRUE;
         }
         if (!strcmp(argv[i], "--version")) {
             printf("ClearDNS version %s\n", VERSION); // show version
@@ -40,24 +54,23 @@ char* init(int argc, char *argv[]) { // return config file
                 log_error("Option `--config` missing value");
                 exit(1);
             }
-            free(config);
-            config = string_init(argv[++i]); // use custom config file
+            free(settings.config);
+            settings.config = string_init(argv[++i]); // use custom config file
         }
     }
-    log_debug("Config file -> %s", config);
-    return config;
+    log_debug("Config file -> %s", settings.config);
 }
 
-int main(int argc, char *argv[]) { // ClearDNS service
-    char *config_file = init(argc, argv);
-    log_info("ClearDNS server start (%s)", VERSION);
+void cleardns() { // cleardns service
+    if (settings.verbose || settings.debug) {
+        LOG_LEVEL = LOG_DEBUG; // enable debug log level
+    }
     create_folder(EXPOSE_DIR);
     create_folder(WORK_DIR);
     chdir(EXPOSE_DIR);
-
-    load_config(config_file);
-    free(config_file);
-    if (LOG_LEVEL == LOG_DEBUG) { // debug mode enabled
+    load_config(settings.config); // configure parser
+    free(settings.config);
+    if (settings.debug) { // debug mode enabled
         loader.diverter->debug = TRUE;
         loader.domestic->debug = TRUE;
         loader.foreign->debug = TRUE;
@@ -69,8 +82,8 @@ int main(int argc, char *argv[]) { // ClearDNS service
         }
     }
 
-    process_list_init();
     log_info("Start loading process");
+    process_list_init();
     assets_load(loader.resource);
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
@@ -87,19 +100,25 @@ int main(int argc, char *argv[]) { // ClearDNS service
         adguard_free(loader.filter);
     }
 
-    for (char **script = loader.script; *script != NULL; ++script) { // run custom script
+    for (char **script = loader.script; *script != NULL; ++script) { // running custom script
         log_info("Run custom script -> `%s`", *script);
         run_command(*script);
     }
     string_list_free(loader.script);
 
-    process_list_run();
+    process_list_run(); // start all process
     if (loader.crond != NULL) { // assets not disabled
         pid_t my_pid = getpid();
         log_info("ClearDNS PID -> %d", my_pid);
         kill(my_pid, SIGALRM); // send alarm signal to itself
         crontab_free(loader.crond);
     }
-    process_list_daemon();
+    process_list_daemon(); // daemon all process
+}
+
+int main(int argc, char *argv[]) {
+    init(argc, argv);
+    log_info("ClearDNS server start (%s)", VERSION);
+    cleardns();
     return 0;
 }
