@@ -27,4 +27,3 @@ domains = {x for x in domains if re.search(regex, str(x)) is not None}
 
 with open('gfwlist.txt', 'w') as fileObj:
     fileObj.write('\n'.join(sorted(domains)) + '\n')
-os.system('xz -kf9 gfwlist.txt')

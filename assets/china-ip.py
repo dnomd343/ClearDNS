@@ -50,4 +50,3 @@ for ip in v6:
 
 with open('china-ip.txt', 'w') as fileObj:
     fileObj.write('\n'.join(ips) + '\n')
-os.system('xz -kf9 china-ip.txt')
