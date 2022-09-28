@@ -53,9 +53,9 @@ FROM ${ALPINE_IMG} AS asset
 COPY --from=dnsproxy /tmp/dnsproxy /asset/usr/bin/
 COPY --from=overture /tmp/overture /asset/usr/bin/
 COPY --from=adguardhome /tmp/AdGuardHome /asset/usr/bin/
-RUN wget https://res.dnomd343.top/Share/gfwlist/gfwlist.txt && \
-    wget https://res.dnomd343.top/Share/chinalist/china-ip.txt && \
-    wget https://res.dnomd343.top/Share/chinalist/chinalist.txt
+RUN wget https://res.dnomd343.top/Share/cleardns/gfwlist.txt && \
+    wget https://res.dnomd343.top/Share/cleardns/china-ip.txt && \
+    wget https://res.dnomd343.top/Share/cleardns/chinalist.txt
 RUN apk add xz && tar cJf /asset/assets.tar.xz ./*.txt
 COPY --from=cleardns /tmp/cleardns /asset/usr/bin/
 COPY --from=cleardns /tmp/toJSON /asset/usr/bin/

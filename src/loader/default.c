@@ -44,9 +44,9 @@ foreign:\n\
 assets:\n\
   cron: \"0 4 * * *\"\n\
   update:\n\
-    gfwlist.txt: https://res.dnomd343.top/Share/gfwlist/gfwlist.txt\n\
-    china-ip.txt: https://res.dnomd343.top/Share/chinalist/china-ip.txt\n\
-    chinalist.txt: https://res.dnomd343.top/Share/chinalist/chinalist.txt\n\
+    gfwlist.txt: https://res.dnomd343.top/Share/cleardns/gfwlist.txt\n\
+    china-ip.txt: https://res.dnomd343.top/Share/cleardns/china-ip.txt\n\
+    chinalist.txt: https://res.dnomd343.top/Share/cleardns/chinalist.txt\n\
 "
 
 void load_default_config(const char *config_file) {

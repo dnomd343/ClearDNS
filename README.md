@@ -52,7 +52,7 @@ ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 
 
 当分流器接到请求时，若在 `chinalist.txt` 中有所匹配，则只请求国内组，若在 `gfwlist.txt` 匹配，则仅请求国外组；两者均未未匹配的情况下，将同时请求国内组与国外组，若国内组返回结果在 `china-ip.txt` 中，则证明 DNS 未被污染，采纳国内组结果，若返回国外 IP 地址，则可能已经被污染，将返回国外组结果。
 
-由于以上资源数据一直在变动，ClearDNS 内置了更新功能，可自动这些资源文件；数据从多个上游项目收集，每天进行一次合并整理，整合数据的源码可见[此处](./asset/)，您可以自由配置更新服务器，或者禁用更新。
+由于以上资源数据一直在变动，ClearDNS 内置了更新功能，可自动这些资源文件；数据从多个上游项目收集，每天进行一次合并整理，整合数据的源码可见[此处](./assets/)，您可以自由配置更新服务器，或者禁用更新。
 
 ## 配置格式
 
@@ -98,9 +98,9 @@ foreign:
 assets:
   cron: "0 4 * * *"
   update:
-    gfwlist.txt: https://res.dnomd343.top/Share/gfwlist/gfwlist.txt
-    china-ip.txt: https://res.dnomd343.top/Share/chinalist/china-ip.txt
-    chinalist.txt: https://res.dnomd343.top/Share/chinalist/chinalist.txt
+    gfwlist.txt: https://res.dnomd343.top/Share/cleardns/gfwlist.txt
+    china-ip.txt: https://res.dnomd343.top/Share/cleardns/china-ip.txt
+    chinalist.txt: https://res.dnomd343.top/Share/cleardns/chinalist.txt
 ```
 
 ### Port
@@ -267,9 +267,9 @@ assets:
   disable: false
   cron: "0 4 * * *"
   update:
-    gfwlist.txt: https://res.dnomd343.top/Share/gfwlist/gfwlist.txt
-    china-ip.txt: https://res.dnomd343.top/Share/chinalist/china-ip.txt
-    chinalist.txt: https://res.dnomd343.top/Share/chinalist/chinalist.txt
+    gfwlist.txt: https://res.dnomd343.top/Share/cleardns/gfwlist.txt
+    china-ip.txt: https://res.dnomd343.top/Share/cleardns/china-ip.txt
+    chinalist.txt: https://res.dnomd343.top/Share/cleardns/chinalist.txt
 ```
 
 + `disable` ：是否关闭资源文件加载，默认为 `false`
