@@ -9,7 +9,7 @@ WORKDIR ./upx-${UPX_VER}-src/
 RUN make -C ./src/ && mkdir -p /upx/bin/ && mv ./src/upx.out /upx/bin/upx && \
     mkdir -p /upx/lib/ && cd /usr/lib/ && cp -d ./libgcc_s.so* ./libstdc++.so* ./libucl.so* /upx/lib/
 
-FROM ${GOLANG_IMG} AS adguardhome
+FROM ${GOLANG_IMG} AS adguard
 ENV ADGUARD_VER="v0.107.13"
 RUN apk add git make npm yarn && git clone https://github.com/AdguardTeam/AdGuardHome.git
 WORKDIR ./AdGuardHome/
@@ -47,18 +47,18 @@ RUN apk add build-base cmake
 COPY ./ /ClearDNS/
 WORKDIR /ClearDNS/build/
 RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make && mv ../bin/cleardns /tmp/ && strip /tmp/cleardns
-COPY --from=toJSON /tmp/toJSON /tmp/
 
 FROM ${ALPINE_IMG} AS asset
+RUN apk add xz && mkdir -p /asset/
+RUN wget https://res.dnomd343.top/Share/cleardns/gfwlist.txt.xz && \
+    wget https://res.dnomd343.top/Share/cleardns/china-ip.txt.xz && \
+    wget https://res.dnomd343.top/Share/cleardns/chinalist.txt.xz && \
+    xz -d *.xz && tar cJf /asset/assets.tar.xz ./*.txt
 COPY --from=dnsproxy /tmp/dnsproxy /asset/usr/bin/
 COPY --from=overture /tmp/overture /asset/usr/bin/
-COPY --from=adguardhome /tmp/AdGuardHome /asset/usr/bin/
-RUN wget https://res.dnomd343.top/Share/cleardns/gfwlist.txt && \
-    wget https://res.dnomd343.top/Share/cleardns/china-ip.txt && \
-    wget https://res.dnomd343.top/Share/cleardns/chinalist.txt
-RUN apk add xz && tar cJf /asset/assets.tar.xz ./*.txt
+COPY --from=adguard /tmp/AdGuardHome /asset/usr/bin/
 COPY --from=cleardns /tmp/cleardns /asset/usr/bin/
-COPY --from=cleardns /tmp/toJSON /asset/usr/bin/
+COPY --from=toJSON /tmp/toJSON /asset/usr/bin/
 
 FROM ${ALPINE_IMG}
 COPY --from=asset /asset/ /
