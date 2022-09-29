@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include "logger.h"
 #include "sundry.h"
 #include "system.h"
@@ -27,10 +28,13 @@ void crontab_dump(crontab *info) { // show crontab options in debug log
 
 process* crontab_load(crontab *info) { // load crontab options
     crontab_dump(info);
-    // TODO: use getpid()
-    char *cron_cmd = string_join(info->cron, " kill -14 $(ps -o pid,comm | grep cleardns | awk '{print $1}')");
-    save_file("/var/spool/cron/crontabs/root", cron_cmd); // SIGALRM -> 14
+    char *my_pid = uint32_to_string(getpid());
+    char *cron_cmd = string_join("\tkill -14 ", my_pid); // SIGALRM -> 14
+    char *cron_exp = string_join(info->cron, cron_cmd);
+    save_file("/var/spool/cron/crontabs/root", cron_exp);
+    free(cron_exp);
     free(cron_cmd);
+    free(my_pid);
 
     process *proc = process_init("Crontab", "crond");
     process_add_arg(proc, "-f"); // foreground
