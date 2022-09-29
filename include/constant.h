@@ -10,6 +10,7 @@
 #define DOMESTIC_PORT 4053
 #define FOREIGN_PORT  6053
 
+#define RESTART_DELAY    1
 #define DIVERTER_TIMEOUT 6
 
 #define VERSION     "1.3.0-rc1"

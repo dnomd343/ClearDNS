@@ -164,8 +164,7 @@ void get_sub_exit() { // catch child process exit
             char *exit_msg = get_exit_msg(status);
             log_warn("%s (PID = %d) -> %s", (*proc)->name, (*proc)->pid, exit_msg);
             free(exit_msg);
-            // TODO: delay with global const
-            sleep(1); // reduce restart frequency
+            sleep(RESTART_DELAY); // reduce restart frequency
             process_exec(*proc);
             log_info("%s restart complete", (*proc)->name);
             return; // skip following check
