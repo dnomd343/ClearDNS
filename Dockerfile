@@ -10,7 +10,7 @@ RUN make -C ./src/ && mkdir -p /upx/bin/ && mv ./src/upx.out /upx/bin/upx && \
     mkdir -p /upx/lib/ && cd /usr/lib/ && cp -d ./libgcc_s.so* ./libstdc++.so* ./libucl.so* /upx/lib/
 
 FROM ${GOLANG_IMG} AS adguard
-ENV ADGUARD_VER="v0.107.13"
+ENV ADGUARD_VER="v0.107.14"
 RUN apk add git make npm yarn && git clone https://github.com/AdguardTeam/AdGuardHome.git
 WORKDIR ./AdGuardHome/
 RUN git checkout ${ADGUARD_VER} && make js-deps
@@ -28,7 +28,7 @@ COPY --from=upx /upx/ /usr/
 RUN upx -9 /tmp/overture
 
 FROM ${GOLANG_IMG} AS dnsproxy
-ENV DNSPROXY_VER="0.45.0"
+ENV DNSPROXY_VER="0.45.1"
 RUN wget https://github.com/AdguardTeam/dnsproxy/archive/refs/tags/v${DNSPROXY_VER}.tar.gz && tar xf v${DNSPROXY_VER}.tar.gz
 WORKDIR ./dnsproxy-${DNSPROXY_VER}/
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY_VER} -s -w" && mv dnsproxy /tmp/
