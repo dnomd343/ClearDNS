@@ -49,11 +49,12 @@ WORKDIR /ClearDNS/build/
 RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make && mv ../bin/cleardns /tmp/ && strip /tmp/cleardns
 
 FROM ${ALPINE_IMG} AS asset
-RUN apk add xz && mkdir -p /asset/
+RUN apk add xz
+WORKDIR /asset/
 RUN wget https://res.dnomd343.top/Share/cleardns/gfwlist.txt.xz && \
     wget https://res.dnomd343.top/Share/cleardns/china-ip.txt.xz && \
     wget https://res.dnomd343.top/Share/cleardns/chinalist.txt.xz && \
-    xz -d *.xz && tar cJf /asset/assets.tar.xz ./*.txt
+    xz -d *.xz && tar cJf assets.tar.xz ./*.txt && rm *.txt
 COPY --from=dnsproxy /tmp/dnsproxy /asset/usr/bin/
 COPY --from=overture /tmp/overture /asset/usr/bin/
 COPY --from=adguard /tmp/AdGuardHome /asset/usr/bin/
@@ -62,4 +63,5 @@ COPY --from=toJSON /tmp/toJSON /asset/usr/bin/
 
 FROM ${ALPINE_IMG}
 COPY --from=asset /asset/ /
+WORKDIR /cleardns/
 ENTRYPOINT ["cleardns"]
