@@ -11,8 +11,8 @@ COPY --from=apk /apk/ /apk/
 RUN apk add git && /apk/setup
 RUN git clone https://github.com/dnomd343/upx.git
 WORKDIR ./upx/
-RUN git submodule update --init && rm -rf ./.git/ && \
-    make UPX_CMAKE_CONFIG_FLAGS=-DCMAKE_EXE_LINKER_FLAGS=-static && \
+RUN git submodule update --init && rm -rf ./.git/
+RUN make UPX_CMAKE_CONFIG_FLAGS=-DCMAKE_EXE_LINKER_FLAGS=-static && \
     mv ./build/release/upx /tmp/ && strip /tmp/upx
 
 FROM ${GOLANG} AS adguard
