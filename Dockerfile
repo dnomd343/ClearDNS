@@ -6,8 +6,8 @@ RUN apk add build-base cmake git
 RUN git clone https://github.com/dnomd343/upx.git
 WORKDIR ./upx/
 RUN git submodule update --init && rm -rf ./.git/ && \
-    sed -i '2i\set(CMAKE_EXE_LINKER_FLAGS "-static")' CMakeLists.txt && \
-    make && mv ./build/release/upx /tmp/ && strip /tmp/upx
+    make UPX_CMAKE_CONFIG_FLAGS=-DCMAKE_EXE_LINKER_FLAGS=-static && \
+    mv ./build/release/upx /tmp/ && strip /tmp/upx
 
 FROM ${GOLANG} AS adguard
 ENV ADGUARD="v0.107.14"
