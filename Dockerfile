@@ -2,12 +2,12 @@ ARG ALPINE="alpine:3.16"
 ARG GOLANG="golang:1.18-alpine3.16"
 
 FROM ${ALPINE} AS upx
-ENV UPX="3.96"
-RUN sed -i 's/v3.\d\d/v3.15/' /etc/apk/repositories && apk add bash build-base perl ucl-dev zlib-dev
-RUN wget https://github.com/upx/upx/releases/download/v${UPX}/upx-${UPX}-src.tar.xz && tar xf upx-${UPX}-src.tar.xz
-WORKDIR ./upx-${UPX}-src/
-RUN make -C ./src/ && mkdir -p /upx/bin/ && mv ./src/upx.out /upx/bin/upx && \
-    mkdir -p /upx/lib/ && cd /usr/lib/ && cp -d libgcc_s.so* libstdc++.so* libucl.so* /upx/lib/
+RUN apk add build-base cmake git
+RUN git clone https://github.com/dnomd343/upx.git ./upx-build/
+WORKDIR ./upx-build/
+RUN git submodule update --init && rm -rf ./.git/
+RUN mkdir -p /upx/bin/ && make && mv ./build/release/upx /upx/bin/ && \
+    mkdir -p /upx/lib/ && cp -d /usr/lib/libgcc_s.so* /usr/lib/libstdc++.so* /upx/lib/
 
 FROM ${GOLANG} AS adguard
 ENV ADGUARD="v0.107.14"
