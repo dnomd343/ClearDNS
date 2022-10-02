@@ -28,6 +28,8 @@ void crontab_dump(crontab *info) { // show crontab options in debug log
 
 process* crontab_load(crontab *info) { // load crontab options
     crontab_dump(info);
+    create_folder("/var/spool/cron/");
+    create_folder("/var/spool/cron/crontabs/");
     char *my_pid = uint32_to_string(getpid());
     char *cron_cmd = string_join("\tkill -14 ", my_pid); // SIGALRM -> 14
     char *cron_exp = string_join(info->cron, cron_cmd);
