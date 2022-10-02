@@ -3,11 +3,11 @@ ARG GOLANG="golang:1.18-alpine3.16"
 
 FROM ${ALPINE} AS upx
 RUN apk add build-base cmake git
-RUN git clone https://github.com/dnomd343/upx.git ./upx-build/
-WORKDIR ./upx-build/
-RUN git submodule update --init && rm -rf ./.git/
-RUN mkdir -p /upx/bin/ && make && mv ./build/release/upx /upx/bin/ && \
-    mkdir -p /upx/lib/ && cp -d /usr/lib/libgcc_s.so* /usr/lib/libstdc++.so* /upx/lib/
+RUN git clone https://github.com/dnomd343/upx.git
+WORKDIR ./upx/
+RUN git submodule update --init && rm -rf ./.git/ && \
+    sed -i '2i\set(CMAKE_EXE_LINKER_FLAGS "-static")' CMakeLists.txt && \
+    make && mv ./build/release/upx /tmp/ && strip /tmp/upx
 
 FROM ${GOLANG} AS adguard
 ENV ADGUARD="v0.107.14"
@@ -16,7 +16,7 @@ WORKDIR ./AdGuardHome/
 RUN git checkout ${ADGUARD} && make js-deps
 RUN make js-build
 RUN make CHANNEL="release" VERSION=${ADGUARD} VERBOSE=1 go-build && mv AdGuardHome /tmp/
-COPY --from=upx /upx/ /usr/
+COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/AdGuardHome
 
 FROM ${GOLANG} AS overture
@@ -24,7 +24,7 @@ ENV OVERTURE="1.8"
 RUN wget https://github.com/shawn1m/overture/archive/refs/tags/v${OVERTURE}.tar.gz && tar xf ./v${OVERTURE}.tar.gz
 WORKDIR ./overture-${OVERTURE}/main/
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.version=v${OVERTURE} -s -w" && mv main /tmp/overture
-COPY --from=upx /upx/ /usr/
+COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/overture
 
 FROM ${GOLANG} AS dnsproxy
@@ -32,14 +32,14 @@ ENV DNSPROXY="0.45.1"
 RUN wget https://github.com/AdguardTeam/dnsproxy/archive/refs/tags/v${DNSPROXY}.tar.gz && tar xf v${DNSPROXY}.tar.gz
 WORKDIR ./dnsproxy-${DNSPROXY}/
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY} -s -w" && mv dnsproxy /tmp/
-COPY --from=upx /upx/ /usr/
+COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/dnsproxy
 
 FROM ${GOLANG} AS toJSON
 COPY ./toJSON/ /toJSON/
 WORKDIR /toJSON/
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-s -w" && mv toJSON /tmp/
-COPY --from=upx /upx/ /usr/
+COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/toJSON
 
 FROM ${ALPINE} AS cleardns
