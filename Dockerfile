@@ -45,8 +45,8 @@ RUN upx -9 /tmp/toJSON
 FROM ${ALPINE} AS cleardns
 RUN apk add build-base cmake
 COPY ./ /ClearDNS/
-WORKDIR /ClearDNS/build/
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make && mv ../bin/cleardns /tmp/ && strip /tmp/cleardns
+WORKDIR /ClearDNS/bin/
+RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make && strip cleardns && mv cleardns /tmp/
 
 FROM ${ALPINE} AS build
 RUN apk add xz
@@ -55,9 +55,9 @@ RUN wget https://res.dnomd343.top/Share/cleardns/gfwlist.txt.xz && \
     wget https://res.dnomd343.top/Share/cleardns/china-ip.txt.xz && \
     wget https://res.dnomd343.top/Share/cleardns/chinalist.txt.xz && \
     xz -d *.xz && tar cJf assets.tar.xz *.txt && rm *.txt
-COPY --from=dnsproxy /tmp/dnsproxy /release/usr/bin/
-COPY --from=overture /tmp/overture /release/usr/bin/
 COPY --from=adguard /tmp/AdGuardHome /release/usr/bin/
+COPY --from=overture /tmp/overture /release/usr/bin/
+COPY --from=dnsproxy /tmp/dnsproxy /release/usr/bin/
 COPY --from=cleardns /tmp/cleardns /release/usr/bin/
 COPY --from=toJSON /tmp/toJSON /release/usr/bin/
 
