@@ -51,7 +51,7 @@ void process_exec(process *proc) {
     log_info("%s start", proc->name);
     process_dump(proc);
     if ((pid = fork()) < 0) { // fork error
-        log_perror("%s fork error", proc->name);
+        log_perror("%s fork error -> ", proc->name);
         server_exit(EXIT_FORK_ERROR);
     } else if (pid == 0) { // child process
         if (chdir(proc->cwd)) { // change working directory
@@ -172,7 +172,7 @@ void get_sub_exit() { // catch child process exit
     }
     int wait_ret = waitpid(-1, &status, WNOHANG); // waitpid for all sub-process (non-blocking)
     if (wait_ret == -1) {
-        log_perror("Waitpid error");
+        log_perror("Waitpid error -> ");
         server_exit(EXIT_WAIT_ERROR);
     } else if (wait_ret) { // process exit
         char *exit_msg = get_exit_msg(status);
