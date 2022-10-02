@@ -81,8 +81,8 @@ void extract(const char *file) { // extract one asset file from `.tar.xz` file
     }
     free(output_file);
 
-    char *extract_cmd = (char *)malloc(strlen(ASSETS_PKG) + strlen(file) + strlen(ASSETS_DIR) + 15);
-    sprintf(extract_cmd, "tar xf %s ./%s -C %s", ASSETS_PKG, file, ASSETS_DIR);
+    char *extract_cmd = (char *)malloc(strlen(ASSETS_PKG) + strlen(file) + strlen(ASSETS_DIR) + 13);
+    sprintf(extract_cmd, "tar xf %s %s -C %s", ASSETS_PKG, file, ASSETS_DIR);
     if (run_command(extract_cmd)) {
         log_warn("Extract asset `%s` failed", file);
     } else {
