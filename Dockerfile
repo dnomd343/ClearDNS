@@ -1,8 +1,14 @@
 ARG ALPINE="alpine:3.16"
 ARG GOLANG="golang:1.18-alpine3.16"
 
+FROM ${ALPINE} AS apk
+WORKDIR /apk/
+RUN echo -e "cd \`dirname \$0\`\napk add --no-network \\" > setup && chmod +x setup && \
+    apk update && apk fetch -R build-base cmake | grep -oE '\S+$' | awk '{print "./"$0".apk \\"}' >> setup
+
 FROM ${ALPINE} AS upx
-RUN apk add build-base cmake git
+COPY --from=apk /apk/ /apk/
+RUN apk add git && /apk/setup
 RUN git clone https://github.com/dnomd343/upx.git
 WORKDIR ./upx/
 RUN git submodule update --init && rm -rf ./.git/ && \
@@ -43,7 +49,8 @@ COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/toJSON
 
 FROM ${ALPINE} AS cleardns
-RUN apk add build-base cmake
+COPY --from=apk /apk/ /apk/
+RUN /apk/setup
 COPY ./ /ClearDNS/
 WORKDIR /ClearDNS/bin/
 RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && \
