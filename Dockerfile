@@ -46,7 +46,8 @@ FROM ${ALPINE} AS cleardns
 RUN apk add build-base cmake
 COPY ./ /ClearDNS/
 WORKDIR /ClearDNS/bin/
-RUN cmake -DCMAKE_BUILD_TYPE=Release .. && make && strip cleardns && mv cleardns /tmp/
+RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && \
+    make && strip cleardns && mv cleardns /tmp/
 
 FROM ${ALPINE} AS build
 RUN apk add xz
