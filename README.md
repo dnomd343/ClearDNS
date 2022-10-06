@@ -592,12 +592,10 @@ shell> docker buildx build -t dnomd343/cleardns --platform="linux/amd64,linux/ar
 
 ## 许可证
 
-TODO: add LICENSE
+Thanks for [@AdguardTeam](https://github.com/AdguardTeam)'s [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome.git) (GPL-3.0) project.
 
-+ DnsProxy
+Thanks for [@ameshkov](https://github.com/ameshkov)'s [dnsproxy](https://github.com/AdguardTeam/dnsproxy.git) (Apache-2.0) project.
 
-+ AdGuardHome
-
-+ Overture
+Thanks for [@shawn1m](https://github.com/shawn1m)'s [overture](https://github.com/shawn1m/overture.git) (MIT) project.
 
 MIT ©2022 [@dnomd343](https://github.com/dnomd343)
