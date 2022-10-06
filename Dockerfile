@@ -16,7 +16,7 @@ RUN make UPX_CMAKE_CONFIG_FLAGS=-DCMAKE_EXE_LINKER_FLAGS=-static && \
     mv ./build/release/upx /tmp/ && strip /tmp/upx
 
 FROM ${GOLANG} AS adguard
-ENV ADGUARD="v0.107.14"
+ENV ADGUARD="v0.107.15"
 RUN apk add git make npm yarn && git clone https://github.com/AdguardTeam/AdGuardHome.git
 WORKDIR ./AdGuardHome/
 RUN git checkout ${ADGUARD} && make js-deps
