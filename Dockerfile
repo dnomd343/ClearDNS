@@ -16,7 +16,7 @@ RUN make UPX_CMAKE_CONFIG_FLAGS=-DCMAKE_EXE_LINKER_FLAGS=-static && \
     mv ./build/release/upx /tmp/ && strip /tmp/upx
 
 FROM ${GOLANG} AS adguard
-ENV ADGUARD="v0.107.15"
+ENV ADGUARD="v0.107.16"
 RUN apk add git make npm yarn && git clone https://github.com/AdguardTeam/AdGuardHome.git
 WORKDIR ./AdGuardHome/
 RUN git checkout ${ADGUARD} && make js-deps
@@ -34,7 +34,7 @@ COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/overture
 
 FROM ${GOLANG} AS dnsproxy
-ENV DNSPROXY="0.45.2"
+ENV DNSPROXY="0.45.3"
 RUN wget https://github.com/AdguardTeam/dnsproxy/archive/refs/tags/v${DNSPROXY}.tar.gz && tar xf v${DNSPROXY}.tar.gz
 WORKDIR ./dnsproxy-${DNSPROXY}/
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY} -s -w" && mv dnsproxy /tmp/
