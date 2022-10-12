@@ -3,8 +3,8 @@ ARG GOLANG="golang:1.18-alpine3.16"
 
 FROM ${ALPINE} AS apk
 WORKDIR /apk/
-RUN echo -e "cd \`dirname \$0\`\napk add --no-network \\" > setup && chmod +x setup && \
-    apk update && apk fetch -R build-base cmake | grep -oE '\S+$' | awk '{print "./"$0".apk \\"}' >> setup
+RUN echo -e "cd \`dirname \$0\`\napk add --no-network \\" > setup && chmod +x setup && apk update && \
+    apk fetch -R build-base cmake | grep -oE '\S+$' | awk '{print "./"$0".apk \\"}' >> setup && /apk/setup
 
 FROM ${ALPINE} AS upx
 COPY --from=apk /apk/ /apk/
