@@ -1,19 +1,14 @@
 ARG ALPINE="alpine:3.16"
 ARG GOLANG="golang:1.18-alpine3.16"
 
-FROM ${ALPINE} AS apk
-WORKDIR /apk/
-RUN echo -e "cd \`dirname \$0\`\napk add --no-network \\" > setup && chmod +x setup && apk update && \
-    apk fetch -R build-base cmake | grep -oE '\S+$' | awk '{print "./"$0".apk \\"}' >> setup && /apk/setup
-
 FROM ${ALPINE} AS upx
-COPY --from=apk /apk/ /apk/
-RUN apk add git && /apk/setup
-RUN git clone https://github.com/dnomd343/upx.git
+RUN apk add build-base cmake git
+RUN git clone https://github.com/dnomd343/upx.git --depth=1
 WORKDIR ./upx/
 RUN git submodule update --init && rm -rf ./.git/
-RUN make UPX_CMAKE_CONFIG_FLAGS=-DCMAKE_EXE_LINKER_FLAGS=-static && \
-    mv ./build/release/upx /tmp/ && strip /tmp/upx
+RUN make UPX_CMAKE_CONFIG_FLAGS=-DCMAKE_EXE_LINKER_FLAGS=-static
+WORKDIR ./build/release/
+RUN strip upx && mv upx /tmp/
 
 FROM ${GOLANG} AS adguard
 ENV ADGUARD="v0.107.16"
@@ -49,12 +44,11 @@ COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/toJSON
 
 FROM ${ALPINE} AS cleardns
-COPY --from=apk /apk/ /apk/
-RUN /apk/setup
+RUN apk add build-base cmake
 COPY ./ /ClearDNS/
 WORKDIR /ClearDNS/bin/
-RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && \
-    make && strip cleardns && mv cleardns /tmp/
+RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && make
+RUN strip cleardns && mv cleardns /tmp/
 
 FROM ${ALPINE} AS build
 RUN apk add xz
