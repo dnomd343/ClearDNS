@@ -11,18 +11,19 @@ WORKDIR ./build/release/
 RUN strip upx && mv upx /tmp/
 
 FROM ${GOLANG} AS adguard
-ENV ADGUARD="v0.107.16"
-RUN apk add git make npm yarn && git clone https://github.com/AdguardTeam/AdGuardHome.git
+ENV ADGUARD="0.107.16"
+RUN apk add git make npm yarn
+RUN git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${ADGUARD} --depth=1
 WORKDIR ./AdGuardHome/
-RUN git checkout ${ADGUARD} && make js-deps
+RUN make js-deps
 RUN make js-build
-RUN make CHANNEL="release" VERSION=${ADGUARD} VERBOSE=1 go-build && mv AdGuardHome /tmp/
+RUN make CHANNEL="release" VERBOSE=1 go-build && mv AdGuardHome /tmp/
 COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/AdGuardHome
 
 FROM ${GOLANG} AS overture
 ENV OVERTURE="1.8"
-RUN wget https://github.com/shawn1m/overture/archive/refs/tags/v${OVERTURE}.tar.gz && tar xf ./v${OVERTURE}.tar.gz
+RUN wget https://github.com/shawn1m/overture/archive/refs/tags/v${OVERTURE}.tar.gz && tar xf v${OVERTURE}.tar.gz
 WORKDIR ./overture-${OVERTURE}/main/
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.version=v${OVERTURE} -s -w" && mv main /tmp/overture
 COPY --from=upx /tmp/upx /usr/bin/
