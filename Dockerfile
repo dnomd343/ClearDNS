@@ -30,7 +30,7 @@ COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/overture
 
 FROM ${GOLANG} AS dnsproxy
-ENV DNSPROXY="0.45.3"
+ENV DNSPROXY="0.45.4"
 RUN wget https://github.com/AdguardTeam/dnsproxy/archive/refs/tags/v${DNSPROXY}.tar.gz && tar xf v${DNSPROXY}.tar.gz
 WORKDIR ./dnsproxy-${DNSPROXY}/
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY} -s -w" && mv dnsproxy /tmp/
