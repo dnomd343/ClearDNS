@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "config.h"
 #include "loader.h"
 #include "logger.h"
@@ -63,14 +63,14 @@ overture* load_diverter(cleardns_config *config) {
 
     if (string_list_len(config->ttl)) {
         free(diverter->ttl_file);
-        diverter->ttl_file = string_init(ASSET_TTL);
+        diverter->ttl_file = strdup(ASSET_TTL);
         char *ttl_file = string_join(WORK_DIR, ASSET_TTL);
         save_string_list(ttl_file, config->ttl);
         free(ttl_file);
     }
     if (string_list_len(config->hosts)) {
         free(diverter->host_file);
-        diverter->host_file = string_init(ASSET_HOSTS);
+        diverter->host_file = strdup(ASSET_HOSTS);
         char *hosts_file = string_join(WORK_DIR, ASSET_HOSTS);
         save_string_list(hosts_file, config->hosts);
         free(hosts_file);
@@ -79,9 +79,9 @@ overture* load_diverter(cleardns_config *config) {
     free(diverter->domestic_ip_file);
     free(diverter->foreign_domain_file);
     free(diverter->domestic_domain_file);
-    diverter->domestic_ip_file = string_init(ASSET_CHINA_IP);
-    diverter->foreign_domain_file = string_init(ASSET_GFW_LIST);
-    diverter->domestic_domain_file = string_init(ASSET_CHINA_LIST);
+    diverter->domestic_ip_file = strdup(ASSET_CHINA_IP);
+    diverter->foreign_domain_file = strdup(ASSET_GFW_LIST);
+    diverter->domestic_domain_file = strdup(ASSET_CHINA_LIST);
 
     char *gfwlist = string_join(WORK_DIR, ASSET_GFW_LIST);
     char *china_ip = string_join(WORK_DIR, ASSET_CHINA_IP);
@@ -108,8 +108,8 @@ adguard* load_filter(cleardns_config *config) {
     adguard *filter = adguard_init();
     filter->dns_port = config->port;
     filter->web_port = config->adguard.port;
-    filter->username = string_init(config->adguard.username);
-    filter->password = string_init(config->adguard.password);
+    filter->username = strdup(config->adguard.username);
+    filter->password = strdup(config->adguard.password);
     char *diverter_port = uint32_to_string(config->diverter.port);
     filter->upstream = string_join("127.0.0.1:", diverter_port);
     free(diverter_port);
@@ -121,7 +121,7 @@ crontab* load_crond(cleardns_config *config) {
         return NULL; // disable crond
     }
     crontab *crond = crontab_init();
-    crond->cron = string_init(config->assets.cron);
+    crond->cron = strdup(config->assets.cron);
     return crond;
 }
 

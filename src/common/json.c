@@ -87,7 +87,7 @@ char* json_string_value(char* caption, cJSON *json) { // json string value -> st
     if (!cJSON_IsString(json)) {
         log_fatal("`%s` must be string", caption);
     }
-    return string_init(json->valuestring);
+    return strdup(json->valuestring);
 }
 
 char** json_string_list_value(char *caption, cJSON *json, char **string_list) { // json string array

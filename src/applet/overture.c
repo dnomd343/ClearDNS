@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "cJSON.h"
 #include "logger.h"
 #include "sundry.h"
@@ -30,10 +31,10 @@ overture* overture_init() { // init overture options
     info->foreign_port = FOREIGN_PORT;
     info->domestic_port = DOMESTIC_PORT;
     info->reject_type = uint32_list_init();
-    info->foreign_ip_file = string_init("/dev/null");
-    info->domestic_ip_file = string_init("/dev/null");
-    info->foreign_domain_file = string_init("/dev/null");
-    info->domestic_domain_file = string_init("/dev/null");
+    info->foreign_ip_file = strdup("/dev/null");
+    info->domestic_ip_file = strdup("/dev/null");
+    info->foreign_domain_file = strdup("/dev/null");
+    info->domestic_domain_file = strdup("/dev/null");
     return info;
 }
 

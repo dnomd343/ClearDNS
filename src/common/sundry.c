@@ -14,10 +14,6 @@ char* show_bool(uint8_t value) { // return `true` or `false`
     return "false";
 }
 
-char* string_init(const char *str) { // new string
-    return strcpy((char *)malloc(strlen(str) + 1), str);
-}
-
 char* string_join(const char *base, const char *add) { // combine string
     char *ret = (char *)malloc(strlen(base) + strlen(add) + 1);
     return strcat(strcpy(ret, base), add);
@@ -26,7 +22,7 @@ char* string_join(const char *base, const char *add) { // combine string
 char* uint32_to_string(uint32_t number) { // convert uint32 -> string
     char to_str[11]; // MAX_LEN(uint32) -> 4294967296(10-bytes)
     sprintf(to_str, "%u", number);
-    return string_init(to_str);
+    return strdup(to_str);
 }
 
 void string_list_debug(char *describe, char **string_list) { // show string list in debug log

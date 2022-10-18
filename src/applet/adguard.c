@@ -25,8 +25,8 @@ adguard* adguard_init() { // init adguard options
     info->dns_port = DNS_PORT;
     info->web_port = ADGUARD_PORT;
     info->upstream = string_join("127.0.0.1:", port_str); // default upstream
-    info->username = string_init(ADGUARD_USER);
-    info->password = string_init(ADGUARD_PASSWD);
+    info->username = strdup(ADGUARD_USER);
+    info->password = strdup(ADGUARD_PASSWD);
     free(port_str);
     return info;
 }

@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sundry.h"
 #include "structure.h"
 
 char** string_list_init() { // init string list
@@ -20,7 +19,7 @@ uint32_t string_list_len(char **string_list) { // get len of string list
 void string_list_append(char ***string_list, const char *string) {
     uint32_t len = string_list_len(*string_list);
     *string_list = (char **)realloc(*string_list, sizeof(char *) * (len + 2)); // extend string list
-    (*string_list)[len] = string_init(string);
+    (*string_list)[len] = strdup(string);
     (*string_list)[len + 1] = NULL; // list end sign
 }
 
@@ -39,7 +38,7 @@ void string_list_free(char **string_list) { // free string list
 
 char* string_list_dump(char **string_list) { // ['a', 'b', 'c', ...]
     if (string_list_len(string_list) == 0) {
-        return string_init("[]"); // empty string list
+        return strdup("[]"); // empty string list
     }
     char *string_ret = (char *)malloc(2);
     strcpy(string_ret, "[");
@@ -86,7 +85,7 @@ void uint32_list_free(uint32_t **uint32_list) { // free uint32 list
 
 char* uint32_list_dump(uint32_t **uint32_list) { // [1, 2, 3, ...]
     if (uint32_list_len(uint32_list) == 0) {
-        return string_init("[]"); // empty int list
+        return strdup("[]"); // empty int list
     }
     char uint32_str[12];
     char *string_ret = (char *)malloc(2);

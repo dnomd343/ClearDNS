@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "logger.h"
-#include "sundry.h"
 #include "system.h"
 #include "constant.h"
 

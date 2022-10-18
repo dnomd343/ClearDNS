@@ -3,6 +3,7 @@
 #endif
 
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
@@ -28,7 +29,7 @@ void process_exec(process *proc);
 process* process_init(const char *caption, const char *bin) { // init process struct
     process *proc = (process *)malloc(sizeof(process));
     proc->pid = 0; // process not running
-    proc->name = string_init(caption); // process caption
+    proc->name = strdup(caption); // process caption
     proc->cmd = string_list_init();
     string_list_append(&proc->cmd, bin); // argv[0] normally be process file name
     proc->env = string_list_init(); // empty environment variable
@@ -116,7 +117,7 @@ char* get_exit_msg(int status) { // get why the child process death
         free(exit_sig);
         return exit_msg;
     }
-    return string_init("Unknown reason");
+    return strdup("Unknown reason");
 }
 
 void server_exit(int exit_code) { // kill sub process and exit
