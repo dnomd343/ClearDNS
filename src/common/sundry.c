@@ -1,3 +1,7 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE // NOLINT
+#endif
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
