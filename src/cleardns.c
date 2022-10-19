@@ -115,8 +115,12 @@ void cleardns() { // cleardns service
 }
 
 int main(int argc, char *argv[]) {
-    init(argc, argv);
-    log_info("ClearDNS server start (%s)", VERSION);
-    cleardns();
+//    init(argc, argv);
+//    log_info("ClearDNS server start (%s)", VERSION);
+//    cleardns();
+
+    char *test = string_load("`%s` -> %d", "test", 2333);
+    printf("%s\n", test);
+
     return 0;
 }

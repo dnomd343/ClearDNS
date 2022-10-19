@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include "logger.h"
 #include "constant.h"
 #include "structure.h"
@@ -17,6 +18,14 @@ char* show_bool(uint8_t value) { // return `true` or `false`
 char* string_join(const char *base, const char *add) { // combine string
     char *ret = (char *)malloc(strlen(base) + strlen(add) + 1);
     return strcat(strcpy(ret, base), add);
+}
+
+char* string_load(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    char *buf = NULL;
+    vasprintf(&buf, fmt, ap);
+    return buf;
 }
 
 char* uint32_to_string(uint32_t number) { // convert uint32 -> string
