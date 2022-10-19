@@ -283,7 +283,7 @@ assets:
 
 ### 1. 网络配置
 
-> 本项目基于 Docker 构建，在 [Docker Hub](https://hub.docker.com/repository/docker/dnomd343/cleardns) 或 [Github Package](https://github.com/dnomd343/ClearDNS/pkgs/container/cleardns) 可以查看已构建的各版本镜像。
+> 本项目基于 Docker 构建，在 [Docker Hub](https://hub.docker.com/r/dnomd343/cleardns) 或 [Github Package](https://github.com/dnomd343/ClearDNS/pkgs/container/cleardns) 可以查看已构建的各版本镜像。
 
 ClearDNS 基于 Docker 网络有以下三种部署模式：
 
