@@ -465,7 +465,7 @@ ClearDNS 会将数据持久化存储，以在重启 Docker 或宿主机后保留
 
 > 国外组服务器切勿使用常规 DNS 服务，例如 `8.8.8.8` ，由于请求信息为明文，GFW 会抢答回复数据，导致内容仍然受到污染。
 
-在 `cleardns.yml` 中指定上游 DNS 服务器，国内组可指定国内公共 DNS 服务，国外组需指定可用的加密 DNS 服务，具体说明参考[关于DNS上游](#关于 DNS 上游)部分。
+在 `cleardns.yml` 中指定上游 DNS 服务器，国内组可指定国内公共 DNS 服务，国外组需指定可用的加密 DNS 服务，具体说明参考[关于DNS上游](#关于-DNS-上游)部分。
 
 > DNSCrypt 使用 `DNS Stamp` 封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
 
