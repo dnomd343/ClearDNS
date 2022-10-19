@@ -13,9 +13,8 @@
 #define RESTART_DELAY    1
 #define DIVERTER_TIMEOUT 6
 
-#define VERSION     "1.3.1"
+#define VERSION     "1.3.2"
 #define CONFIG_FILE "cleardns.yml"
-
 #define ADGUARD_USER   "admin"
 #define ADGUARD_PASSWD "cleardns"
 
