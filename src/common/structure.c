@@ -92,7 +92,7 @@ char* uint32_list_dump(uint32_t **uint32_list) { // [1, 2, 3, ...]
     strcpy(string_ret, "[");
     for (uint32_t **number = uint32_list; *number != NULL; ++number) {
         sprintf(uint32_str, "%u", **number);
-        string_ret = (char*)realloc(string_ret, strlen(string_ret) + 15);
+        string_ret = (char *)realloc(string_ret, strlen(string_ret) + 15);
         string_ret = strcat(strcat(string_ret, uint32_str), ", ");
     }
     string_ret[strlen(string_ret) - 2] = '\0';

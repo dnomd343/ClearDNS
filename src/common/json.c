@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "cJSON.h"
@@ -27,8 +26,7 @@ char* to_json(const char *file) { // convert JSON / TOML / YAML to json format (
     flag[8] = '\0';
 
     char *output_file = string_join("/tmp/to-json-", flag);
-    char *to_json_cmd = (char *)malloc(strlen(file) + strlen(output_file) + 11);
-    sprintf(to_json_cmd, "toJSON %s > %s", file, output_file);
+    char *to_json_cmd = string_load("toJSON %s > %s", file, output_file);
     int to_json_ret = run_command(to_json_cmd);
     free(to_json_cmd);
 

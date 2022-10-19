@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "logger.h"
+#include "sundry.h"
 #include "system.h"
 #include "constant.h"
 
@@ -65,8 +66,7 @@ void save_file(const char *file, const char *content) { // save content into fil
 }
 
 void file_append(const char *base_file, const char *append_file) { // append_file >> base_file
-    char *append_cmd = (char *)malloc(strlen(base_file) + strlen(append_file) + 9);
-    sprintf(append_cmd, "cat %s >> %s", append_file, base_file);
+    char *append_cmd = string_load("cat %s >> %s", append_file, base_file);
     run_command(append_cmd);
     free(append_cmd);
 }
@@ -108,8 +108,7 @@ void save_string_list(const char *file, char **string_list) { // save string lis
 
 void download_file(const char *file, const char *url) { // download file
     log_debug("Download file `%s` -> %s", file, url);
-    char *download_cmd = (char *)malloc(strlen(file) + strlen(url) + 15);
-    sprintf(download_cmd, "wget -T 8 -O %s %s", file, url);
+    char *download_cmd = string_load("wget -T 8 -O %s %s", file, url);
     if (run_command(download_cmd)) {
         log_warn("File `%s` download failed", url);
     }
