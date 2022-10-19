@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 char* show_bool(uint8_t value);
-char* string_init(const char *str);
+char* string_load(const char *fmt, ...);
 char* uint32_to_string(uint32_t number);
 char* string_join(const char *base, const char *add);
 void string_list_debug(char *describe, char **string_list);

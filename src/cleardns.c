@@ -22,13 +22,13 @@ struct {
 } settings;
 
 void init(int argc, char *argv[]) { // return config file
-    settings.config = string_init(CONFIG_FILE);
+    settings.config = strdup(CONFIG_FILE);
     settings.debug = FALSE;
     settings.verbose = FALSE;
 
     if (getenv("CONFIG") != NULL) {
         free(settings.config);
-        settings.config = string_init(getenv("CONFIG"));
+        settings.config = strdup(getenv("CONFIG"));
     }
     if (getenv("DEBUG") != NULL && !strcmp(getenv("DEBUG"), "TRUE")) {
         settings.debug = TRUE;
@@ -55,7 +55,7 @@ void init(int argc, char *argv[]) { // return config file
                 exit(1);
             }
             free(settings.config);
-            settings.config = string_init(argv[++i]); // use custom config file
+            settings.config = strdup(argv[++i]); // use custom config file
         }
     }
     log_debug("Config file -> %s", settings.config);

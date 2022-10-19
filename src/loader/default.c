@@ -1,7 +1,7 @@
 #include <stdlib.h>
+#include <string.h>
 #include "json.h"
 #include "logger.h"
-#include "sundry.h"
 #include "system.h"
 
 #define DEFAULT_CONFIG "\
@@ -63,7 +63,7 @@ void load_default_config(const char *config_file) {
         remove_file(temp_file);
     }
     if (config_content == NULL) {
-        config_content = string_init(DEFAULT_CONFIG);
+        config_content = strdup(DEFAULT_CONFIG);
     }
     save_file(config_file, config_content);
     free(config_content);

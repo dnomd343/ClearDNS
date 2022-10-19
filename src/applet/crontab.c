@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "logger.h"
 #include "sundry.h"
@@ -17,7 +18,7 @@ void crontab_free(crontab *info) { // free crontab options
 crontab* crontab_init() { // init crontab options
     crontab *info = (crontab *)malloc(sizeof(crontab));
     info->debug = FALSE;
-    info->cron = string_init(UPDATE_CRON);
+    info->cron = strdup(UPDATE_CRON);
     return info;
 }
 

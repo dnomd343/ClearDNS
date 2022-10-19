@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "config.h"
 #include "logger.h"
 #include "sundry.h"
@@ -33,11 +34,11 @@ cleardns_config* config_init() { // init config struct of cleardns
 
     config->adguard.port = ADGUARD_PORT;
     config->adguard.enable = TRUE;
-    config->adguard.username = string_init(ADGUARD_USER);
-    config->adguard.password = string_init(ADGUARD_PASSWD);
+    config->adguard.username = strdup(ADGUARD_USER);
+    config->adguard.password = strdup(ADGUARD_PASSWD);
 
     config->assets.disable = FALSE;
-    config->assets.cron = string_init(UPDATE_CRON);
+    config->assets.cron = strdup(UPDATE_CRON);
     config->assets.update_file = string_list_init();
     config->assets.update_url = string_list_init();
 
