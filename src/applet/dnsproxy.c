@@ -10,18 +10,6 @@
 char* dnsproxy_config(dnsproxy *info);
 void dnsproxy_dump(const char *caption, dnsproxy *info);
 
-void dnsproxy_add_primary(dnsproxy *info, const char *server) { // add primary dns server
-    string_list_append(&info->primary, server);
-}
-
-void dnsproxy_add_fallback(dnsproxy *info, const char *server) { // add fallback dns server
-    string_list_append(&info->fallback, server);
-}
-
-void dnsproxy_add_bootstrap(dnsproxy *info, const char *server) { // add bootstrap dns server
-    string_list_append(&info->bootstrap, server);
-}
-
 void dnsproxy_free(dnsproxy *info) { // free dnsproxy options
     string_list_free(info->bootstrap);
     string_list_free(info->fallback);
