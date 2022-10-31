@@ -1,7 +1,6 @@
 use serde_json::{Value};
 
-fn json_str() -> String {
-    let json = r#"{
+const JSON_STR: &str = r#"{
   "demo": "key_1",
   "author": "dnomd343",
   "test": [
@@ -10,13 +9,13 @@ fn json_str() -> String {
     "345"
   ]
 }"#;
-    return String::from(json);
-}
 
 fn main() {
-    let raw = json_str();
-    println!("JSON raw content ->\n{}", raw);
+    println!("JSON raw content ->\n{}", JSON_STR);
 
-    let parsed: Value = serde_json::from_str(&raw[..]).unwrap();
-    println!("Author -> {}", parsed["author"]);
+    let data: Value = serde_json::from_str(JSON_STR).unwrap();
+    println!("{:#?}", data);
+
+    let ret = serde_json::to_string(&data).unwrap();
+    println!("JSON output ->\n{}", ret);
 }
