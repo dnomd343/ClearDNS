@@ -20,16 +20,16 @@
 #define OVERTURE_BIN "overture"
 #define ADGUARD_BIN  "AdGuardHome"
 
-#define UPDATE_CRON "0 4 * * *"
-#define ASSETS_PKG  "/assets.tar.xz"
-
-#define ADGUARD_USER   "admin"
-#define ADGUARD_PASSWD "cleardns"
-
 #define EXPOSE_DIR  "/cleardns/"
 #define WORK_DIR    "/etc/cleardns/"
 #define ASSETS_DIR  "/cleardns/assets/"
 #define ADGUARD_DIR "/cleardns/adguard/"
+
+#define ADGUARD_USER   "admin"
+#define ADGUARD_PASSWD "cleardns"
+
+#define UPDATE_CRON    "0 4 * * *"
+#define ASSETS_PKG     "/assets.tar.xz"
 
 #define ASSET_TTL        "ttl.txt"
 #define ASSET_HOSTS      "hosts.txt"
@@ -37,7 +37,7 @@
 #define ASSET_CHINA_IP   "china-ip.txt"
 #define ASSET_CHINA_LIST "chinalist.txt"
 
-#define EXIT_NORMAL 0
+#define EXIT_NORMAL     0
 #define EXIT_FORK_ERROR 1
 #define EXIT_EXEC_ERROR 2
 #define EXIT_WAIT_ERROR 3
