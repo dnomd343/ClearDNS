@@ -1,4 +1,3 @@
-use std::fs::{read, read_to_string};
 use std::io::Read;
 use serde_json as json;
 use serde_yaml as yaml;
@@ -48,32 +47,11 @@ fn read_file(path: &str) -> String { // read file content
 }
 
 fn main() {
-
-    let file_name = "test.json_";
-
-    let content = read_file(file_name);
-
-    println!("{}", content);
-
-    // match std::fs::File::open(file_name) {
-    //     Ok(file) => {
-    //         read_to_string()
-    //     },
-    //     Err(_) => std::process::exit(FILE_ERROR),
-    // }
-
-    // let mut file = std::fs::File::open(file_name).unwrap();
-    // let mut contents = String::new();
-    // file.read_to_string(&mut contents).unwrap();
-    // println!("{}", contents);
-
-    // match std::fs::File::open(file_name) {
-    //     Ok(mut file) => {
-    //         let mut contents = String::new();
-    //         file.read_to_string(&mut contents).unwrap();
-    //         println!("{}", contents);
-    //     },
-    //     Err(_) => std::process::exit(FILE_ERROR),
-    // }
-
+    let args: Vec<String> = std::env::args().collect(); // input arguments
+    if args.len() < 2 { // missing arguments
+        println!("usage: toJSON [file]");
+        std::process::exit(0);
+    }
+    let content = read_file(&args[1].clone()[..]); // read file content
+    println!("{}", to_json(&content[..])); // convert to JSON format
 }
