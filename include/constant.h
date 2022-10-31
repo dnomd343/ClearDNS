@@ -13,22 +13,23 @@
 #define RESTART_DELAY    1
 #define DIVERTER_TIMEOUT 6
 
-#define VERSION     "1.3.2"
+#define VERSION     "1.3.3"
 #define CONFIG_FILE "cleardns.yml"
-#define ADGUARD_USER   "admin"
-#define ADGUARD_PASSWD "cleardns"
 
 #define DNSPROXY_BIN "dnsproxy"
 #define OVERTURE_BIN "overture"
 #define ADGUARD_BIN  "AdGuardHome"
 
+#define UPDATE_CRON "0 4 * * *"
+#define ASSETS_PKG  "/assets.tar.xz"
+
+#define ADGUARD_USER   "admin"
+#define ADGUARD_PASSWD "cleardns"
+
 #define EXPOSE_DIR  "/cleardns/"
 #define WORK_DIR    "/etc/cleardns/"
 #define ASSETS_DIR  "/cleardns/assets/"
 #define ADGUARD_DIR "/cleardns/adguard/"
-
-#define UPDATE_CRON      "0 4 * * *"
-#define ASSETS_PKG       "/assets.tar.xz"
 
 #define ASSET_TTL        "ttl.txt"
 #define ASSET_HOSTS      "hosts.txt"
