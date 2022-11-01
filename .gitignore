@@ -5,3 +5,4 @@
 /to-json/target/
 /cmake-build-debug/
 /cmake-build-release/
+/src/to-json/target/
