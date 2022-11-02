@@ -46,6 +46,8 @@ RUN cargo build --release
 WORKDIR /ClearDNS/bin/
 RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && make
 RUN strip cleardns && mv cleardns /tmp/
+COPY --from=upx /tmp/upx /usr/bin/
+RUN upx -9 /tmp/cleardns
 
 FROM ${ALPINE} AS build
 RUN apk add xz
