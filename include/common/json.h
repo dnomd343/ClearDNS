@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "cJSON.h"
 
-char* to_json(const char *config_file);
+char* to_json(const char *content);
 uint8_t is_json_suffix(const char *file_name);
 cJSON* json_field_get(cJSON *entry, const char *key);
 void json_field_replace(cJSON *entry, const char *key, cJSON *content);

@@ -114,24 +114,9 @@ void cleardns() { // cleardns service
     process_list_daemon(); // daemon all process
 }
 
-#include "json.h"
-
 int main(int argc, char *argv[]) {
-
-    char error_string[] = "\f233\a";
-    char yaml_string[] = "test: ok\narray:\n  - 123\n  - 234\n  - 345\n";
-
-    log_info("Test yaml content ->\n%s", yaml_string);
-    char *json_result = to_json(yaml_string);
-    log_info("Return json content -> %s", json_result);
-    free(json_result);
-
-    log_info("Test error content");
-    char *ret = to_json(error_string);
-    log_info("Return -> %s", ret);
-
-//    init(argc, argv);
-//    log_info("ClearDNS server start (%s)", VERSION);
-//    cleardns();
+    init(argc, argv);
+    log_info("ClearDNS server start (%s)", VERSION);
+    cleardns();
     return 0;
 }
