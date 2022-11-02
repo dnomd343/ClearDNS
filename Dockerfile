@@ -39,17 +39,14 @@ COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/dnsproxy
 
 FROM ${RUST} AS to-json
-# TODO: update crates.io index
 COPY ./src/to-json/ /to-json/
 WORKDIR /to-json/
 RUN cargo build --release
-WORKDIR ./target/release/
-RUN cp libto_json.a /
 
 FROM ${ALPINE} AS cleardns
 RUN apk add build-base cmake
 COPY ./ /cleardns/
-COPY --from=to-json /libto_json.a /cleardns/src/to-json/target/release/
+COPY --from=to-json /to-json/ /cleardns/src/to-json/
 WORKDIR /cleardns/bin/
 RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && make
 RUN strip cleardns && mv cleardns /tmp/
