@@ -57,12 +57,8 @@ void load_default_config(const char *config_file) {
     log_info("Loading default configure file");
     char *config_content = NULL;
     if (is_json_suffix(config_file)) { // convert to json format
-        char temp_file[] = "temp.yml";
-        save_file(temp_file, DEFAULT_CONFIG);
-        config_content = to_json(temp_file);
-        remove_file(temp_file);
-    }
-    if (config_content == NULL) {
+        config_content = to_json(DEFAULT_CONFIG);
+    } else {
         config_content = strdup(DEFAULT_CONFIG);
     }
     save_file(config_file, config_content);

@@ -7,6 +7,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include/bcrypt)
 include_directories(${PROJECT_SOURCE_DIR}/include/common)
 include_directories(${PROJECT_SOURCE_DIR}/include/loader)
 
+link_directories(${PROJECT_SOURCE_DIR}/src/to-json/target/release)
+
 add_subdirectory(utils)
 add_subdirectory(applet)
 add_subdirectory(bcrypt)

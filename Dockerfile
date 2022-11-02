@@ -38,16 +38,11 @@ RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DN
 COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/dnsproxy
 
-FROM ${RUST} AS to-json
-COPY ./to-json/ /to-json/
-WORKDIR /to-json/
-RUN cargo build --release && mv ./target/release/to-json /tmp/toJSON
-COPY --from=upx /tmp/upx /usr/bin/
-RUN upx -9 /tmp/toJSON
-
-FROM ${ALPINE} AS cleardns
+FROM ${RUST} AS cleardns
 RUN apk add build-base cmake
 COPY ./ /ClearDNS/
+WORKDIR /ClearDNS/src/to-json/
+RUN cargo build --release
 WORKDIR /ClearDNS/bin/
 RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && make
 RUN strip cleardns && mv cleardns /tmp/
@@ -63,7 +58,6 @@ COPY --from=adguard /tmp/AdGuardHome /release/usr/bin/
 COPY --from=overture /tmp/overture /release/usr/bin/
 COPY --from=dnsproxy /tmp/dnsproxy /release/usr/bin/
 COPY --from=cleardns /tmp/cleardns /release/usr/bin/
-COPY --from=to-json /tmp/toJSON /release/usr/bin/
 
 FROM ${ALPINE}
 COPY --from=build /release/ /

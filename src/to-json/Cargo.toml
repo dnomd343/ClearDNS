@@ -3,9 +3,12 @@ name = "to-json"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+crate-type = ["staticlib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde_json = "1.0.86"
+serde_json = "1.0.87"
 serde_yaml = "0.9.14"
 toml = "0.5.9"
