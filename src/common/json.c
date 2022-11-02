@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "sundry.h"
 #include "system.h"
+#include "to_json.h"
 #include "constant.h"
 #include "structure.h"
 
@@ -17,26 +18,39 @@ uint8_t is_json_suffix(const char *file_name) { // whether file name end with `.
     return FALSE;
 }
 
-char* to_json(const char *file) { // convert JSON / TOML / YAML to json format (if failed -> return NULL)
-    char flag[9];
-    for (int i = 0; i < 8; ++i) { // generate 8-bits flag
-        flag[i] = (char)gen_rand_num(10);
-        flag[i] += 48;
-    }
-    flag[8] = '\0';
+char* to_json(const char *raw) { // convert JSON / TOML / YAML to json format (if failed -> return NULL)
 
-    char *output_file = string_join("/tmp/to-json-", flag);
-    char *to_json_cmd = string_load("toJSON %s > %s", file, output_file);
-    int to_json_ret = run_command(to_json_cmd);
-    free(to_json_cmd);
+    const char *json_string = to_json_rust(raw); // convert to json format
 
-    char *json_content = NULL;
-    if (!to_json_ret) { // toJSON return zero code (convert fine)
-        json_content = read_file(output_file);
+    char *json_content = strdup(json_string); // load string into owner heap
+
+    free_rust_string(json_string); // free rust string
+
+    if (strlen(json_content) == 0) { // empty string -> convert error
+        free(json_content);
+        return NULL;
     }
-    remove_file(output_file);
-    free(output_file);
     return json_content;
+
+//    char flag[9];
+//    for (int i = 0; i < 8; ++i) { // generate 8-bits flag
+//        flag[i] = (char)gen_rand_num(10);
+//        flag[i] += 48;
+//    }
+//    flag[8] = '\0';
+//
+//    char *output_file = string_join("/tmp/to-json-", flag);
+//    char *to_json_cmd = string_load("toJSON %s > %s", file, output_file);
+//    int to_json_ret = run_command(to_json_cmd);
+//    free(to_json_cmd);
+//
+//    char *json_content = NULL;
+//    if (!to_json_ret) { // toJSON return zero code (convert fine)
+//        json_content = read_file(output_file);
+//    }
+//    remove_file(output_file);
+//    free(output_file);
+//    return json_content;
 }
 
 cJSON* json_field_get(cJSON *entry, const char *key) { // fetch key from json map (create when key not exist)
