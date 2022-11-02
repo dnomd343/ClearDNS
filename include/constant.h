@@ -48,10 +48,13 @@ ClearDNS usage:\n\
   Command: ./cleardns [OPTIONS]\n\
 \n\
   Options:\n\
-    --debug   Enable debug mode.\n\
-    --config  Specify config file. (default: cleardns.yml)\n\
-    --version Show version information.\n\
-    --help    Print this message.\n\
+    --debug    Enable debug mode.\n\
+    --config   Specify config file. (default: cleardns.yml)\n\
+    --verbose  Output verbose log content.\n\
+    --version  Show version information.\n\
+    --help     Print this message.\n\
 "
+
+// TODO: add verbose option
 
 #endif
