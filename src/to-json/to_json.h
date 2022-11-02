@@ -1,3 +1,7 @@
+#pragma once
+
+/* Generated with cbindgen:0.23.0 */
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
