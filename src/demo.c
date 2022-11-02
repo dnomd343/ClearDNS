@@ -1,18 +1,24 @@
 #include <stdio.h>
+#include <string.h>
 #include "to_json.h"
 
 int main() {
     printf("start demo\n");
 
-    char raw_string[] = "hello";
+    char yaml_string[] = "test: ok\narray:\n  - 123\n  - 234\n  - 345\n";
+    printf("----------------\n");
+    printf("%s", yaml_string);
+    printf("----------------\n");
 
-    const char *json_content = to_json_rust(raw_string);
+    const char *raw_json_string = to_json_rust(yaml_string);
+    char *json_string = strdup(raw_json_string);
 
-    printf("return content -> `%s`\n", json_content);
+    printf("----------------\n");
+    printf("%s\n", json_string);
+    printf("----------------\n");
 
-    free_rust_string(json_content);
-
-    printf("rust string free success\n");
+    free_rust_string(raw_json_string);
+    printf("rust string free complete\n");
 
     return 0;
 }
