@@ -1,4 +1,5 @@
 use std::ffi::{c_char, CStr, CString};
+use crate::json::to_json;
 
 #[no_mangle]
 pub unsafe extern "C" fn free_rust_string(string: *const c_char) {
@@ -13,6 +14,7 @@ pub unsafe extern "C" fn to_json_rust(content: *const c_char) -> *const c_char {
     println!("Raw content -> {}", content);
 
     // TODO: convert to JSON format
+    let content: String = to_json(content); // may return empty string
 
     CString::new(content).unwrap().into_raw()
 }
