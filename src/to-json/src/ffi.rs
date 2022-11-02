@@ -9,12 +9,6 @@ pub unsafe extern "C" fn free_rust_string(string: *const c_char) {
 #[no_mangle]
 pub unsafe extern "C" fn to_json_rust(content: *const c_char) -> *const c_char {
     let content: &str = CStr::from_ptr(content).to_str().unwrap();
-
-    // TODO: remove test code
-    println!("Raw content -> {}", content);
-
-    // TODO: convert to JSON format
     let content: String = to_json(content); // may return empty string
-
     CString::new(content).unwrap().into_raw()
 }
