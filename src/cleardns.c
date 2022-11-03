@@ -41,6 +41,9 @@ void init(int argc, char *argv[]) { // return config file
         if (!strcmp(argv[i], "--debug")) {
             settings.debug = TRUE;
         }
+        if (!strcmp(argv[i], "--verbose")) {
+            settings.verbose = TRUE;
+        }
         if (!strcmp(argv[i], "--version")) {
             printf("ClearDNS version %s\n", VERSION); // show version
             exit(0);
