@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 char* read_file(const char *file);
-void remove_file(const char *file);
 int run_command(const char *command);
 void create_folder(const char *folder);
 uint8_t is_file_exist(const char *file);

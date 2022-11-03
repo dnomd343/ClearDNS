@@ -17,16 +17,6 @@ int run_command(const char *command) { // running command under system shell
     return ret_code;
 }
 
-void remove_file(const char *file) { // delete file
-    if (!is_file_exist(file)) { // file not found
-        log_debug("Delete file `%s` skip -> file not exist", file);
-    } else if (remove(file)) { // remove failed
-        log_perror("Delete file `%s` failed -> ", file);
-    } else { // remove success
-        log_debug("Delete file `%s` success", file);
-    }
-}
-
 void create_folder(const char *folder) { // create folder
     if (!access(folder, 0)) { // target is file or folder
         struct stat buf;

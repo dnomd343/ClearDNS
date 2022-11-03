@@ -56,11 +56,3 @@ uint8_t check_port(uint16_t port) { // whether port is valid
     }
     return FALSE;
 }
-
-uint16_t gen_rand_num(uint16_t limit) { // 0 ~ (limit - 1)
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    srand(tv.tv_usec);
-    usleep(1); // sleep 1us (different time seed)
-    return rand() % limit; // NOLINT
-}
