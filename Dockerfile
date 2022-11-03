@@ -12,7 +12,7 @@ WORKDIR ./build/release/
 RUN strip upx && mv upx /tmp/
 
 FROM ${GOLANG} AS adguard
-ENV ADGUARD="0.107.16"
+ENV ADGUARD="0.107.17"
 RUN apk add git make npm yarn
 RUN git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${ADGUARD} --depth=1
 WORKDIR ./AdGuardHome/
