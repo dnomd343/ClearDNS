@@ -22,9 +22,11 @@ char* to_json(const char *content) { // convert JSON / TOML / YAML to json forma
     char *json_content = strdup(json_string); // load string into owner heap
     free_rust_string(json_string); // free rust string
     if (strlen(json_content) == 0) { // empty string -> convert error
+        log_warn("JSON convert error ->\n%s", content);
         free(json_content);
         return NULL;
     }
+    log_debug("JSON convert result ->\n%s", json_content);
     return json_content;
 }
 
