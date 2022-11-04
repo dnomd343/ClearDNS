@@ -47,11 +47,12 @@ FROM ${RUST} AS to-json
 COPY ./src/to-json/ /to-json/
 WORKDIR /to-json/
 RUN cargo build --release
+RUN cp ./target/release/libto_json.a /
 
 FROM ${ALPINE} AS cleardns
 RUN apk add build-base cmake
 COPY ./ /cleardns/
-COPY --from=to-json /to-json/ /cleardns/src/to-json/
+COPY --from=to-json /libto_json.a /cleardns/src/to-json/target/release/
 WORKDIR /cleardns/bin/
 RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static -DCMAKE_BUILD_TYPE=Release .. && make
 RUN strip cleardns && mv cleardns /tmp/
