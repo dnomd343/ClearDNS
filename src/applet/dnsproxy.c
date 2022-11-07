@@ -21,6 +21,7 @@ dnsproxy* dnsproxy_init(uint16_t port) { // init dnsproxy options
     dnsproxy *info = (dnsproxy *)malloc(sizeof(dnsproxy));
     info->port = port;
     info->cache = 0; // disable cache in default
+    info->ipv6 = TRUE;
     info->debug = FALSE;
     info->verify = TRUE;
     info->parallel = TRUE;
@@ -35,6 +36,7 @@ void dnsproxy_dump(const char *caption, dnsproxy *info) { // show dnsproxy optio
     char *str_dump;
     log_debug("%s port -> %u", caption, info->port);
     log_debug("%s cache -> %u", caption, info->cache);
+    log_debug("%s ipv6 -> %s", caption, show_bool(info->ipv6));
     log_debug("%s debug -> %s", caption, show_bool(info->debug));
     log_debug("%s verify -> %s", caption, show_bool(info->verify));
     log_debug("%s parallel -> %s", caption, show_bool(info->parallel));
@@ -93,6 +95,9 @@ char* dnsproxy_config(dnsproxy *info) { // generate json configure from dnsproxy
     }
     if (info->optimistic) {
         cJSON_AddTrueToObject(config, "cache-optimistic"); // cache-optimistic --(default)--> `false`
+    }
+    if (!info->ipv6) {
+        cJSON_AddTrueToObject(config, "ipv6-disabled"); // ipv6-disabled --(default)--> `false`
     }
 
     cJSON *port = cJSON_CreateArray();

@@ -37,6 +37,11 @@ void upstream_parser(char *caption, upstream_config *config, cJSON *json) { // u
             config->port = json_int_value(key_name, json);
             free(key_name);
         }
+        if (!strcmp(json->string, "ipv6")) {
+            key_name = string_join(caption, ".ipv6");
+            config->ipv6 = json_bool_value(key_name, json);
+            free(key_name);
+        }
         if (!strcmp(json->string, "verify")) {
             key_name = string_join(caption, ".verify");
             config->verify = json_bool_value(key_name, json);

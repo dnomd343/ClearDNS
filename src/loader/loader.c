@@ -29,6 +29,7 @@ void load_diverter_assets() {
 
 dnsproxy* load_domestic(cleardns_config *config) {
     dnsproxy *domestic = dnsproxy_init(config->domestic.port);
+    domestic->ipv6 = config->domestic.ipv6;
     domestic->verify = config->domestic.verify;
     domestic->parallel = config->domestic.parallel;
     if (config->cache.enable) {
@@ -43,6 +44,7 @@ dnsproxy* load_domestic(cleardns_config *config) {
 
 dnsproxy* load_foreign(cleardns_config *config) {
     dnsproxy *foreign = dnsproxy_init(config->foreign.port);
+    foreign->ipv6 = config->foreign.ipv6;
     foreign->verify = config->foreign.verify;
     foreign->parallel = config->foreign.parallel;
     if (config->cache.enable) {

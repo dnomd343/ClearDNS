@@ -14,6 +14,7 @@ cleardns_config* config_init() { // init config struct of cleardns
     config->cache.optimistic = FALSE;
 
     config->domestic.port = DOMESTIC_PORT;
+    config->domestic.ipv6 = TRUE;
     config->domestic.verify = TRUE;
     config->domestic.parallel = TRUE;
     config->domestic.bootstrap = string_list_init();
@@ -21,6 +22,7 @@ cleardns_config* config_init() { // init config struct of cleardns
     config->domestic.primary = string_list_init();
 
     config->foreign.port = FOREIGN_PORT;
+    config->foreign.ipv6 = TRUE;
     config->foreign.verify = TRUE;
     config->foreign.parallel = TRUE;
     config->foreign.bootstrap = string_list_init();
@@ -56,6 +58,7 @@ void config_dump(cleardns_config *config) { // dump config info of cleardns
     log_debug("Cache optimistic -> %s", show_bool(config->cache.optimistic));
 
     log_debug("Domestic port -> %u", config->domestic.port);
+    log_debug("Domestic ipv6 -> %s", show_bool(config->domestic.ipv6));
     log_debug("Domestic verify -> %s", show_bool(config->domestic.verify));
     log_debug("Domestic parallel -> %s", show_bool(config->domestic.parallel));
     string_list_debug("Domestic bootstrap", config->domestic.bootstrap);
@@ -63,6 +66,7 @@ void config_dump(cleardns_config *config) { // dump config info of cleardns
     string_list_debug("Domestic primary", config->domestic.primary);
 
     log_debug("Foreign port -> %u", config->foreign.port);
+    log_debug("Foreign ipv6 -> %s", show_bool(config->foreign.ipv6));
     log_debug("Foreign verify -> %s", show_bool(config->foreign.verify));
     log_debug("Foreign parallel -> %s", show_bool(config->foreign.parallel));
     string_list_debug("Foreign bootstrap", config->foreign.bootstrap);
