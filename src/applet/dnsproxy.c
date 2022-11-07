@@ -96,8 +96,9 @@ char* dnsproxy_config(dnsproxy *info) { // generate json configure from dnsproxy
     if (info->optimistic) {
         cJSON_AddTrueToObject(config, "cache-optimistic"); // cache-optimistic --(default)--> `false`
     }
-    // TODO: load ipv6 option
-    log_warn("TODO: load ipv6 option");
+    if (!info->ipv6) {
+        cJSON_AddTrueToObject(config, "ipv6-disabled"); // ipv6-disabled --(default)--> `false`
+    }
 
     cJSON *port = cJSON_CreateArray();
     cJSON_AddItemToArray(port, cJSON_CreateNumber(info->port));
