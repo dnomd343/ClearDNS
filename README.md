@@ -173,6 +173,7 @@ diverter:
 ```yaml
 domestic:
   port: 4053
+  ipv6: true
   verify: true
   parallel: true
   bootstrap: ...
@@ -185,6 +186,8 @@ domestic:
 ```
 
 + `port` ：国内组 DNS 端口，默认为 `4053`
+
++ `ipv6` ：是否允许 IPv6 查询，关闭后将屏蔽 `AAAA` 请求，默认为 `true`
 
 + `verify` ：是否验证证书合法性，关闭后允许无效的 TLS 证书，默认为 `true`
 
