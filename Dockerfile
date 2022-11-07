@@ -7,7 +7,7 @@ RUN apk add build-base cmake
 #ENV UPX="4.0.0"
 #RUN wget https://github.com/upx/upx/releases/download/v${UPX}/upx-${UPX}-src.tar.xz && tar xf upx-${UPX}-src.tar.xz
 RUN apk add git
-RUN git clone https://github.com/upx/upx.git
+RUN git clone https://github.com/dnomd343/upx.git --depth=1
 WORKDIR ./upx/
 RUN git submodule update --init
 RUN rm -rf ./.git/
