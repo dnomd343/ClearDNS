@@ -206,6 +206,7 @@ domestic:
 ```yaml
 foreign:
   port: 6053
+  ipv6: true
   verify: true
   parallel: true
   bootstrap: ...
