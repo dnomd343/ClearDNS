@@ -7,6 +7,7 @@
 typedef struct {
     uint16_t port;
     uint32_t cache;
+    uint8_t ipv6; // bool value
     uint8_t debug; // bool value
     uint8_t verify; // bool value
     uint8_t parallel; // bool value

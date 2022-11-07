@@ -5,6 +5,7 @@
 
 typedef struct {
     uint16_t port;
+    uint8_t ipv6; // bool value
     uint8_t verify; // bool value
     uint8_t parallel; // bool value
     char **bootstrap;
