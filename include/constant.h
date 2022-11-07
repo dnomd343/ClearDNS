@@ -55,6 +55,4 @@ ClearDNS usage:\n\
     --help     Print this message.\n\
 "
 
-// TODO: add verbose option
-
 #endif
