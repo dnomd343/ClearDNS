@@ -12,7 +12,7 @@ unsafe fn load_c_string(ptr: *const c_char) -> String { // load string from c-st
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn free_rust_string(ptr: *const c_char) {
+pub unsafe extern "C" fn free_rust_string(ptr: *const c_char) { // free string memory
     let _ = CString::from_raw(ptr as *mut _);
 }
 

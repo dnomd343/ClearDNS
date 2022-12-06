@@ -2,9 +2,9 @@ use crate::parser::{parser, Value};
 
 fn json_convert(content: &str) -> Result<String, String> { // convert to JSON format
     let data = match parser(content)? {
-        Value::JSON(_json) => serde_json::to_string(&_json),
-        Value::YAML(_yaml) => serde_json::to_string(&_yaml),
-        Value::TOML(_toml) => serde_json::to_string(&_toml),
+        Value::JSON(json) => serde_json::to_string(&json),
+        Value::YAML(yaml) => serde_json::to_string(&yaml),
+        Value::TOML(toml) => serde_json::to_string(&toml),
     };
     match data {
         Ok(data) => Ok(data),
