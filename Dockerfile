@@ -1,5 +1,5 @@
 ARG ALPINE="alpine:3.16"
-ARG RUST="rust:1.64-alpine3.16"
+ARG RUST="rust:1.65-alpine3.16"
 ARG GOLANG="golang:1.18-alpine3.16"
 
 FROM ${ALPINE} AS upx
