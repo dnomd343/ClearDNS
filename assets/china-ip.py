@@ -4,49 +4,27 @@
 import os
 from IPy import IP, IPSet
 
+operators = ['china', 'cmcc', 'chinanet', 'unicom', 'tietong', 'cernet', 'cstnet', 'drpeng', 'googlecn']
+operators += ['%s6' % x for x in operators]  # add `...6` suffix
 source = [
     'curl -sL https://github.com/misakaio/chnroutes2/raw/master/chnroutes.txt | sed \'/^#/d\'',
     'curl -sL https://github.com/metowolf/iplist/raw/master/data/special/china.txt',
     'curl -sL https://github.com/17mon/china_ip_list/raw/master/china_ip_list.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/cernet.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/china.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/chinanet.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/cmcc.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/cstnet.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/drpeng.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/googlecn.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/tietong.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/unicom.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/cernet6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/china6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/chinanet6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/cmcc6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/cstnet6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/drpeng6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/googlecn6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/tietong6.txt',
-    'curl -sL https://gaoyifan.github.io/china-operator-ip/unicom6.txt',
-]
+] + ['curl -sL https://gaoyifan.github.io/china-operator-ip/%s.txt' % x for x in operators]
 
-ips = set()
-for script in source:
+ipv4 = IPSet()
+ipv6 = IPSet()
+ipAddrs = set()
+for script in source:  # traverse fetch commands
     raw = os.popen(script).read().split('\n')
-    ips.update(filter(None, raw))
-
-v4 = IPSet()
-v6 = IPSet()
-for ip in ips:
+    ipAddrs.update(filter(None, raw))
+for ipAddr in ipAddrs:
     try:
-        ipAddr = IP(ip)
-        (v4 if ipAddr.version() == 4 else v6).add(ipAddr)
-    except:
-        pass
+        ip = IP(ipAddr)  # ip format check
+        (ipv4 if ip.version() == 4 else ipv6).add(ip)
+    except: pass
 
-ips = []
-for ip in v4:
-    ips.append(str(ip) + ('' if '/' in str(ip) else '/32'))
-for ip in v6:
-    ips.append(str(ip) + ('' if '/' in str(ip) else '/128'))
-
+release = [('%s' if '/' in str(ip) else '%s/32') % str(ip) for ip in ipv4]  # format into CIDR
+release += [('%s' if '/' in str(ip) else '%s/128') % str(ip) for ip in ipv6]
 with open('china-ip.txt', 'w') as fileObj:
-    fileObj.write('\n'.join(ips) + '\n')
+    fileObj.write('\n'.join(release) + '\n')

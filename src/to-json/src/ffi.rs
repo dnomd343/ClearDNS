@@ -1,4 +1,4 @@
-use crate::convert::to_json;
+use crate::json::to_json;
 use std::ffi::{c_char, CStr, CString};
 
 fn to_c_string(string: String) -> *const c_char { // fetch c-style ptr of string
