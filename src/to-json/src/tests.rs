@@ -1,4 +1,4 @@
-use crate::convert::to_json;
+use crate::json::to_json;
 
 #[allow(dead_code)]
 const JSON_TEST_CONTENT: &str = r#"
