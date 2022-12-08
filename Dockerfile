@@ -1,6 +1,6 @@
-ARG ALPINE="alpine:3.16"
+ARG ALPINE="alpine:3.17"
 ARG RUST="rust:1.65-alpine3.16"
-ARG GOLANG="golang:1.18-alpine3.16"
+ARG GOLANG="golang:1.18-alpine3.17"
 
 FROM ${ALPINE} AS upx
 RUN apk add build-base cmake
