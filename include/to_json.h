@@ -7,6 +7,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-void free_rust_string(const char *string);
+void free_rust_string(const char *ptr);
 
-const char *to_json_rust(const char *content);
+const char *to_json_ffi(const char *content);
