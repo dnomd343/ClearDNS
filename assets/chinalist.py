@@ -14,11 +14,10 @@ source = [
 ]
 
 domains = set()
-for script in source:
+for script in source:  # traverse fetch commands
     raw = os.popen(script).read().split('\n')
     domains.update(filter(None, raw))
 regex = r'^(?=^.{3,255}$)[a-zA-Z0-9][a-zA-Z0-9\-]{0,62}(.[a-zA-Z0-9][a-zA-Z0-9\-]{0,62})+$'
-domains = {x for x in domains if re.search(regex, str(x)) is not None}
-
+domains = {x for x in domains if re.search(regex, str(x)) is not None}  # filter invalid domains
 with open('chinalist.txt', 'w') as fileObj:
     fileObj.write('\n'.join(sorted(domains)) + '\n')
