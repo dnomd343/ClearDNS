@@ -354,7 +354,7 @@ shell> docker run -dt \
   --volume /etc/cleardns/:/cleardns/ \
   --volume /etc/timezone:/etc/timezone:ro \
   --volume /etc/localtime:/etc/localtime:ro \
-  --port 53:53/udp --port 53:53 --port 80:80 \
+  -p 53:53/udp -p 53:53 -p 80:80 \
 dnomd343/cleardns
 ```
 
