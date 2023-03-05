@@ -117,28 +117,9 @@ void cleardns() { // cleardns service
     process_list_daemon(); // daemon all process
 }
 
-#include "bcrypt.h"
-
 int main(int argc, char *argv[]) {
     init(argc, argv);
     log_info("ClearDNS server start (%s)", VERSION);
-
-    LOG_LEVEL = LOG_DEBUG;
-    log_debug("test mode start");
-
-    const char demo_str[] = "dnomd343";
-    char *hash_ret = bcrypt_hash(demo_str);
-
-    log_info("bcrypt hash -> `%s`", hash_ret);
-
-    log_info("check ret -> `%s`", show_bool(bcrypt_verify(demo_str, hash_ret)));
-
-    log_info("check ret -> `%s`", show_bool(bcrypt_verify("233333", hash_ret)));
-
-    log_info("exit");
-
-    return 0;
-
     cleardns();
     return 0;
 }

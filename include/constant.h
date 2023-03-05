@@ -13,6 +13,8 @@
 #define RESTART_DELAY    1
 #define DIVERTER_TIMEOUT 6
 
+// TODO: using CMAKE template
+
 #define VERSION     "1.3.3"
 #define CONFIG_FILE "cleardns.yml"
 
