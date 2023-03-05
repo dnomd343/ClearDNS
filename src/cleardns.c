@@ -118,6 +118,28 @@ void cleardns() { // cleardns service
 }
 
 int main(int argc, char *argv[]) {
+
+    char **demo = string_list_init();
+    string_list_append(&demo, "item 1");
+    string_list_append(&demo, "item 2");
+    string_list_append(&demo, "item 3");
+
+    char *tmp = string_list_dump(demo);
+    log_warn("dump -> %s", tmp);
+
+    string_list_free(demo);
+
+    log_info("string list -> %p", demo);
+    log_info("string list 1 -> %p", demo[0]);
+    log_info("string list 2 -> %p", demo[1]);
+    log_info("string list 3 -> %p", demo[2]);
+    log_info("string list 4 -> %p", demo[3]);
+
+    rust_test(demo);
+
+    log_warn("test end");
+    exit(0);
+
     init(argc, argv);
     log_info("ClearDNS server start (%s)", VERSION);
     cleardns();

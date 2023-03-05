@@ -12,4 +12,10 @@ void assets_load(assets *info);
 
 void assets_extract();
 
+// RUST DEMO START
+
+void rust_test(const char *const *ptr);
+
+// RUST DEMO END
+
 #endif

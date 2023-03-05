@@ -1,17 +1,18 @@
-use std::collections::{HashMap, HashSet};
-use reqwest::Client;
-use std::env::set_var;
-use std::time::Duration;
-
 use std::fs::File;
 use std::io::Read;
+use reqwest::Client;
 use std::path::PathBuf;
-
+use std::time::Duration;
 use log::{debug, info, warn};
+use std::collections::HashSet;
 
-const TIMEOUT: u64 = 60;
-
-const ASSETS_DIR: &str = "/cleardns/assets/";
+#[derive(Debug)]
+pub(crate) struct Asset {
+    pub(crate) name: String,
+    pub(crate) timeout: u64,
+    pub(crate) workdir: String, // assets folder
+    pub(crate) sources: Vec<String>, // http url or file path
+}
 
 /// Cut text line by line and remove invisible characters on both sides.
 fn asset_tidy(data: &str) -> Vec<String> {
@@ -54,10 +55,10 @@ async fn http_fetch(url: &str, timeout: u64) -> Result<Vec<String>, String> {
 }
 
 /// Read the specified text file and organize it into a String array.
-async fn local_fetch(path: &str) -> Result<Vec<String>, String> {
+async fn local_fetch(path: &str, workdir: &str) -> Result<Vec<String>, String> {
     let mut path = String::from(path);
     if !path.starts_with("/") { // relative path
-        let file_path = PathBuf::from(ASSETS_DIR).join(path);
+        let file_path = PathBuf::from(workdir).join(path);
         path = String::from(file_path.to_str().unwrap());
     }
     match File::open(&path) {
@@ -74,16 +75,16 @@ async fn local_fetch(path: &str) -> Result<Vec<String>, String> {
 }
 
 /// Get multiple resource data and merge them.
-async fn asset_fetch(name: &str, sources: Vec<&str>) -> Vec<String> {
+pub(crate) async fn asset_fetch(info: &Asset) -> Vec<String> {
     let is_remote = |src: &str| {
         src.starts_with("http://") || src.starts_with("https://")
     };
     let mut contents: Vec<Vec<String>> = vec![];
-    for source in sources {
-        contents.push(match if is_remote(source) {
-            http_fetch(source.trim(), TIMEOUT).await
+    for source in &info.sources {
+        contents.push(match if is_remote(&source) {
+            http_fetch(source.trim(), info.timeout).await
         } else {
-            local_fetch(source.trim()).await
+            local_fetch(source.trim(), &info.workdir).await
         } {
             Ok(data) => {
                 debug!("Asset source `{}` fetch success with {} items", source.trim(), data.len());
@@ -99,62 +100,6 @@ async fn asset_fetch(name: &str, sources: Vec<&str>) -> Vec<String> {
         .into_iter()
         .flatten()
         .collect::<Vec<String>>());
-    info!("Asset `{}` fetch complete with {} items", name, contents.len());
+    info!("Asset `{}` fetch complete with {} items", info.name, contents.len());
     contents
-}
-
-async fn demo() {
-
-    println!("demo function start");
-
-    // match asset_fetch("https://res.343.re/Share/cleardns/gfwlist.txt", TIMEOUT).await {
-    //     Ok(data) => {
-    //         println!("{:?}", data);
-    //     },
-    //     Err(err) => println!("error -> {}", err)
-    // }
-
-    match local_fetch("../../tmp/gfwlist.txt").await {
-        Ok(data) => {
-            // println!("{:?}", data);
-        },
-        Err(err) => println!("error -> `{}`", err)
-    };
-
-    println!("demo function exit");
-
-}
-
-#[tokio::main]
-async fn main() {
-
-    set_var("RUST_LOG", "trace");
-    env_logger::init();
-
-    let d = vec![
-        "https://res.343.re/Share/cleardns/gfwlist.txt",
-        "/tmp/gfwlist.txt",
-    ];
-    asset_fetch("test", d).await;
-
-    // let demo = vec![
-    //     "baidu.com",
-    //     "ip.343.re",
-    //     "qq.com",
-    //     "google.com",
-    //     "res.343.re",
-    //     "ip.343.re",
-    //     "343.re",
-    // ];
-    // let demo = demo.into_iter()
-    //     .map(|x| String::from(x))
-    //     .collect();
-    // remove_dup(&demo);
-
-    // let data: &str = "dnomd343\n linjucong\n\nfuck\t\n7700\n";
-    // println!("{}", data);
-    // tidy(data);
-
-    println!("end demo");
-
 }
