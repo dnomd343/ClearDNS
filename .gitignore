@@ -2,7 +2,10 @@
 /build/
 /.idea/
 /assets/*.txt
+
 /cmake-build/
 /cmake-build-debug/
 /cmake-build-release/
+
+/src/assets/target/
 /src/to-json/target/
