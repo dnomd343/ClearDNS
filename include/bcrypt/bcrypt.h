@@ -60,10 +60,16 @@ int bcrypt_hashpw(const char *passwd, const char salt[BCRYPT_HASHSIZE],
 int bcrypt_checkpw(const char *passwd, const char hash[BCRYPT_HASHSIZE]);
 
 /*
- * This function expects a string and return bcrypt result (random salt)
+ * This function expects a string and return bcrypt result with random salt.
  */
 
-char* bcrypt_cal(const char *data);
+char* bcrypt_hash(const char *data);
+
+/*
+ * This function verifies that the data matches the hash value.
+ */
+
+int bcrypt_verify(const char *data, const char *hash);
 
 /*
  * Brief Example

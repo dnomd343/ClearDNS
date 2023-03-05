@@ -48,7 +48,7 @@ char *adguard_config(adguard *info, const char *raw_config) { // modify adguard 
 
     cJSON *user_config = cJSON_CreateObject(); // setting up username and password
     cJSON *users_config = cJSON_CreateArray();
-    char *password = bcrypt_cal(info->password);
+    char *password = bcrypt_hash(info->password);
     cJSON_AddItemToObject(user_config, "name", cJSON_CreateString(info->username));
     cJSON_AddItemToObject(user_config, "password", cJSON_CreateString(password));
     cJSON_AddItemToArray(users_config, user_config);

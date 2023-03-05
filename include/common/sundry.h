@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-char* show_bool(uint8_t value);
 uint8_t check_port(uint16_t port);
+const char* show_bool(uint8_t value);
 char* string_load(const char *fmt, ...);
 char* uint32_to_string(uint32_t number);
 char* string_join(const char *base, const char *add);

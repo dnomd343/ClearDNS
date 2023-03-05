@@ -10,7 +10,7 @@
 #include "constant.h"
 #include "structure.h"
 
-char* show_bool(uint8_t value) { // return `true` or `false`
+const char* show_bool(uint8_t value) { // return `true` or `false`
     if (value) {
         return "true";
     }
