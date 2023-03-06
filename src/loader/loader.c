@@ -127,12 +127,13 @@ crontab* load_crond(cleardns_config *config) {
     return crond;
 }
 
-assets* load_assets(cleardns_config *config) {
-    assets *resource = assets_init();
-    string_list_update(&resource->update_file, config->assets.update_file);
-    string_list_update(&resource->update_url, config->assets.update_url);
-    return resource;
-}
+// TODO: new assets manager
+//assets* load_assets(cleardns_config *config) {
+//    assets *resource = assets_init();
+//    string_list_update(&resource->update_file, config->assets.update_file);
+//    string_list_update(&resource->update_url, config->assets.update_url);
+//    return resource;
+//}
 
 void load_config(const char *config_file) { // parser and load cleardns configure
     cleardns_config *config = config_init();
@@ -161,7 +162,8 @@ void load_config(const char *config_file) { // parser and load cleardns configur
     loader.crond = load_crond(config);
     log_debug("Crond options parser success");
 
-    loader.resource = load_assets(config);
+    // TODO: update assets loader
+//    loader.resource = load_assets(config);
     log_debug("Assets options parser success");
 
     loader.script = string_list_init();
