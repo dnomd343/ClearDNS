@@ -15,7 +15,7 @@ void assets_extract();
 // RUST DEMO START
 
 void rust_test_single(const char *ptr);
-void rust_test_multi(const char *const *ptr);
+void rust_test_multi(char *const *ptr);
 
 // RUST DEMO END
 

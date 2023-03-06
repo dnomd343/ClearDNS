@@ -120,16 +120,15 @@ void cleardns() { // cleardns service
 int main(int argc, char *argv[]) {
 
     char **demo = string_list_init();
-    string_list_append(&demo, "item 1 afdcafaed");
-    string_list_append(&demo, "item 2 fasdfcade");
-    string_list_append(&demo, "item 3 fadfa");
+
+    string_list_append(&demo, "item 1");
+    string_list_append(&demo, "item 2");
+    string_list_append(&demo, "item 3");
     string_list_append(&demo, "item 4");
     string_list_append(&demo, "item 5");
 
     char *tmp = string_list_dump(demo);
     log_warn("dump -> %s", tmp);
-
-    string_list_free(demo);
 
     log_info("string list -> %p -> %p", &demo, demo);
     log_info("string list 1 -> %p -> %p -> `%s`", &demo[0], demo[0], demo[0]);
@@ -139,14 +138,16 @@ int main(int argc, char *argv[]) {
     log_info("string list 5 -> %p -> %p -> `%s`", &demo[4], demo[4], demo[4]);
     log_info("string list 6 -> %p -> %p -> `%s`", &demo[5], demo[5], demo[5]);
 
-//    rust_test_single(demo[0]);
-//    rust_test_single(demo[1]);
-//    rust_test_single(demo[2]);
-//    rust_test_single(demo[3]);
-//    rust_test_single(demo[4]);
-//
     rust_test_multi(demo);
 
+    log_info("string list 1 -> %p -> %p -> `%s`", &demo[0], demo[0], demo[0]);
+    log_info("string list 2 -> %p -> %p -> `%s`", &demo[1], demo[1], demo[1]);
+    log_info("string list 3 -> %p -> %p -> `%s`", &demo[2], demo[2], demo[2]);
+    log_info("string list 4 -> %p -> %p -> `%s`", &demo[3], demo[3], demo[3]);
+    log_info("string list 5 -> %p -> %p -> `%s`", &demo[4], demo[4], demo[4]);
+    log_info("string list 6 -> %p -> %p -> `%s`", &demo[5], demo[5], demo[5]);
+
+    string_list_free(demo);
 
     log_warn("test end");
     exit(0);
