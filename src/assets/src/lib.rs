@@ -1,9 +1,3 @@
-// mod fetch;
-//
-// use std::env::set_var;
-//
-// use crate::fetch::Asset;
-
 mod ffi;
 
 // use std::ffi::{c_char, CStr};

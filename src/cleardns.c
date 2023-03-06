@@ -130,22 +130,10 @@ int main(int argc, char *argv[]) {
     char *tmp = string_list_dump(demo);
     log_warn("dump -> %s", tmp);
 
-    log_info("string list -> %p -> %p", &demo, demo);
-    log_info("string list 1 -> %p -> %p -> `%s`", &demo[0], demo[0], demo[0]);
-    log_info("string list 2 -> %p -> %p -> `%s`", &demo[1], demo[1], demo[1]);
-    log_info("string list 3 -> %p -> %p -> `%s`", &demo[2], demo[2], demo[2]);
-    log_info("string list 4 -> %p -> %p -> `%s`", &demo[3], demo[3], demo[3]);
-    log_info("string list 5 -> %p -> %p -> `%s`", &demo[4], demo[4], demo[4]);
-    log_info("string list 6 -> %p -> %p -> `%s`", &demo[5], demo[5], demo[5]);
+//    assets_log_init(TRUE);
+    assets_log_init(FALSE);
 
-    rust_test_multi(demo);
-
-    log_info("string list 1 -> %p -> %p -> `%s`", &demo[0], demo[0], demo[0]);
-    log_info("string list 2 -> %p -> %p -> `%s`", &demo[1], demo[1], demo[1]);
-    log_info("string list 3 -> %p -> %p -> `%s`", &demo[2], demo[2], demo[2]);
-    log_info("string list 4 -> %p -> %p -> `%s`", &demo[3], demo[3], demo[3]);
-    log_info("string list 5 -> %p -> %p -> `%s`", &demo[4], demo[4], demo[4]);
-    log_info("string list 6 -> %p -> %p -> `%s`", &demo[5], demo[5], demo[5]);
+    rust_assets_update("test.txt", demo, ASSETS_DIR);
 
     string_list_free(demo);
 

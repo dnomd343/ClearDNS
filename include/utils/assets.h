@@ -12,11 +12,8 @@ void assets_load(assets *info);
 
 void assets_extract();
 
-// RUST DEMO START
+void assets_log_init(uint8_t verbose);
 
-void rust_test_single(const char *ptr);
-void rust_test_multi(char *const *ptr);
-
-// RUST DEMO END
+uint8_t rust_assets_update(const char *file, char *const *sources, const char *assets_dir);
 
 #endif

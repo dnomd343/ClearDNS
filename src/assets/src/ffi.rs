@@ -1,3 +1,5 @@
+use log::debug;
+use std::env::set_var;
 use std::os::raw::c_char;
 use std::ffi::{CStr, CString};
 
@@ -20,22 +22,26 @@ unsafe fn load_c_string_list(ptr: *const *const c_char) -> Vec<String> {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn rust_test_single(ptr: *const c_char) {
-    println!("enter rust function");
-
-    let ret = load_c_string(ptr);
-    println!("ret: {:?}", ret);
-
-    println!("exit rust function");
+pub unsafe extern "C" fn assets_log_init(verbose: u8) {
+    if verbose == 0 { // bool value `FALSE`
+        set_var("RUST_LOG", "info");
+    } else {
+        set_var("RUST_LOG", "trace");
+    }
+    env_logger::init();
 }
 
-
 #[no_mangle]
-pub unsafe extern "C" fn rust_test_multi(ptr: *const *const c_char) {
-    println!("enter rust function");
+pub unsafe extern "C" fn rust_assets_update(
+    file: *const c_char, sources: *const *const c_char, assets_dir: *const c_char) -> u8 {
 
-    let ret = load_c_string_list(ptr);
-    println!("ret: {:?}", ret);
+    let file = load_c_string(file); // import c-style string
+    let sources = load_c_string_list(sources);
+    let assets_dir = load_c_string(assets_dir);
 
-    println!("exit rust function");
+    debug!("file: {}", file);
+    debug!("source: {:?}", sources);
+    debug!("assets dir: {}", assets_dir);
+
+    0
 }
