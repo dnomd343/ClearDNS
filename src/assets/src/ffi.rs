@@ -70,7 +70,6 @@ pub async unsafe extern "C" fn asset_update(
     debug!("Asset sources -> {:?}", sources);
     debug!("Asset target -> `{}`", file);
 
-    // TODO: clear target file at first
     match asset_fetch(&name, &sources).await {
         Some(data) => {
             let mut content = String::new();
@@ -81,6 +80,7 @@ pub async unsafe extern "C" fn asset_update(
             match OpenOptions::new()
                 .write(true)
                 .create(true)
+                .truncate(true)
                 .open(&file) { // open target file
                 Ok(mut fp) => {
                     match fp.write_all(content.as_ref()) {
