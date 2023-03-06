@@ -22,4 +22,4 @@ add_executable(cleardns cleardns.c)
 target_link_libraries(cleardns utils applet bcrypt common loader)
 
 # TODO: just for test
-target_link_libraries(cleardns assets)
+target_link_libraries(cleardns assets ssl crypto)

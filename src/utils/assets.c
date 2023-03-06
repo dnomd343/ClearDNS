@@ -72,18 +72,19 @@ void assets_update_entry() { // receive SIGALRM for update all assets
         log_info("Skip update assets");
         return;
     }
-    log_info("Start assets update");
-
-    // TODO: call rust `assets_update` function
-//    for (char **file = update.update_file; *file != NULL; ++file) {
-//        char **url = file - update.update_file + update.update_url;
-//        char *asset_file = string_join(ASSETS_DIR, *file);
-//        log_info("Update asset `%s` -> %s", asset_file, *url);
-//        download_file(asset_file, *url); // download asset from url
-//        free(asset_file);
-//    }
-
-    log_info("Restart overture");
+    log_info("Start updating assets");
+    for (asset **res = update_info; *res != NULL; ++res) {
+        char *content = string_list_dump((*res)->sources);
+        log_debug("Updating `%s` -> %s", (*res)->file, content);
+        if (asset_update((*res)->file, (*res)->sources, ASSETS_DIR)) {
+            log_debug("Asset `%s` update success", (*res)->file);
+        } else {
+            log_warn("Asset `%s` update failed", (*res)->file);
+        }
+        free(content);
+    }
+    // TODO: refresh `/etc/cleardns/*.txt`
+    log_info("Restart overture to apply new assets");
     run_command("pgrep overture | xargs kill"); // restart overture
     log_info("Assets update complete");
 }
