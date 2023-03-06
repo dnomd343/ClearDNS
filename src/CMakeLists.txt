@@ -7,8 +7,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include/bcrypt)
 include_directories(${PROJECT_SOURCE_DIR}/include/common)
 include_directories(${PROJECT_SOURCE_DIR}/include/loader)
 
-link_directories(${PROJECT_SOURCE_DIR}/src/assets/target/release)
-link_directories(${PROJECT_SOURCE_DIR}/src/to-json/target/release)
+link_directories(${PROJECT_SOURCE_DIR}/src/target/release)
 
 add_subdirectory(utils)
 add_subdirectory(applet)
@@ -18,6 +17,3 @@ add_subdirectory(loader)
 
 add_executable(cleardns cleardns.c)
 target_link_libraries(cleardns utils applet bcrypt common loader)
-
-# TODO: just for test
-target_link_libraries(cleardns assets ssl crypto)
