@@ -20,6 +20,8 @@ struct cleardns {
 
 extern struct cleardns loader;
 
+void load_diverter_assets();
+
 void load_config(const char *config_file);
 
 #endif

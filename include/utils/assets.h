@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+extern char **custom_gfwlist;
+extern char **custom_china_ip;
+extern char **custom_chinalist;
+
 typedef struct {
     char *file; // string
     char **sources; // string list

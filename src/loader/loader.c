@@ -95,6 +95,13 @@ overture* load_diverter(cleardns_config *config) {
     free(china_ip);
     free(gfwlist);
 
+    custom_gfwlist = config->diverter.gfwlist;
+    custom_china_ip = config->diverter.china_ip;
+    custom_chinalist = config->diverter.chinalist;
+    config->diverter.gfwlist = string_list_init();
+    config->diverter.china_ip = string_list_init();
+    config->diverter.chinalist = string_list_init();
+
     uint32_list_update(&diverter->reject_type, config->reject);
     if (!config->assets.disable) {
         assets_extract(); // extract built-in resource

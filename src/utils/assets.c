@@ -1,14 +1,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include "assets.h"
+#include "loader.h"
 #include "logger.h"
 #include "sundry.h"
 #include "system.h"
 #include "constant.h"
 #include "structure.h"
-#include "assets.h"
 
 asset **update_info;
+
+char **custom_gfwlist;
+char **custom_china_ip;
+char **custom_chinalist;
 
 void assets_update_entry();
 void extract(const char *file);
@@ -83,7 +88,18 @@ void assets_update_entry() { // receive SIGALRM for update all assets
         }
         free(content);
     }
-    // TODO: refresh `/etc/cleardns/*.txt`
+
+    char *gfwlist = string_join(WORK_DIR, ASSET_GFW_LIST);
+    char *china_ip = string_join(WORK_DIR, ASSET_CHINA_IP);
+    char *chinalist = string_join(WORK_DIR, ASSET_CHINA_LIST);
+    save_string_list(gfwlist, custom_gfwlist);
+    save_string_list(china_ip, custom_china_ip);
+    save_string_list(chinalist, custom_chinalist);
+    free(chinalist);
+    free(china_ip);
+    free(gfwlist);
+    load_diverter_assets(); // load assets data into `WORK_DIR`
+
     log_info("Restart overture to apply new assets");
     run_command("pgrep overture | xargs kill"); // restart overture
     log_info("Assets update complete");
