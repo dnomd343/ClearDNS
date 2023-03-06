@@ -70,6 +70,7 @@ pub async unsafe extern "C" fn asset_update(
     debug!("Asset sources -> {:?}", sources);
     debug!("Asset target -> `{}`", file);
 
+    // TODO: clear target file at first
     match asset_fetch(&name, &sources).await {
         Some(data) => {
             let mut content = String::new();
@@ -82,7 +83,7 @@ pub async unsafe extern "C" fn asset_update(
                 .create(true)
                 .open(&file) { // open target file
                 Ok(mut fp) => {
-                    match fp.write_all(content.trim().as_ref()) {
+                    match fp.write_all(content.as_ref()) {
                         Err(err) => {
                             warn!("File `{}` save error: {}", file, err);
                         }

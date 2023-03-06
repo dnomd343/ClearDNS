@@ -92,3 +92,8 @@ pub(crate) async fn asset_fetch(name: &str, sources: &Vec<String>) -> Option<Vec
     info!("Asset `{}` fetch complete with {} items", name, contents.len());
     Some(contents)
 }
+
+#[cfg(test)]
+mod tests {
+    // TODO: add test items
+}

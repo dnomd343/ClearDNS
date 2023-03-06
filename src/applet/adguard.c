@@ -110,7 +110,7 @@ process* adguard_load(adguard *info, const char *dir) { // load adguard options
         adguard_config_ret = adguard_config(info, "{}"); // begin with empty json
     } else { // configure exist -> modify
         char *adguard_config_content = read_file(adguard_config_file);
-        char *adguard_config_json = to_json(adguard_config_content);
+        char *adguard_config_json = to_json_format(adguard_config_content);
         adguard_config_ret = adguard_config(info, adguard_config_json);
         free(adguard_config_content);
         free(adguard_config_json);

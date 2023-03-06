@@ -7,10 +7,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include/bcrypt)
 include_directories(${PROJECT_SOURCE_DIR}/include/common)
 include_directories(${PROJECT_SOURCE_DIR}/include/loader)
 
+link_directories(${PROJECT_SOURCE_DIR}/src/assets/target/release)
 link_directories(${PROJECT_SOURCE_DIR}/src/to-json/target/release)
-
-# TODO: just for test
-link_directories(${PROJECT_SOURCE_DIR}/src/assets/target/debug)
 
 add_subdirectory(utils)
 add_subdirectory(applet)

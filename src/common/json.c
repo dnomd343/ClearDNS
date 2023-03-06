@@ -17,19 +17,17 @@ uint8_t is_json_suffix(const char *file_name) { // whether file name end with `.
     return FALSE;
 }
 
-char* to_json(const char *content) { // convert JSON / TOML / YAML to json format (failed -> NULL)
-    const char *json_string = to_json_ffi(content); // convert to json format
+char* to_json_format(const char *content) { // convert JSON / TOML / YAML to json format (failed -> NULL)
+    const char *json_string = to_json(content); // convert to json format
+    if (json_string == NULL) {
+        log_warn("JSON convert error ->\n%s", content);
+        return NULL; // convert failed
+    }
     char *json_content = strdup(json_string); // load string into owner heap
     free_rust_string(json_string); // free rust string
-    if (strlen(json_content) == 0) { // empty string -> convert error
-        log_warn("JSON convert error ->\n%s", content);
-        free(json_content);
-        return NULL;
-    }
     log_debug("JSON convert result ->\n%s", json_content);
     return json_content;
 }
-
 
 cJSON* json_field_get(cJSON *entry, const char *key) { // fetch key from json map (create when key not exist)
     cJSON *sub = entry->child;

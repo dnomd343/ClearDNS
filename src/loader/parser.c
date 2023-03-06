@@ -199,7 +199,7 @@ void config_parser(cleardns_config *config, const char *config_file) {
         log_info("Start JSON configure parser");
     } else { // YAML or TOML format
         log_info("Start configure parser");
-        char *convert_ret = to_json(config_content);
+        char *convert_ret = to_json_format(config_content);
         if (convert_ret == NULL) { // convert failed
             log_fatal("Configure parser error");
         }
