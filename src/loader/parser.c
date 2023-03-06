@@ -130,7 +130,18 @@ void assets_parser(assets_config *config, cJSON *json) { // assets options parse
             config->cron = json_string_value("assets.cron", json);
         }
         if (!strcmp(json->string, "update")) {
-            json_string_map_value("assets.update", json, &config->update_file, &config->update_url);
+            if (!cJSON_IsObject(json)) {
+                log_fatal("`%s` must be map", "assets.update");
+            }
+            cJSON *asset_item = json->child;
+            while (asset_item != NULL) { // traverse all json field
+                asset *res = asset_init(asset_item->string);
+                char *caption = string_join("assets.update.", asset_item->string);
+                res->sources = json_string_list_value(caption, asset_item, res->sources);
+                free(caption);
+                assets_append(&config->resources, res);
+                asset_item = asset_item->next;
+            }
         }
         json = json->next; // next field
     }

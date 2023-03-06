@@ -115,18 +115,3 @@ uint32_t** json_uint32_list_value(char *caption, cJSON *json, uint32_t **uint32_
     }
     return uint32_list;
 }
-
-void json_string_map_value(char *caption, cJSON *json, char ***key_list, char ***value_list) { // json string map
-    if (!cJSON_IsObject(json)) {
-        log_fatal("`%s` must be map", caption);
-    }
-    json = json->child;
-    while (json != NULL) { // traverse all json field
-        if (!cJSON_IsString(json)) {
-            log_fatal("`%s` must be string-string map", caption);
-        }
-        string_list_append(key_list, json->string);
-        string_list_append(value_list, json->valuestring);
-        json = json->next;
-    }
-}

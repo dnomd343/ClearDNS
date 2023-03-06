@@ -51,7 +51,7 @@ assets:\n\
 
 void load_default_config(const char *config_file) {
     if (is_file_exist(config_file)) {
-        log_debug("Configure file exist -> skip load default");
+        log_debug("Configure file exist -> skip loading default");
         return;
     }
     log_info("Loading default configure file");

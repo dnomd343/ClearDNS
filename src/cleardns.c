@@ -66,6 +66,7 @@ void init(int argc, char *argv[]) { // return config file
 
 void cleardns() { // cleardns service
     if (settings.verbose || settings.debug) {
+        // TODO: rust log module settings
         LOG_LEVEL = LOG_DEBUG; // enable debug log level
     }
     create_folder(EXPOSE_DIR);
@@ -87,14 +88,14 @@ void cleardns() { // cleardns service
 
     log_info("Start loading process");
     process_list_init();
-//    assets_load(loader.resource);
+    assets_load(loader.resource);
     process_list_append(dnsproxy_load("Domestic", loader.domestic, "domestic.json"));
     process_list_append(dnsproxy_load("Foreign", loader.foreign, "foreign.json"));
     process_list_append(overture_load(loader.diverter, "overture.json"));
     overture_free(loader.diverter);
     dnsproxy_free(loader.domestic);
     dnsproxy_free(loader.foreign);
-//    assets_free(loader.resource);
+    assets_free(loader.resource);
     if (loader.crond != NULL) {
         process_list_append(crontab_load(loader.crond)); // free crontab struct later
     }
@@ -118,74 +119,6 @@ void cleardns() { // cleardns service
 }
 
 int main(int argc, char *argv[]) {
-
-    LOG_LEVEL = LOG_DEBUG;
-
-    asset *res_1 = asset_init("demo 1");
-    asset *res_2 = asset_init("demo 2");
-    asset *res_3 = asset_init("demo 3");
-
-    string_list_append(&res_1->sources, "item a1");
-    string_list_append(&res_1->sources, "item a2");
-    string_list_append(&res_1->sources, "item a3");
-
-//    asset_add_src(res_1, "item a1");
-//    asset_add_src(res_1, "item a2");
-//    asset_add_src(res_1, "item a3");
-
-    string_list_append(&res_2->sources, "item b1");
-    string_list_append(&res_2->sources, "item b2");
-
-//    asset_add_src(res_2, "item b1");
-//    asset_add_src(res_2, "item b2");
-
-    string_list_append(&res_3->sources, "item c1");
-
-//    asset_add_src(res_3, "item c1");
-
-    asset **res = assets_init();
-    log_info("res init size: %d", assets_size(res));
-
-    assets_append(&res, res_1);
-    assets_append(&res, res_2);
-    assets_append(&res, res_3);
-
-    log_info("res size: %d", assets_size(res));
-
-    assets_dump(res);
-
-//    asset_free(res_1);
-//    asset_free(res_2);
-//    asset_free(res_3);
-
-    assets_free(res);
-
-//    char **res_1 = string_list_init();
-//    char **res_2 = string_list_init();
-//    char **res_3 = string_list_init();
-//
-//    string_list_append(&res_1, "item a1");
-//    string_list_append(&res_1, "item a2");
-//    string_list_append(&res_1, "item a3");
-//
-//    string_list_append(&res_2, "item b1");
-//    string_list_append(&res_2, "item b2");
-//
-//    string_list_append(&res_3, "item c");
-
-//    char *tmp = string_list_dump(demo);
-//    log_warn("dump -> %s", tmp);
-
-//    assets_log_init(TRUE);
-    assets_log_init(FALSE);
-
-//    rust_assets_update("test.txt", demo, ASSETS_DIR);
-
-//    string_list_free(demo);
-
-    log_warn("test end");
-    exit(0);
-
     init(argc, argv);
     log_info("ClearDNS server start (%s)", VERSION);
     cleardns();

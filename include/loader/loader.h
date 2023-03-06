@@ -15,8 +15,7 @@ struct cleardns {
     overture *diverter;
     adguard *filter;
     crontab *crond;
-    // TODO: update assets ptr
-//    assets *resource;
+    asset **resource;
 };
 
 extern struct cleardns loader;
