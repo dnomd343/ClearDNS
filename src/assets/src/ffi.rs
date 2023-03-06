@@ -84,17 +84,11 @@ pub async unsafe extern "C" fn asset_update(
                 .open(&file) { // open target file
                 Ok(mut fp) => {
                     match fp.write_all(content.as_ref()) {
-                        Err(err) => {
-                            warn!("File `{}` save error: {}", file, err);
-                        }
-                        _ => {
-                            debug!("File `{}` save success", file);
-                        },
+                        Err(err) => warn!("File `{}` save error: {}", file, err),
+                        _ => debug!("File `{}` save success", file),
                     }
                 },
-                Err(err) => {
-                    warn!("File `{}` open failed: {}", file, err);
-                },
+                Err(err) => warn!("File `{}` open failed: {}", file, err),
             };
             TRUE // asset fetch success
         },

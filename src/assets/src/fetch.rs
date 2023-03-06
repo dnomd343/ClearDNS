@@ -95,5 +95,99 @@ pub(crate) async fn asset_fetch(name: &str, sources: &Vec<String>) -> Option<Vec
 
 #[cfg(test)]
 mod tests {
-    // TODO: add test items
+    use std::fs;
+    use std::pin::Pin;
+    use std::future::Future;
+    use std::fs::OpenOptions;
+    use std::io::Write;
+    use super::{asset_tidy, remove_dup};
+    use super::{http_fetch, local_fetch, asset_fetch};
+
+    const TEST_DATA: &str = "\tabc  \n123 \n 456\r\nabc\n\n789  ";
+
+    #[test]
+    fn basic() {
+        assert_eq!(asset_tidy(TEST_DATA), vec![
+            String::from("abc"),
+            String::from("123"),
+            String::from("456"),
+            String::from("abc"),
+            String::from("789"),
+        ]);
+        assert_eq!(remove_dup(&asset_tidy(TEST_DATA)), vec![
+            String::from("abc"),
+            String::from("123"),
+            String::from("456"),
+            String::from("789"),
+        ]);
+    }
+
+    fn run_async<T>(func: Pin<Box<impl Future<Output=T>>>) {
+        tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .unwrap()
+            .block_on(func);
+    }
+
+    fn gen_test_file() {
+        let mut fp = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open("/tmp/assets_test_file")
+            .unwrap();
+        fp.write_all(TEST_DATA.as_ref()).expect("test file create error");
+    }
+
+    #[test]
+    fn asset() {
+        // test http_fetch function
+        run_async(Box::pin(async {
+            assert!(http_fetch("invalid url", 10).await.is_err());
+            assert_eq!(
+                http_fetch("https://gstatic.com/generate_204", 10).await,
+                Ok(vec![])
+            );
+        }));
+
+        // test local_fetch function
+        gen_test_file();
+        run_async(Box::pin(async {
+            assert!(local_fetch("/").await.is_err());
+            assert_eq!(
+                local_fetch("/tmp/assets_test_file").await,
+                Ok(vec![
+                    String::from("abc"),
+                    String::from("123"),
+                    String::from("456"),
+                    String::from("abc"),
+                    String::from("789"),
+                ])
+            );
+        }));
+
+        // test combine asset_fetch function
+        run_async(Box::pin(async {
+            assert!(
+                asset_fetch("", &vec![]).await.unwrap().is_empty()
+            );
+            assert!(
+                asset_fetch("", &vec![String::from("...")]).await.is_none()
+            );
+            assert_eq!(
+                asset_fetch("", &vec![
+                    String::from("/tmp/assets_test_file"),
+                    String::from("https://gstatic.com/generate_204")
+                ]).await,
+                Some(vec![
+                    String::from("abc"),
+                    String::from("123"),
+                    String::from("456"),
+                    String::from("789"),
+                ])
+            );
+        }));
+        fs::remove_file("/tmp/assets_test_file").expect("test file delete error");
+    }
 }
