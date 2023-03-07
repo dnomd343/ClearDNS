@@ -26,14 +26,16 @@ FROM ${GOLANG} AS overture
 ENV OVERTURE="1.8"
 RUN wget https://github.com/shawn1m/overture/archive/refs/tags/v${OVERTURE}.tar.gz && tar xf v${OVERTURE}.tar.gz
 WORKDIR ./overture-${OVERTURE}/main/
+RUN go get
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.version=v${OVERTURE} -s -w" && mv main /tmp/overture
 COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/overture
 
 FROM ${GOLANG} AS dnsproxy
-ENV DNSPROXY="0.46.4"
+ENV DNSPROXY="0.48.0"
 RUN wget https://github.com/AdguardTeam/dnsproxy/archive/refs/tags/v${DNSPROXY}.tar.gz && tar xf v${DNSPROXY}.tar.gz
 WORKDIR ./dnsproxy-${DNSPROXY}/
+RUN go get
 RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY} -s -w" && mv dnsproxy /tmp/
 COPY --from=upx /tmp/upx /usr/bin/
 RUN upx -9 /tmp/dnsproxy
