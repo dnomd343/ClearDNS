@@ -355,7 +355,7 @@ ClearDNS 同时发布在多个镜像源上：
 检查相关端口状态：
 
 ```bash
-shell> netstat -tlnpu | grep -E ":53|:80"
+netstat -tlnpu | grep -E ":53|:80"
 ```
 
 + 若 `TCP/53` 或 `UDP/53` 被占用，请先关闭对应进程
@@ -365,14 +365,14 @@ shell> netstat -tlnpu | grep -E ":53|:80"
 启动 ClearDNS 容器：
 
 ```bash
-shell> docker run -dt \
+docker run -dt \
   --restart always \
   --name cleardns --hostname cleardns \
   --volume /etc/cleardns/:/cleardns/ \
   --volume /etc/timezone:/etc/timezone:ro \
   --volume /etc/localtime:/etc/localtime:ro \
   -p 53:53/udp -p 53:53 -p 80:80 \
-dnomd343/cleardns
+  dnomd343/cleardns
 ```
 
 </details>
@@ -386,7 +386,7 @@ dnomd343/cleardns
 检查相关端口状态：
 
 ```bash
-shell> netstat -tlnpu | grep -E ":53|:80|:4053|:5353|:6053"
+netstat -tlnpu | grep -E ":53|:80|:4053|:5353|:6053"
 ```
 
 + 若 `TCP/53` 或 `UDP/53` 被占用，请先关闭对应进程
@@ -419,10 +419,10 @@ docker run -dt --network host \
 
 ```bash
 # 开启eth0网卡混杂模式
-shell> ip link set eth0 promisc on
+$ ip link set eth0 promisc on
 
 # 创建macvlan网络，按实际情况指定网络信息
-shell> docker network create -d macvlan \
+$ docker network create -d macvlan \
   --subnet={IPv4网段} --gateway={IPv4网关} \
   --subnet={IPv6网段} --gateway={IPv6网关} \  # IPv6可选
   --ipv6 -o parent=eth0 macvlan  # 在eth0网卡上运行
@@ -431,7 +431,7 @@ shell> docker network create -d macvlan \
 启动 ClearDNS 容器：
 
 ```bash
-shell> docker run -dt --network macvlan \
+docker run -dt --network macvlan \
   --restart always --privileged \
   --name cleardns --host cleardns \
   --volume /etc/cleardns/:/cleardns/ \
@@ -446,7 +446,7 @@ shell> docker run -dt --network macvlan \
 宿主机网络更改配置，以下示例基于 Debian 系发行版：
 
 ```bash
-shell> vim /etc/network/interfaces
+vim /etc/network/interfaces
 ```
 
 添加以下内容，创建网桥连接宿主机，按实际情况指定网络信息：
@@ -470,13 +470,13 @@ iface macvlan inet static
 重启宿主机网络生效（或直接重启系统）：
 
 ```bash
-shell> /etc/init.d/networking restart
+$ /etc/init.d/networking restart
 [ ok ] Restarting networking (via systemctl): networking.service.
 ```
 
 </details>
 
-<hr/>
+---
 
 ClearDNS 会将数据持久化存储，以在重启 Docker 或宿主机后保留配置及日志，上述命令将文件存储在工作目录 `/etc/cleardns` 下，您可以根据需要更改此目录。
 
@@ -486,44 +486,44 @@ ClearDNS 会将数据持久化存储，以在重启 Docker 或宿主机后保留
 
 > 国外组服务器切勿使用常规 DNS 服务，例如 `8.8.8.8` ，由于请求信息为明文，GFW 会抢答回复数据，导致内容仍然受到污染。
 
-在 `cleardns.yml` 中指定上游 DNS 服务器，国内组可指定国内公共 DNS 服务，国外组需指定可用的加密 DNS 服务，具体说明参考[关于DNS上游](#关于-DNS-上游)部分。
+在 `cleardns.yml` 中指定上游 DNS 服务器，国内组可指定国内公共 DNS 服务，国外组需指定可用的加密 DNS 服务，具体说明参考[关于上游的配置](#关于上游的配置)部分。
 
 > DNSCrypt 使用 `DNS Stamp` 封装，可以在[这里](https://dnscrypt.info/stamps)在线解析或生成链接内容。
 
 各 DNS 协议格式示例如下：
 
-**Plain DNS**
+#### Plain DNS
 
 + `1.1.1.1`
 
 + `8.8.8.8`
 
-**DNS-over-TLS**
+#### DNS-over-TLS
 
 + `tls://223.5.5.5`
 
 + `tls://dns.alidns.com`
 
-**DNS-over-HTTPS**
+#### DNS-over-HTTPS
 
 + `https://dns.pub/dns-query`
 
 + `https://223.5.5.5/dns-query`
 
-**DNS-over-QUIC**
+#### DNS-over-QUIC
 
 + `quic://94.140.14.14`
 
 + `quic://dns.adguard.com`
 
-**DNSCrypt**
+#### DNSCrypt
 
 + `sdns://AQIAAAAAAAAAFDE3Ni4xMDMuMTMwLjEzMDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20`
 
 修改配置文件后，重启 Docker 容器生效
 
 ```bash
-shell> docker restart cleardns
+docker restart cleardns
 ```
 
 ### 3. 配置 AdGuardHome
@@ -534,13 +534,13 @@ shell> docker restart cleardns
 
 在 DNS 封锁清单中，可配置以下规则：
 
-+ `AdGuard`：`https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt`
++ `AdGuard` ：`https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt`
 
-+ `Anti-AD`：`https://anti-ad.net/easylist.txt`
++ `Anti-AD` ：`https://anti-ad.net/easylist.txt`
 
-+ `AdAway`：`https://adaway.org/hosts.txt`
++ `AdAway` ：`https://adaway.org/hosts.txt`
 
-+ `乘风规则`：`https://res.343.re/Share/Adblock-Rules/xinggsf.txt`
++ `乘风规则` ：`https://res.343.re/Share/Adblock-Rules/xinggsf.txt`
 
 > 配置过多的规则会导致设备负载变大，请酌情添加。
 
@@ -552,7 +552,7 @@ shell> docker restart cleardns
 
 ## 补充说明
 
-### 关于 DNS 上游
+### 关于上游的配置
 
 ClearDNS 上游分为国内组 `Domestic` 与国外组 `Foreign` ，它们的配置逻辑不尽相同，下面分别说明：
 
@@ -586,8 +586,8 @@ ClearDNS 上游分为国内组 `Domestic` 与国外组 `Foreign` ，它们的配
 
 您可以借助 [dnslookup](https://github.com/ameshkov/dnslookup) 工具进行测试，使用以下命令多次测试后取平均值，可以大致反映延迟时长。
 
-```
-shell> time dnslookup baidu.com tls://dns.pub
+```bash
+$ time dnslookup baidu.com tls://dns.pub
 ··· DNS 查询返回 ···
 
 real    0m0.030s
@@ -597,18 +597,20 @@ sys     0m0.005s
 
 ## 手动编译
 
-**本地构建**
+### 本地构建
 
-```
-shell> git clone https://github.com/dnomd343/ClearDNS.git
-shell> cd ./ClearDNS/
-shell> docker build -t cleardns .
+```bash
+$ git clone https://github.com/dnomd343/ClearDNS.git
+···
+$ cd ./ClearDNS/
+$ docker build -t cleardns .
+···
 ```
 
-**交叉构建**
+### 交叉构建
 
-```
-shell> docker buildx build -t dnomd343/cleardns --platform="linux/amd64,linux/arm64" https://github.com/dnomd343/ClearDNS.git --push
+```bash
+docker buildx build -t dnomd343/cleardns --platform="linux/amd64,linux/arm64" https://github.com/dnomd343/ClearDNS.git --push
 ```
 
 ## 许可证
