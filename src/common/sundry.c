@@ -49,7 +49,7 @@ void uint32_list_debug(char *describe, uint32_t **uint32_list) { // show uint32 
 }
 
 uint8_t check_port(uint16_t port) { // whether port is valid
-    if (port > 0 && port <= 65535) { // 1 ~ 65535
+    if (port > 0) { // 1 ~ 65535 (uint16_t <= 65535)
         return TRUE;
     }
     return FALSE;

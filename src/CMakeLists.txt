@@ -9,6 +9,11 @@ include_directories(${PROJECT_SOURCE_DIR}/include/loader)
 
 link_directories(${PROJECT_SOURCE_DIR}/src/target/release)
 
+configure_file(
+    ${PROJECT_SOURCE_DIR}/include/constant.h.in
+    ${PROJECT_SOURCE_DIR}/include/constant.h
+)
+
 add_subdirectory(utils)
 add_subdirectory(applet)
 add_subdirectory(bcrypt)

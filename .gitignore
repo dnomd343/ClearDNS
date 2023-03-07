@@ -1,7 +1,9 @@
 /bin/
 /.idea/
-/assets/*.txt
 /src/target/
 /cmake-build/
 /cmake-build-debug/
 /cmake-build-release/
+
+/assets/*.txt
+/include/constant.h
