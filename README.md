@@ -619,6 +619,8 @@ docker buildx build -t dnomd343/cleardns --platform="linux/amd64,linux/arm64" ht
 
 ## 许可证
 
+> NOTE: AdGuardHome will work as a child process, which will not violate the GPLv3 license. ClearDNS is based on the MIT license, which allows commercial use, but the AdGuardHome function should be turned off at this time.
+
 Thanks for [@AdguardTeam](https://github.com/AdguardTeam)'s [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome.git) (GPL-3.0) project.
 
 Thanks for [@ameshkov](https://github.com/ameshkov)'s [dnsproxy](https://github.com/AdguardTeam/dnsproxy.git) (Apache-2.0) project.
