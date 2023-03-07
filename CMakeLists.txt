@@ -14,10 +14,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if(NOT CMAKE_EXE_LINKER_FLAGS)
-    set(CMAKE_EXE_LINKER_FLAGS -static)
-endif()
-
 ###############################################################
 
 macro(git_tag _tag)
