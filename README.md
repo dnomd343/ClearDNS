@@ -4,6 +4,8 @@
 
 + ✅ 支持多种加密协议，包括 DoH 、DoT 、DoQ 与 DNSCrypt
 
++ ✅ 内置详细的分流规则，同时也支持自定义域名和 CIDR 策略
+
 + ✅ DNS 请求审计，记录不同设备的查询、拦截、返回等信息
 
 + ✅ 自定义拦截规则，可屏蔽指定应用，如 QQ 、微信、微博等
@@ -14,7 +16,7 @@
 
 + ✅ 在 DNS 层面上实现去广告与防跟踪功能，按需求配置自定义规则
 
-由于 ClearDNS 工作在 DNS 层面，无论 APP 、网页还是机顶盒、IoT 设备等均可生效；它可以部署在内网中，为局域网设备提供服务，建议运行在内网一台长期开机的设备上（主路由、树莓派、小主机、旁路由、NAS 设备等），同时 ClearDNS 也可部署在公网服务器上，面向国内网络提供无污染服务。
+由于 ClearDNS 工作在服务器一侧，因此对 APP 、网页、机顶盒、IoT 设备等均可生效；它一般部署在内网中，为局域网设备提供服务，建议运行在内网一台长期开机的设备上（主路由、树莓派、小主机、旁路由、NAS 设备等），同时 ClearDNS 也可部署在公网服务器上，面向国内网络提供无污染服务。
 
 ## 设计架构
 
@@ -36,7 +38,7 @@
 
 DNS 请求在通过 AdGuardHome 处理后，发往分流器 Diverter ，在这里将借助路由资源、国内组 Domestic 与国外组 Foreign 的返回结果，甄别出被污染的数据，返回正确的 DNS 解析；两组请求都可拥有多个上游服务器，ClearDNS 可以逐个对服务器进行请求，亦可同时发起查询。
 
-ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 的明文查询，该方式无法抵抗 DNS 污染，对部分运营商有效，仅建议用于国内无劫持的环境下使用；其次为 `DNS over HTTPS` 、`DNS over TLS` 、`DNS over QUIC` 与 `DNSCrypt` ，它们都是加密的 DNS 服务协议，可以抵抗污染与劫持行为，但可能被防火长城拦截；在出境请求中，`DNS over TLS` 特别是标准端口的服务已经被大规模封杀，`DNSCrypt` 也基本无法使用，目前建议使用 `DNS over QUIC` 与非标准路径的 `DNS over HTTPS` 服务。
+ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 的明文查询，该方式无法抵抗 DNS 污染，对部分运营商有效（相当于不使用运营商分配的 DNS 服务器），仅建议用于国内无劫持的环境下使用；其次为 `DNS over HTTPS` 、`DNS over TLS` 、`DNS over QUIC` 与 `DNSCrypt` ，它们都是加密的 DNS 服务协议，可以抵抗污染与劫持行为，但可能被防火长城拦截；在出境请求中，`DNS over TLS` 特别是标准端口的服务已经被大规模封杀，`DNSCrypt` 也基本无法使用，目前建议使用 `DNS over QUIC` 与非标准路径的 `DNS over HTTPS` 服务。
 
 对于多种 DNS 加密协议的简述，可以参考[浅谈DNS协议](https://blog.dnomd343.top/dns-server/#DNS%E5%90%84%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B)，里面讲解了不同协议的区别与优缺点，以及 DNS 服务的分享格式。
 
@@ -50,9 +52,17 @@ ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 
 
 > 防火长城的 DNS 污染有一个特点，被污染的结果必为境外 IP 地址
 
-当分流器接到请求时，若在 `chinalist.txt` 中有所匹配，则只请求国内组，若在 `gfwlist.txt` 匹配，则仅请求国外组；两者均未未匹配的情况下，将同时请求国内组与国外组，若国内组返回结果在 `china-ip.txt` 中，则证明 DNS 未被污染，采纳国内组结果，若返回国外 IP 地址，则可能已经被污染，将选取国外组结果。
+当分流器接到请求时，若在 `chinalist.txt` 中有所匹配，则只请求国内组，若在 `gfwlist.txt` 中匹配，则仅请求国外组；两者均未未匹配的情况下，将同时请求国内组与国外组，若国内组返回结果在 `china-ip.txt` 中，则证明 DNS 未被污染，采纳国内组结果，若返回国外 IP 地址，则可能已经被污染，将选取国外组结果。
 
-由于以上资源数据一直在变动，ClearDNS 内置了更新功能，支持自动获取新的资源文件；数据从多个上游项目收集，每天进行一次合并整理，整合数据的源码可见[此处](./assets)，您可以自由配置更新服务器，或者禁用更新。
+由于以上资源数据一直在变动，ClearDNS 内置了更新功能，用于自动获取新的资源文件；本项目提供了默认分流配置文件，从多个上游项目收集后合并，每天零点更新一次，数据处理的源码可见[此处](./assets)，下发地址如下：
+
++ `gfwlist.txt` ：`https://res.343.re/Share/cleardns/gfwlist.txt`
+
++ `china-ip.txt` ：`https://res.343.re/Share/cleardns/china-ip.txt`
+
++ `chinalist.txt` ：`https://res.343.re/Share/cleardns/chinalist.txt`
+
+在 ClearDNS 的默认配置文件中，使用了本项目的分流资源作为更新上游，您可以修改配置，指向自定义资源（支持多个本地或远程文件），也可禁用更新。
 
 ## 配置格式
 
@@ -122,7 +132,7 @@ cache:
 
 + `size` ：DNS 缓存容量，单位为字节，开启时建议设置在 `64k` 到 `4m` 量级，默认为 `0`
 
-+ `optimistic` ：DNS 乐观缓存，开启后当数据 TTL 过期时，仍然返回原内容，但 TTL 修改为 10 ，同时立即向上游发起查询；由于绝大多数 DNS 记录在 TTL 期限内不会发生变化，这个机制可以显著减少请求平均延迟，但一旦出现变动，访问目标必须等待 10 秒后解析刷新才恢复正常。
++ `optimistic` ：DNS 乐观缓存，开启后当记录过期时，仍然返回上一次查询结果，但 TTL 修改为 10 ，同时立即向上游发起查询；由于绝大多数 DNS 记录在 TTL 期限内不会发生变化，这个机制可以显著减少请求平均延迟，但一旦出现变动，访问目标必须等待 10 秒后解析刷新才恢复正常。
 
 ### AdGuard
 
@@ -158,13 +168,13 @@ diverter:
 
 + `port` ：DNS 分流器端口，若 AdGuardHome 关闭，本选项将失效，默认为 `5353`
 
-> 以下选项用于添加自定义规则，将优先覆盖在资源文件上
+> 以下选项用于添加自定义规则，将合并在资源文件上
 
-+ `gfwlist` ：自定义的 GFW 拦截域名列表，针对该域名的查询将屏蔽 `domestic` 组结果
++ `gfwlist` ：自定义的 GFW 拦截域名列表，针对该域名的查询将屏蔽 `domestic` 组结果，默认为空
 
-+ `chinalist` ：自定义的国内域名列表，针对该域名的查询将屏蔽 `foreign` 组结果
++ `chinalist` ：自定义的国内域名列表，针对该域名的查询将屏蔽 `foreign` 组结果，默认为空
 
-+ `china-ip` ：自定义的国内 IP 段，`domestic` 组返回内容若命中则采纳，否则使用 `foreign` 组结果
++ `china-ip` ：自定义的国内 IP 段，`domestic` 组返回内容若命中则采纳，否则使用 `foreign` 组结果，默认为空
 
 ### Domestic
 
@@ -253,9 +263,9 @@ ttl:
 
 ### Custom
 
-自定义脚本，将在 ClearDNS 初始化后，即将启动前执行
+自定义脚本，将在 ClearDNS 初始化后，即将启动前执行。
 
-> 本功能用于注入自定义功能，基于 Alpine 的 `ash` 执行，可能不支持部分 `bash` 语法
+> 本功能用于注入自定义功能，基于 Alpine 的 `ash` 执行，可能不支持部分 `bash` 语法。
 
 ```yaml
 custom:
@@ -265,7 +275,7 @@ custom:
 
 ### Assets
 
-资源文件升级选项，用于自动更新分流资源
+资源文件升级选项，用于自动更新分流资源。
 
 ```yaml
 assets:
@@ -274,14 +284,21 @@ assets:
   update:
     gfwlist.txt: https://res.dnomd343.top/Share/cleardns/gfwlist.txt
     china-ip.txt: https://res.dnomd343.top/Share/cleardns/china-ip.txt
-    chinalist.txt: https://res.dnomd343.top/Share/cleardns/chinalist.txt
+    chinalist.txt:
+      - https://res.dnomd343.top/Share/cleardns/chinalist.txt
+      - /tmp/chinalist-local.txt
+      - demo.list  # aka `${WorkDir}/assets/demo.list`
+    custom.txt:
+      - https://.../my-custom-asset.txt
 ```
 
 + `disable` ：是否关闭资源文件加载，默认为 `false`
 
 + `cron` ：指定触发升级的 Crontab 表达式
 
-+ `url` ：指定资源升级的下载 URL 链接
+> 某一资源文件指定多个升级目标时，若其中任意一个出错，将导致该资源文件升级失败。
+
++ `update` ：指定资源升级的上游，支持远程 URL 和本地文件，支持指定多个目标，将自动去重后合并。
 
 ## 部署教程
 
@@ -309,13 +326,15 @@ ClearDNS 基于 Docker 网络有以下三种部署模式：
 
 ```bash
 # 检查Docker环境
-shell> docker --version
+$ docker --version
 ··· Docker 版本信息 ···
 
 # 无Docker环境请先执行安装
-shell> wget -qO- https://get.docker.com/ | bash
+$ wget -qO- https://get.docker.com/ | bash
 ··· Docker 安装日志 ···
 ```
+
+> 下述命令中，容器路径可替换为上述其他源，国内网络可优先选择阿里云仓库
 
 ClearDNS 同时发布在多个镜像源上：
 
@@ -324,8 +343,6 @@ ClearDNS 同时发布在多个镜像源上：
 + `Github Package` ：`ghcr.io/dnomd343/cleardns`
 
 + `阿里云镜像` ：`registry.cn-shenzhen.aliyuncs.com/dnomd343/cleardns`
-
-> 下述命令中，容器路径可替换为上述其他源，国内网络可优先选择阿里云仓库
 
 > 由于容器中默认为 UTC0 时区，将导致日志时间不匹配，映射 `/etc/timezone` 与 `/etc/localtime` 文件用于同步时区信息
 
