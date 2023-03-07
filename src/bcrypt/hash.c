@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <stdlib.h>
 #include "bcrypt.h"
 #include "logger.h"
