@@ -34,12 +34,13 @@ RUN apk add git
 ENV ADGUARD="0.107.25"
 RUN git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${ADGUARD} --depth=1
 
-FROM alpine:3.16 AS adguard-web
+FROM ${ALPINE} AS adguard-web
 RUN apk add make npm
 COPY --from=adguard-src /AdGuardHome/ /AdGuardHome/
 WORKDIR /AdGuardHome/
 RUN make js-deps
-RUN make js-build
+# TODO: for node18, remove the OpenSSL compatibility option after AdGuardHome project upgrade
+RUN env NODE_OPTIONS="--openssl-legacy-provider" make js-build
 RUN mv ./build/static/ /tmp/
 
 FROM ${GOLANG} AS adguard
