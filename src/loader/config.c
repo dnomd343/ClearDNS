@@ -41,8 +41,7 @@ cleardns_config* config_init() { // init config struct of cleardns
 
     config->assets.disable = FALSE;
     config->assets.cron = strdup(UPDATE_CRON);
-    config->assets.update_file = string_list_init();
-    config->assets.update_url = string_list_init();
+    config->assets.resources = assets_init();
 
     config->reject = uint32_list_init();
     config->hosts = string_list_init();
@@ -85,10 +84,8 @@ void config_dump(cleardns_config *config) { // dump config info of cleardns
 
     log_debug("Assets disable -> %s", show_bool(config->assets.disable));
     log_debug("Assets update cron -> `%s`", config->assets.cron);
-    for (char **file = config->assets.update_file; *file != NULL; ++file) { // show string mapping
-        char **url = file - config->assets.update_file + config->assets.update_url;
-        log_debug("Assets file `%s` -> %s", *file, *url);
-    }
+    log_debug("Assets with %d resource items", assets_size(config->assets.resources));
+    assets_dump(config->assets.resources);
 
     uint32_list_debug("DNS reject type", config->reject);
     string_list_debug("Domain TTL", config->ttl);
@@ -113,8 +110,7 @@ void config_free(cleardns_config *config) { // free config struct of cleardns
     free(config->adguard.password);
 
     free(config->assets.cron);
-    string_list_free(config->assets.update_file);
-    string_list_free(config->assets.update_url);
+    assets_free(config->assets.resources);
 
     uint32_list_free(config->reject);
     string_list_free(config->hosts);

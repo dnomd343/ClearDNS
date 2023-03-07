@@ -95,6 +95,13 @@ overture* load_diverter(cleardns_config *config) {
     free(china_ip);
     free(gfwlist);
 
+    custom_gfwlist = config->diverter.gfwlist;
+    custom_china_ip = config->diverter.china_ip;
+    custom_chinalist = config->diverter.chinalist;
+    config->diverter.gfwlist = string_list_init();
+    config->diverter.china_ip = string_list_init();
+    config->diverter.chinalist = string_list_init();
+
     uint32_list_update(&diverter->reject_type, config->reject);
     if (!config->assets.disable) {
         assets_extract(); // extract built-in resource
@@ -127,11 +134,13 @@ crontab* load_crond(cleardns_config *config) {
     return crond;
 }
 
-assets* load_assets(cleardns_config *config) {
-    assets *resource = assets_init();
-    string_list_update(&resource->update_file, config->assets.update_file);
-    string_list_update(&resource->update_url, config->assets.update_url);
-    return resource;
+asset** load_assets(cleardns_config *config) {
+    asset **resources = assets_init();
+    for (asset **res = config->assets.resources; *res != NULL; ++res) {
+        assets_append(&resources, *res); // pointer movement
+    }
+    *(config->assets.resources) = NULL; // disable old assets list
+    return resources;
 }
 
 void load_config(const char *config_file) { // parser and load cleardns configure

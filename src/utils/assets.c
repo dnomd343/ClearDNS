@@ -1,62 +1,106 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include "assets.h"
+#include "loader.h"
 #include "logger.h"
 #include "sundry.h"
 #include "system.h"
 #include "constant.h"
 #include "structure.h"
-#include "assets.h"
 
-assets update;
+asset **update_info;
 
-void assets_update();
-void assets_dump(assets *info);
+char **custom_gfwlist;
+char **custom_china_ip;
+char **custom_chinalist;
+
+void assets_update_entry();
 void extract(const char *file);
 
-void assets_free(assets *info) { // free assets mapping
-    string_list_free(info->update_file);
-    string_list_free(info->update_url);
-    free(info);
+asset* asset_init(const char *name) { // init asset item
+    asset *res = (asset *)malloc(sizeof(asset));
+    res->file = strdup(name);
+    res->sources = string_list_init(); // with multi sources
+    return res;
 }
 
-assets* assets_init() { // init assets mapping
-    assets *info = (assets *)malloc(sizeof(assets));
-    info->update_file = string_list_init();
-    info->update_url = string_list_init();
-    return info;
+asset** assets_init() { // init assets list
+    asset **asset_list = (asset **)malloc(sizeof(asset *));
+    *asset_list = NULL; // list end sign
+    return asset_list;
 }
 
-void assets_dump(assets *info) { // show assets mapping in debug log
-    for (char **file = info->update_file; *file != NULL; ++file) {
-        char **url = file - info->update_file + info->update_url;
-        log_info("Asset `%s` -> %s", *file, *url);
+void assets_free(asset **asset_list) { // free assets list
+    for (asset **res = asset_list; *res != NULL; ++res) {
+        string_list_free((*res)->sources);
+        free((*res)->file);
+        free(*res);
+    }
+    free(asset_list);
+}
+
+uint32_t assets_size(asset **asset_list) { // get size of assets list
+    uint32_t num = 0;
+    while(asset_list[num++] != NULL); // get list size
+    return num - 1;
+}
+
+void assets_dump(asset **asset_list) { // dump assets list content into debug log
+    for (asset **res = asset_list; *res != NULL; ++res) { // iterate over each item
+        char *sources = string_list_dump((*res)->sources);
+        log_debug("Asset item `%s` -> %s", (*res)->file, sources);
+        free(sources);
     }
 }
 
-void assets_load(assets *info) { // load assets mapping
-    update.update_file = string_list_init();
-    update.update_url = string_list_init();
-    string_list_update(&update.update_file, info->update_file);
-    string_list_update(&update.update_url, info->update_url);
-    signal(SIGALRM, assets_update); // receive SIGALRM signal
-    assets_dump(&update);
+void assets_append(asset ***asset_list, asset *res) { // push asset item for assets list
+    uint32_t len = assets_size(*asset_list);
+    *asset_list = (asset **)realloc(*asset_list, sizeof(asset *) * (len + 2)); // extend asset list
+    (*asset_list)[len] = res;
+    (*asset_list)[len + 1] = NULL; // list end sign
 }
 
-void assets_update() { // update all assets
-    if (!string_list_len(update.update_file)) { // empty assets mapping
+void assets_load(asset **info) { // load assets list
+    update_info = assets_init();
+    for (asset **res = info; *res != NULL; ++res) {
+        assets_append(&update_info, *res); // pointer movement
+    }
+    *info = NULL; // disable old assets list
+    assets_dump(update_info);
+    log_info("Remote assets load success");
+    signal(SIGALRM, assets_update_entry); // receive SIGALRM signal
+}
+
+void assets_update_entry() { // receive SIGALRM for update all assets
+    if (assets_size(update_info) == 0) { // empty assets list
         log_info("Skip update assets");
         return;
     }
-    log_info("Start assets update");
-    for (char **file = update.update_file; *file != NULL; ++file) {
-        char **url = file - update.update_file + update.update_url;
-        char *asset_file = string_join(ASSETS_DIR, *file);
-        log_info("Update asset `%s` -> %s", asset_file, *url);
-        download_file(asset_file, *url); // download asset from url
-        free(asset_file);
+    log_info("Start updating assets");
+    for (asset **res = update_info; *res != NULL; ++res) {
+        char *content = string_list_dump((*res)->sources);
+        log_debug("Updating `%s` -> %s", (*res)->file, content);
+        if (asset_update((*res)->file, (*res)->sources, ASSETS_DIR)) {
+            log_debug("Asset `%s` update success", (*res)->file);
+        } else {
+            log_warn("Asset `%s` update failed", (*res)->file);
+        }
+        free(content);
     }
-    log_info("Restart overture");
+
+    char *gfwlist = string_join(WORK_DIR, ASSET_GFW_LIST);
+    char *china_ip = string_join(WORK_DIR, ASSET_CHINA_IP);
+    char *chinalist = string_join(WORK_DIR, ASSET_CHINA_LIST);
+    save_string_list(gfwlist, custom_gfwlist);
+    save_string_list(china_ip, custom_china_ip);
+    save_string_list(chinalist, custom_chinalist);
+    free(chinalist);
+    free(china_ip);
+    free(gfwlist);
+    load_diverter_assets(); // load assets data into `WORK_DIR`
+
+    log_info("Restart overture to apply new assets");
     run_command("pgrep overture | xargs kill"); // restart overture
     log_info("Assets update complete");
 }

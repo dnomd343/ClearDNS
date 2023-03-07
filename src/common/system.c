@@ -95,11 +95,3 @@ void save_string_list(const char *file, char **string_list) { // save string lis
     fclose(fp);
     log_debug("Save `%s` success", file);
 }
-
-void download_file(const char *file, const char *url) { // download file
-    log_debug("Download file `%s` -> %s", file, url);
-    char *download_cmd = string_load("wget -T 8 -O %s %s", file, url);
-    if (run_command(download_cmd)) {
-        log_warn("File `%s` download failed", url);
-    }
-}

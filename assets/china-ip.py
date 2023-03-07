@@ -22,7 +22,8 @@ for ipAddr in ipAddrs:
     try:
         ip = IP(ipAddr)  # ip format check
         (ipv4 if ip.version() == 4 else ipv6).add(ip)
-    except: pass
+    except:
+        pass
 
 release = [('%s' if '/' in str(ip) else '%s/32') % str(ip) for ip in ipv4]  # format into CIDR
 release += [('%s' if '/' in str(ip) else '%s/128') % str(ip) for ip in ipv6]

@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "assets",
+    "to-json"
+]

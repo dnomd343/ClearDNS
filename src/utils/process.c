@@ -55,9 +55,16 @@ void process_exec(process *proc) {
         log_perror("%s fork error -> ", proc->name);
         server_exit(EXIT_FORK_ERROR);
     } else if (pid == 0) { // child process
+        log_debug("Subprocess fork success -> PID = %d", getpid());
         if (chdir(proc->cwd)) { // change working directory
             log_perror("%s with invalid cwd `%s` -> ", proc->name, proc->cwd);
             exit(EXIT_EXEC_ERROR);
+        }
+        pid_t sid = setsid(); // create new session -> detach current terminal
+        if (sid == -1) { // session create failed
+            log_warn("Subprocess failed to create new session");
+        } else {
+            log_debug("Subprocess at new session -> SID = %d", sid);
         }
         prctl(PR_SET_PDEATHSIG, SIGKILL); // child process die with father process
         if (execvpe(*(proc->cmd), proc->cmd, proc->env) < 0) {
@@ -152,7 +159,7 @@ void get_sub_exit() { // catch child process exit
         return;
     }
     int status;
-    log_debug("Handle SIGCHLD start");
+    log_debug("Handle SIGCHLD begin");
     for (process **proc = process_list; *proc != NULL; ++proc) {
         if ((*proc)->pid == 0) {
             continue; // skip not running process
@@ -177,7 +184,7 @@ void get_sub_exit() { // catch child process exit
         server_exit(EXIT_WAIT_ERROR);
     } else if (wait_ret) { // process exit
         char *exit_msg = get_exit_msg(status);
-        log_debug("Sub-process (PID = %d) -> %s", wait_ret, exit_msg);
+        log_debug("Subprocess (PID = %d) -> %s", wait_ret, exit_msg);
         free(exit_msg);
     }
     log_debug("Handle SIGCHLD complete");

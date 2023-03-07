@@ -51,13 +51,13 @@ assets:\n\
 
 void load_default_config(const char *config_file) {
     if (is_file_exist(config_file)) {
-        log_debug("Configure file exist -> skip load default");
+        log_debug("Configure file exist -> skip loading default");
         return;
     }
     log_info("Loading default configure file");
     char *config_content = NULL;
     if (is_json_suffix(config_file)) { // convert to json format
-        config_content = to_json(DEFAULT_CONFIG);
+        config_content = to_json_format(DEFAULT_CONFIG);
     } else {
         config_content = strdup(DEFAULT_CONFIG);
     }

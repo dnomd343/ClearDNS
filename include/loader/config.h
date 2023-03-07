@@ -2,6 +2,7 @@
 #define CONFIG_H_
 
 #include <stdint.h>
+#include "assets.h"
 
 typedef struct {
     uint16_t port;
@@ -34,10 +35,9 @@ typedef struct {
 } adguard_config;
 
 typedef struct {
-    uint8_t disable; // bool value
     char *cron;
-    char **update_file;
-    char **update_url;
+    uint8_t disable; // bool value
+    asset **resources;
 } assets_config;
 
 typedef struct {

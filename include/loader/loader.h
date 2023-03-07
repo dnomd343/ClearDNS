@@ -15,10 +15,12 @@ struct cleardns {
     overture *diverter;
     adguard *filter;
     crontab *crond;
-    assets *resource;
+    asset **resource;
 };
 
 extern struct cleardns loader;
+
+void load_diverter_assets();
 
 void load_config(const char *config_file);
 

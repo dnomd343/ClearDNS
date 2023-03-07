@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 #include "loader.h"
 #include "logger.h"
-#include "sundry.h"
 #include "system.h"
 #include "assets.h"
 #include "adguard.h"
@@ -67,6 +66,9 @@ void init(int argc, char *argv[]) { // return config file
 void cleardns() { // cleardns service
     if (settings.verbose || settings.debug) {
         LOG_LEVEL = LOG_DEBUG; // enable debug log level
+        assets_log_init(TRUE);
+    } else {
+        assets_log_init(FALSE);
     }
     create_folder(EXPOSE_DIR);
     create_folder(WORK_DIR);

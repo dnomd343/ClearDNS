@@ -46,9 +46,26 @@ char *adguard_config(adguard *info, const char *raw_config) { // modify adguard 
         log_fatal("AdGuardHome configure error");
     }
 
+    char *password = NULL;
+    cJSON *user_passwd = cJSON_GetObjectItem(cJSON_GetArrayItem(
+            cJSON_GetObjectItem(json, "users"), 0), "password");
+    if (cJSON_IsString(user_passwd)) {
+        char *hash_val = user_passwd->valuestring;
+        log_debug("Legacy hash value -> `%s`", hash_val);
+        if (bcrypt_verify(info->password, hash_val)) {
+            log_debug("Legacy hash value verify success");
+            password = strdup(hash_val);
+        } else {
+            log_debug("Legacy hash value verify failed");
+        }
+    }
+    if (password == NULL) { // password hash not ready
+        password = bcrypt_hash(info->password);
+    }
+    log_debug("AdGuardHome password -> `%s`", password);
+
     cJSON *user_config = cJSON_CreateObject(); // setting up username and password
     cJSON *users_config = cJSON_CreateArray();
-    char *password = bcrypt_cal(info->password);
     cJSON_AddItemToObject(user_config, "name", cJSON_CreateString(info->username));
     cJSON_AddItemToObject(user_config, "password", cJSON_CreateString(password));
     cJSON_AddItemToArray(users_config, user_config);
@@ -93,7 +110,7 @@ process* adguard_load(adguard *info, const char *dir) { // load adguard options
         adguard_config_ret = adguard_config(info, "{}"); // begin with empty json
     } else { // configure exist -> modify
         char *adguard_config_content = read_file(adguard_config_file);
-        char *adguard_config_json = to_json(adguard_config_content);
+        char *adguard_config_json = to_json_format(adguard_config_content);
         adguard_config_ret = adguard_config(info, adguard_config_json);
         free(adguard_config_content);
         free(adguard_config_json);
