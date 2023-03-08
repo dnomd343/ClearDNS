@@ -31,7 +31,7 @@ endmacro()
 set(VERSION "")
 git_tag(VERSION)
 if(VERSION STREQUAL "")  # without git tag
-    message(FATAL_ERROR "Git command not found")
+    message(FATAL_ERROR "Unable to get version information")
 endif()
 
 ###############################################################
