@@ -614,7 +614,7 @@ $ docker build -t cleardns .
 ```bash
 $ git clone https://github.com/dnomd343/ClearDNS.git
 $ cd ./ClearDNS/
-$ docker buildx build
+$ docker buildx build \
     -t dnomd343/cleardns \
     -t ghcr.io/dnomd343/cleardns \
     -t registry.cn-shenzhen.aliyuncs.com/dnomd343/cleardns \
