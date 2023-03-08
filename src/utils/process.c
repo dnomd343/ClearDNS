@@ -72,6 +72,7 @@ void process_exec(process *proc) {
         }
     }
     proc->pid = pid;
+    usleep(8000); // wait 8ms prevent log clutter
     log_info("%s running success -> PID = %d", proc->name, proc->pid);
 }
 
