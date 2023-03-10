@@ -66,9 +66,9 @@ void init(int argc, char *argv[]) { // return config file
 void cleardns() { // cleardns service
     if (settings.verbose || settings.debug) {
         LOG_LEVEL = LOG_DEBUG; // enable debug log level
-        assets_log_init(TRUE);
+        assets_log_init(TRUE, LOG_PREFIX);
     } else {
-        assets_log_init(FALSE);
+        assets_log_init(FALSE, LOG_PREFIX);
     }
     create_folder(EXPOSE_DIR);
     create_folder(WORK_DIR);

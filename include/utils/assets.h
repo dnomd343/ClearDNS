@@ -23,7 +23,7 @@ uint32_t assets_size(asset **asset_list);
 void assets_append(asset ***asset_list, asset *res);
 
 /// Rust assets interface
-void assets_log_init(uint8_t verbose);
+void assets_log_init(uint8_t verbose, const char *prefix);
 uint8_t asset_update(const char *file, char *const *sources, const char *assets_dir);
 
 #endif

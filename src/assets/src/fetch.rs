@@ -1,9 +1,11 @@
 use std::fs::File;
 use std::io::Read;
-use reqwest::Client;
 use std::time::Duration;
 use log::{debug, info, warn};
 use std::collections::HashSet;
+use reqwest_middleware::ClientBuilder;
+use reqwest_retry::RetryTransientMiddleware;
+use reqwest_retry::policies::ExponentialBackoff;
 
 /// Http download timeout limit
 const TIMEOUT: u64 = 120;
@@ -30,15 +32,23 @@ fn remove_dup(data: &Vec<String>) -> Vec<String> {
 
 /// Download the specified text file and organize it into a String array.
 async fn http_fetch(url: &str, timeout: u64) -> Result<Vec<String>, String> {
-    let client = Client::builder()
+    let retry_policy = ExponentialBackoff::builder()
+        .backoff_exponent(2) // [2, 4, 8, 16, ...]
+        .retry_bounds(
+            Duration::from_secs(5), // min retry interval -> 1s
+            Duration::from_secs(60)) // max retry interval -> 60s
+        .build_with_max_retries(2); // total request 3 times
+    let client = ClientBuilder::new(reqwest::Client::new())
+        .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+        .build();
+    info!("Start downloading `{}`", url);
+    match client.get(url)
         .timeout(Duration::from_secs(timeout))
-        .build().unwrap();
-    debug!("Start downloading `{}`", url);
-    match client.get(url).send().await {
+        .send().await {
         Ok(response) => {
             match response.text().await {
                 Ok(text) => {
-                    info!("Remote file `{}` download success", url);
+                    debug!("Remote file `{}` download success", url);
                     Ok(asset_tidy(&text))
                 },
                 Err(err) => Err(format!("http content error: {}", err))
@@ -56,7 +66,7 @@ async fn local_fetch(path: &str) -> Result<Vec<String>, String> {
             if let Err(err) = file.read_to_string(&mut text) {
                 return Err(format!("file `{}` read failed: {}", path, err));
             };
-            info!("Local file `{}` read success", path);
+            debug!("Local file `{}` read success", path);
             Ok(asset_tidy(&text))
         },
         Err(err) => Err(format!("file `{}` open failed: {}", path, err)),
