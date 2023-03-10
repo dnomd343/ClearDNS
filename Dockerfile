@@ -18,7 +18,7 @@ RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.version=v${OVERTUR
 
 FROM ${ALPINE} AS adguard-src
 RUN apk add git
-ENV ADGUARD="0.107.25"
+ENV ADGUARD="0.107.26"
 RUN git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${ADGUARD} --depth=1
 
 FROM ${ALPINE} AS adguard-web
