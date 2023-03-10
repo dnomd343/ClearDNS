@@ -1,9 +1,11 @@
 use std::fs::File;
 use std::io::Read;
-use reqwest::Client;
 use std::time::Duration;
 use log::{debug, info, warn};
 use std::collections::HashSet;
+use reqwest_middleware::ClientBuilder;
+use reqwest_retry::RetryTransientMiddleware;
+use reqwest_retry::policies::ExponentialBackoff;
 
 /// Http download timeout limit
 const TIMEOUT: u64 = 120;
@@ -30,11 +32,19 @@ fn remove_dup(data: &Vec<String>) -> Vec<String> {
 
 /// Download the specified text file and organize it into a String array.
 async fn http_fetch(url: &str, timeout: u64) -> Result<Vec<String>, String> {
-    let client = Client::builder()
-        .timeout(Duration::from_secs(timeout))
-        .build().unwrap();
+    let retry_policy = ExponentialBackoff::builder()
+        .backoff_exponent(2) // [2, 4, 8, 16, ...]
+        .retry_bounds(
+            Duration::from_secs(5), // min retry interval -> 1s
+            Duration::from_secs(60)) // max retry interval -> 60s
+        .build_with_max_retries(2); // total request 3 times
+    let client = ClientBuilder::new(reqwest::Client::new())
+        .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+        .build();
     debug!("Start downloading `{}`", url);
-    match client.get(url).send().await {
+    match client.get(url)
+        .timeout(Duration::from_secs(timeout))
+        .send().await {
         Ok(response) => {
             match response.text().await {
                 Ok(text) => {
