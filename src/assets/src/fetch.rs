@@ -41,14 +41,14 @@ async fn http_fetch(url: &str, timeout: u64) -> Result<Vec<String>, String> {
     let client = ClientBuilder::new(reqwest::Client::new())
         .with(RetryTransientMiddleware::new_with_policy(retry_policy))
         .build();
-    debug!("Start downloading `{}`", url);
+    info!("Start downloading `{}`", url);
     match client.get(url)
         .timeout(Duration::from_secs(timeout))
         .send().await {
         Ok(response) => {
             match response.text().await {
                 Ok(text) => {
-                    info!("Remote file `{}` download success", url);
+                    debug!("Remote file `{}` download success", url);
                     Ok(asset_tidy(&text))
                 },
                 Err(err) => Err(format!("http content error: {}", err))
@@ -66,7 +66,7 @@ async fn local_fetch(path: &str) -> Result<Vec<String>, String> {
             if let Err(err) = file.read_to_string(&mut text) {
                 return Err(format!("file `{}` read failed: {}", path, err));
             };
-            info!("Local file `{}` read success", path);
+            debug!("Local file `{}` read success", path);
             Ok(asset_tidy(&text))
         },
         Err(err) => Err(format!("file `{}` open failed: {}", path, err)),

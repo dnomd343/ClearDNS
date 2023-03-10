@@ -31,13 +31,32 @@ unsafe fn load_c_string_list(ptr: *const *const c_char) -> Vec<String> {
 
 /// Initialize the rust module log, enable trace level log when verbose is not `0`.
 #[no_mangle]
-pub unsafe extern "C" fn assets_log_init(verbose: u8) {
+pub unsafe extern "C" fn assets_log_init(verbose: u8, prefix: *const c_char) {
     if verbose == FALSE { // bool value `FALSE`
         set_var("RUST_LOG", "info");
     } else {
         set_var("RUST_LOG", "trace");
     }
-    env_logger::init();
+    let log_prefix = load_c_string(prefix);
+    env_logger::builder()
+        .target(env_logger::Target::Stderr)
+        .format(move |buf, record| {
+            let prefix = format!(
+                "\x1b[36m[{}]\x1b[0m \x1b[90m{}\x1b[0m \x1b[35m[{}]\x1b[0m",
+                log_prefix,
+                chrono::Local::now().format("%Y-%m-%d %H:%M:%S%.3f").to_string(),
+                record.module_path().unwrap()
+            );
+            let level = format!("{}[{}]\x1b[0m", match record.level() {
+                log::Level::Trace => "\x1b[39m",
+                log::Level::Debug => "\x1b[36m",
+                log::Level::Info  => "\x1b[32m",
+                log::Level::Warn  => "\x1b[33m",
+                log::Level::Error => "\x1b[31m",
+            }, record.level());
+            write!(buf, "{} {} {:?}\n", prefix, level, record.args())
+        })
+        .init();
 }
 
 /// Update the specified resource file, return `0` on failure.
