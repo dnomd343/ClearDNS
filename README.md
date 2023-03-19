@@ -66,6 +66,28 @@ ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 
 
 在 ClearDNS 的默认配置文件中，使用了本项目的分流资源作为更新上游，您可以修改配置，指向自定义资源（支持多个本地或远程文件），也可禁用更新。
 
+## 命令行参数
+
+在 ClearDNS 启动时，可以指定以下命令行参数：
+
++ `--config` ：指定配置文件名称，默认值为 `cleardns.yml`
+
++ `--verbose` ：打印完整的日志信息
+
++ `--debug` ：进入 Debug 模式
+
++ `--version` ：显示版本信息
+
++ `--help` ：显示帮助信息
+
+ClearDNS 也支持通过环境变量指定参数，其优先级低于命令行参数：
+
++ `CONFIG=my_config.yml` ：指定配置文件名称，默认值为 `cleardns.yml`
+
++ `VERBOSE=TRUE` ：打印完整的日志信息
+
++ `DEBUG=TRUE` ：进入 Debug 模式
+
 ## 配置格式
 
 ClearDNS 支持 JSON 、YAML 与 TOML 格式的配置文件，默认配置如下：
