@@ -56,9 +56,9 @@ RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static .. && make && strip cleardns && mv cl
 FROM ${ALPINE} AS build
 RUN apk add upx xz
 WORKDIR /release/
-RUN wget https://res.dnomd343.top/Share/cleardns/gfwlist.txt.xz && \
-    wget https://res.dnomd343.top/Share/cleardns/china-ip.txt.xz && \
-    wget https://res.dnomd343.top/Share/cleardns/chinalist.txt.xz && \
+RUN wget https://cdn.dnomd343.top/cleardns/gfwlist.txt.xz && \
+    wget https://cdn.dnomd343.top/cleardns/china-ip.txt.xz && \
+    wget https://cdn.dnomd343.top/cleardns/chinalist.txt.xz && \
     xz -d *.xz && tar cJf assets.tar.xz *.txt && rm *.txt
 COPY --from=cleardns /tmp/cleardns /release/usr/bin/
 COPY --from=dnsproxy /tmp/dnsproxy /release/usr/bin/

@@ -64,13 +64,15 @@ https://github.com/felixonmars/dnsmasq-china-list/raw/master/accelerated-domains
 
 ## 下发地址
 
+> 服务端支持 Gzip 和 Brotli 压缩，纯文本资源下载时启用可显著加快速度。
+
 FTP 链接：
 
 + `gfwlist.txt` ：`https://res.343.re/Share/cleardns/gfwlist.txt`
 + `china-ip.txt` ：`https://res.343.re/Share/cleardns/china-ip.txt`
 + `chinalist.txt` ：`https://res.343.re/Share/cleardns/chinalist.txt`
 
-> 纯文本文件在压缩后可显著减少体积，加快下载速度。
+> 如果下载工具不支持压缩，可以使用以下预压缩文件，加快下载速度。
 
 压缩资源链接：
 
@@ -78,10 +80,10 @@ FTP 链接：
 + `china-ip.txt` ：`https://res.343.re/Share/cleardns/china-ip.txt.xz`
 + `chinalist.txt` ：`https://res.343.re/Share/cleardns/chinalist.txt.xz`
 
-> `res.343.re` 为主 FTP 地址，`res.dnomd343.top` 为 CDN 镜像地址，国内用户访问更快。
+> `res.343.re` 为主 FTP 地址，`cdn.dnomd343.top` 为 CDN 镜像地址，国内用户访问更快。
 
-国内加速地址：
+CDN 下载链接：
 
-+ `gfwlist.txt` ：`https://res.dnomd343.top/Share/cleardns/gfwlist.txt.xz`
-+ `china-ip.txt` ：`https://res.dnomd343.top/Share/cleardns/china-ip.txt.xz`
-+ `chinalist.txt` ：`https://res.dnomd343.top/Share/cleardns/chinalist.txt.xz`
++ `gfwlist.txt` ：`https://cdn.dnomd343.top/cleardns/gfwlist.txt`
++ `china-ip.txt` ：`https://cdn.dnomd343.top/cleardns/china-ip.txt`
++ `chinalist.txt` ：`https://cdn.dnomd343.top/cleardns/chinalist.txt`

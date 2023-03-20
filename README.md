@@ -64,6 +64,14 @@ ClearDNS 支持多种 DNS 协议，首先是常规 DNS ，即基于 UDP 或 TCP 
 
 + `chinalist.txt` ：`https://res.343.re/Share/cleardns/chinalist.txt`
 
+国内用户直接访问下载站可能偏慢，建议使用以下镜像地址：
+
++ `gfwlist.txt` ：`https://cdn.dnomd343.top/cleardns/gfwlist.txt`
+
++ `china-ip.txt` ：`https://cdn.dnomd343.top/cleardns/china-ip.txt`
+
++ `chinalist.txt` ：`https://cdn.dnomd343.top/cleardns/chinalist.txt`
+
 在 ClearDNS 的默认配置文件中，使用了本项目的分流资源作为更新上游，您可以修改配置，指向自定义资源（支持多个本地或远程文件），也可禁用更新。
 
 ## 命令行参数
@@ -132,9 +140,9 @@ foreign:
 assets:
   cron: "0 4 * * *"
   update:
-    gfwlist.txt: https://res.dnomd343.top/Share/cleardns/gfwlist.txt
-    china-ip.txt: https://res.dnomd343.top/Share/cleardns/china-ip.txt
-    chinalist.txt: https://res.dnomd343.top/Share/cleardns/chinalist.txt
+    gfwlist.txt: https://cdn.dnomd343.top/cleardns/gfwlist.txt
+    china-ip.txt: https://cdn.dnomd343.top/cleardns/china-ip.txt
+    chinalist.txt: https://cdn.dnomd343.top/cleardns/chinalist.txt
 ```
 
 ### Port
@@ -306,10 +314,10 @@ assets:
   disable: false
   cron: "0 4 * * *"
   update:
-    gfwlist.txt: https://res.dnomd343.top/Share/cleardns/gfwlist.txt
-    china-ip.txt: https://res.dnomd343.top/Share/cleardns/china-ip.txt
+    gfwlist.txt: https://cdn.dnomd343.top/cleardns/gfwlist.txt
+    china-ip.txt: https://cdn.dnomd343.top/cleardns/china-ip.txt
     chinalist.txt:
-      - https://res.dnomd343.top/Share/cleardns/chinalist.txt
+      - https://cdn.dnomd343.top/cleardns/chinalist.txt
       - /tmp/chinalist-local.txt
       - demo.list  # aka `${WorkDir}/assets/demo.list`
     custom.txt:
