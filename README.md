@@ -411,6 +411,28 @@ docker run -dt \
   dnomd343/cleardns
 ```
 
+或使用以下等效 `docker-compose` 配置：
+
+```yml
+version: '3'
+services:
+  cleardns:
+    hostname: cleardns
+    container_name: cleardns
+    image: dnomd343/cleardns
+    network_mode: bridge
+    restart: always
+    tty: true
+    ports:
+      - '53:53'
+      - '80:80'
+      - '53:53/udp'
+    volumes:
+      - ./:/cleardns/
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+```
+
 </details>
 
 <details>
@@ -443,6 +465,24 @@ docker run -dt --network host \
   dnomd343/cleardns
 ```
 
+或使用以下等效 `docker-compose` 配置：
+
+```yml
+version: '3'
+services:
+  cleardns:
+    hostname: cleardns
+    container_name: cleardns
+    image: dnomd343/cleardns
+    network_mode: host
+    restart: always
+    tty: true
+    volumes:
+      - ./:/cleardns/
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+```
+
 </details>
 
 <details>
@@ -467,6 +507,7 @@ $ docker network create -d macvlan \
 启动 ClearDNS 容器：
 
 ```bash
+# privileged 权限可选
 docker run -dt --network macvlan \
   --restart always --privileged \
   --name cleardns --host cleardns \
@@ -475,6 +516,32 @@ docker run -dt --network macvlan \
   --volume /etc/localtime:/etc/localtime:ro \
   --ip {IPv4地址} --ip6 {IPv6地址} \
   dnomd343/cleardns
+```
+
+或使用以下等效 `docker-compose` 配置：
+
+```yml
+version: '3'
+services:
+  cleardns:
+    hostname: cleardns
+    container_name: cleardns
+    image: dnomd343/cleardns
+    privileged: true
+    restart: always
+    tty: true
+    volumes:
+      - ./:/cleardns/
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      macvlan:
+        ipv4_address: {IPv4地址}
+        ipv6_address: {IPv6地址}
+
+networks:
+  macvlan:
+    external: true
 ```
 
 > 以下配置旨在让宿主机能够使用 ClearDNS ，若无此需求可以跳过
