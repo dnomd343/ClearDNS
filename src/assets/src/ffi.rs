@@ -1,9 +1,9 @@
 use std::io::Write;
 use std::env::set_var;
+use log::{debug, warn};
 use std::path::PathBuf;
 use std::fs::OpenOptions;
 use std::os::raw::c_char;
-use log::{debug, trace, warn};
 use std::ffi::{CStr, CString};
 use crate::fetch::asset_fetch;
 
@@ -29,12 +29,15 @@ unsafe fn load_c_string_list(ptr: *const *const c_char) -> Vec<String> {
     string_list
 }
 
-/// Initialize the rust module log, enable trace level log when verbose is not `0`.
+/// Initialize the rust module log, using info level log when verbose is `0`,
+/// enable debug level when verbose is `1`, and others for trace level.
 #[no_mangle]
 pub unsafe extern "C" fn assets_log_init(verbose: u8, prefix: *const c_char) {
-    if verbose == FALSE { // bool value `FALSE`
+    if verbose == 0 { // info level
         set_var("RUST_LOG", "info");
-    } else {
+    } else if verbose == 1 { // debug level
+        set_var("RUST_LOG", "debug");
+    } else { // trace level
         set_var("RUST_LOG", "trace");
     }
     let log_prefix = load_c_string(prefix);
@@ -68,8 +71,8 @@ pub async unsafe extern "C" fn asset_update(
     let name = load_c_string(file); // import c-style string
     let sources = load_c_string_list(sources);
     let assets_dir = load_c_string(assets_dir);
-    trace!("Working folder is `{}`", assets_dir);
-    trace!("Updating `{}` from {:?}", name, sources);
+    debug!("Working folder is `{}`", assets_dir);
+    debug!("Updating `{}` from {:?}", name, sources);
 
     let assets_dir = PathBuf::from(&assets_dir);
     let is_remote = |src: &str| {

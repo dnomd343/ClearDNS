@@ -37,6 +37,10 @@
 #define ASSET_CHINA_IP   "china-ip.txt"
 #define ASSET_CHINA_LIST "chinalist.txt"
 
+#define RUST_LOG_INFO   0
+#define RUST_LOG_DEBUG  1
+#define RUST_LOG_TRACE  2
+
 #define EXIT_NORMAL     0
 #define EXIT_FORK_ERROR 1
 #define EXIT_EXEC_ERROR 2

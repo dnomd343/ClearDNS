@@ -64,12 +64,16 @@ void init(int argc, char *argv[]) { // return config file
 }
 
 void cleardns() { // cleardns service
+    uint8_t rust_log_level = RUST_LOG_INFO; // using info level as default
     if (settings.verbose || settings.debug) {
         LOG_LEVEL = LOG_DEBUG; // enable debug log level
-        assets_log_init(TRUE, LOG_PREFIX);
-    } else {
-        assets_log_init(FALSE, LOG_PREFIX);
+        rust_log_level = RUST_LOG_DEBUG;
+        if (settings.debug) {
+            rust_log_level = RUST_LOG_TRACE; // enable rust trace log
+        }
     }
+    assets_log_init(rust_log_level, LOG_PREFIX); // setting rust log level
+
     create_folder(EXPOSE_DIR);
     create_folder(WORK_DIR);
     chdir(EXPOSE_DIR);
