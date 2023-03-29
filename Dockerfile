@@ -28,6 +28,7 @@ FROM ${NODE} AS adguard-web
 RUN apk add make
 COPY --from=adguard-src /AdGuardHome/ /AdGuardHome/
 WORKDIR /AdGuardHome/
+RUN echo '.nav-item .order-4 {display: none;}' >> ./client/src/components/Header/Header.css
 RUN make js-deps
 RUN make js-build
 RUN mv ./build/static/ /tmp/
