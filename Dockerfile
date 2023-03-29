@@ -39,14 +39,14 @@ COPY --from=adguard-web /tmp/static/ ./build/static/
 RUN make CHANNEL="release" VERBOSE=1 go-build && mv AdGuardHome /tmp/
 
 FROM ${RUST} AS rust-mods
-RUN apk add libc-dev openssl-dev
+RUN apk add musl-dev
 COPY ./src/ /cleardns/
 WORKDIR /cleardns/
 RUN cargo fetch
 RUN cargo build --release && mv ./target/release/*.a /tmp/
 
 FROM ${ALPINE} AS cleardns
-RUN apk add build-base cmake git openssl-libs-static
+RUN apk add gcc git make cmake musl-dev
 COPY ./ /cleardns/
 COPY --from=rust-mods /tmp/libassets.a /cleardns/src/target/release/
 COPY --from=rust-mods /tmp/libto_json.a /cleardns/src/target/release/
