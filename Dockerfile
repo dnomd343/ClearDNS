@@ -4,17 +4,19 @@ ARG GOLANG="golang:1.19-alpine3.17"
 
 FROM ${GOLANG} AS dnsproxy
 ENV DNSPROXY="0.48.0"
-RUN wget https://github.com/AdguardTeam/dnsproxy/archive/refs/tags/v${DNSPROXY}.tar.gz && tar xf v${DNSPROXY}.tar.gz
+RUN wget https://github.com/AdguardTeam/dnsproxy/archive/v${DNSPROXY}.tar.gz -O- | tar xz
 WORKDIR ./dnsproxy-${DNSPROXY}/
 RUN go get
-RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY} -s -w" && mv dnsproxy /tmp/
+RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.VersionString=${DNSPROXY} -s -w"
+RUN mv dnsproxy /tmp/
 
 FROM ${GOLANG} AS overture
 ENV OVERTURE="1.8"
-RUN wget https://github.com/shawn1m/overture/archive/refs/tags/v${OVERTURE}.tar.gz && tar xf v${OVERTURE}.tar.gz
+RUN wget https://github.com/shawn1m/overture/archive/v${OVERTURE}.tar.gz -O- | tar xz
 WORKDIR ./overture-${OVERTURE}/main/
 RUN go get
-RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.version=v${OVERTURE} -s -w" && mv main /tmp/overture
+RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags "-X main.version=v${OVERTURE} -s -w"
+RUN mv main /tmp/overture
 
 FROM ${ALPINE} AS adguard-src
 RUN apk add git
@@ -36,14 +38,16 @@ COPY --from=adguard-src /AdGuardHome/ /AdGuardHome/
 WORKDIR /AdGuardHome/
 RUN go get
 COPY --from=adguard-web /tmp/static/ ./build/static/
-RUN make CHANNEL="release" VERBOSE=1 go-build && mv AdGuardHome /tmp/
+RUN make CHANNEL="release" VERBOSE=1 go-build
+RUN mv AdGuardHome /tmp/
 
 FROM ${RUST} AS rust-mods
 RUN apk add musl-dev
 COPY ./src/ /cleardns/
 WORKDIR /cleardns/
 RUN cargo fetch
-RUN cargo build --release && mv ./target/release/*.a /tmp/
+RUN cargo build --release
+RUN mv ./target/release/*.a /tmp/
 
 FROM ${ALPINE} AS cleardns
 RUN apk add gcc git make cmake musl-dev
@@ -51,15 +55,19 @@ COPY ./ /cleardns/
 COPY --from=rust-mods /tmp/libassets.a /cleardns/src/target/release/
 COPY --from=rust-mods /tmp/libto_json.a /cleardns/src/target/release/
 WORKDIR /cleardns/bin/
-RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static .. && make && strip cleardns && mv cleardns /tmp/
+RUN cmake -DCMAKE_EXE_LINKER_FLAGS=-static .. && make && strip cleardns
+RUN mv cleardns /tmp/
 
-FROM ${ALPINE} AS build
+FROM ${ALPINE} AS assets
+RUN apk add xz
+RUN wget https://cdn.dnomd343.top/cleardns/gfwlist.txt.xz
+RUN wget https://cdn.dnomd343.top/cleardns/china-ip.txt.xz
+RUN wget https://cdn.dnomd343.top/cleardns/chinalist.txt.xz
+RUN xz -d *.xz && tar cJf /tmp/assets.tar.xz gfwlist.txt china-ip.txt chinalist.txt
+
+FROM ${ALPINE} AS release
 RUN apk add upx xz
-WORKDIR /release/
-RUN wget https://cdn.dnomd343.top/cleardns/gfwlist.txt.xz && \
-    wget https://cdn.dnomd343.top/cleardns/china-ip.txt.xz && \
-    wget https://cdn.dnomd343.top/cleardns/chinalist.txt.xz && \
-    xz -d *.xz && tar cJf assets.tar.xz *.txt && rm *.txt
+COPY --from=assets /tmp/assets.tar.xz /release/
 COPY --from=cleardns /tmp/cleardns /release/usr/bin/
 COPY --from=dnsproxy /tmp/dnsproxy /release/usr/bin/
 COPY --from=overture /tmp/overture /release/usr/bin/
@@ -68,6 +76,6 @@ WORKDIR /release/usr/bin/
 RUN ls | xargs -n1 -P0 upx -9
 
 FROM ${ALPINE}
-COPY --from=build /release/ /
+COPY --from=release /release/ /
 WORKDIR /cleardns/
 ENTRYPOINT ["cleardns"]
