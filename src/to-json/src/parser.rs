@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn yaml() {
-        assert!(yaml_parser("").is_none()); // parse invalid text
+        assert!(yaml_parser("&").is_none()); // parse invalid text
         assert!(yaml_parser(YAML_STR).is_some());
     }
 
