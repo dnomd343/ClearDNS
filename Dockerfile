@@ -4,7 +4,7 @@ ARG RUST="rust:1.68-alpine3.17"
 ARG GOLANG="golang:1.19-alpine3.17"
 
 FROM ${GOLANG} AS dnsproxy
-ENV DNSPROXY="0.48.2"
+ENV DNSPROXY="0.49.0"
 RUN wget https://github.com/AdguardTeam/dnsproxy/archive/v${DNSPROXY}.tar.gz -O- | tar xz
 WORKDIR ./dnsproxy-${DNSPROXY}/
 RUN go get
