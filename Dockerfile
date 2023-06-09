@@ -21,7 +21,7 @@ RUN mv main /tmp/overture
 
 FROM ${ALPINE} AS adguard-src
 RUN apk add git
-ENV ADGUARD="0.107.30"
+ENV ADGUARD="0.107.31"
 RUN git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${ADGUARD} --depth=1
 
 FROM ${NODE} AS adguard-web
