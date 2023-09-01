@@ -499,8 +499,8 @@ $ ip link set eth0 promisc on
 
 # 创建macvlan网络，按实际情况指定网络信息
 $ docker network create -d macvlan \
-  --subnet={IPv4网段} --gateway={IPv4网关} \
-  --subnet={IPv6网段} --gateway={IPv6网关} \  # IPv6可选
+  --subnet=IPv4网段 --gateway=IPv4网关 \
+  --subnet=IPv6网段 --gateway=IPv6网关 \  # IPv6可选
   --ipv6 -o parent=eth0 macvlan  # 在eth0网卡上运行
 ```
 
@@ -514,7 +514,7 @@ docker run -dt --network macvlan \
   --volume /etc/cleardns/:/cleardns/ \
   --volume /etc/timezone:/etc/timezone:ro \
   --volume /etc/localtime:/etc/localtime:ro \
-  --ip {IPv4地址} --ip6 {IPv6地址} \
+  --ip IPv4地址 --ip6 IPv6地址 \
   dnomd343/cleardns
 ```
 
@@ -536,8 +536,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
     networks:
       macvlan:
-        ipv4_address: {IPv4地址}
-        ipv6_address: {IPv6地址}
+        ipv4_address: IPv4地址
+        ipv6_address: IPv6地址
 
 networks:
   macvlan:
