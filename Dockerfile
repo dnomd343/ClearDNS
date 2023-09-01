@@ -1,10 +1,10 @@
 ARG ALPINE="alpine:3.18"
 ARG NODE="node:14-alpine3.17"
 ARG RUST="rust:1.72-alpine3.18"
-ARG GOLANG="golang:1.19-alpine3.18"
+ARG GOLANG="golang:1.20-alpine3.18"
 
 FROM ${GOLANG} AS dnsproxy
-ENV DNSPROXY="0.51.0"
+ENV DNSPROXY="0.54.0"
 RUN wget https://github.com/AdguardTeam/dnsproxy/archive/v${DNSPROXY}.tar.gz -O- | tar xz
 WORKDIR ./dnsproxy-${DNSPROXY}/
 RUN go get
