@@ -9,6 +9,6 @@ crate-type = ["staticlib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde_json = "1.0.105"
-serde_yaml = "0.9.25"
-toml = "0.7.6"
+serde_json = "1.0.108"
+serde_yaml = "0.9.27"
+toml = "0.8.8"
