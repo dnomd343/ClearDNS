@@ -1,5 +1,5 @@
 ARG ALPINE="alpine:3.18"
-ARG NODE="node:14-alpine3.17"
+ARG NODE="node:16-alpine3.18"
 ARG RUST="rust:1.74-alpine3.18"
 ARG GOLANG="golang:1.20-alpine3.18"
 
@@ -21,7 +21,7 @@ RUN mv main /tmp/overture
 
 FROM ${ALPINE} AS adguard-src
 RUN apk add git
-ENV ADGUARD="0.107.36"
+ENV ADGUARD="0.107.41"
 RUN git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${ADGUARD} --depth=1
 
 FROM ${NODE} AS adguard-web
