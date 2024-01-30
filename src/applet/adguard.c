@@ -107,7 +107,7 @@ process* adguard_load(adguard *info, const char *dir) { // load adguard options
 
     if (!is_file_exist(adguard_config_file)) { // AdGuardHome configure not exist
         log_info("Create AdGuardHome configure");
-        adguard_config_ret = adguard_config(info, "{}"); // begin with empty json
+        adguard_config_ret = adguard_config(info, "{\"schema_version\": 27}");
     } else { // configure exist -> modify
         char *adguard_config_content = read_file(adguard_config_file);
         char *adguard_config_json = to_json_format(adguard_config_content);
