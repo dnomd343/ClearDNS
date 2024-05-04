@@ -1,7 +1,7 @@
 ARG ALPINE="alpine:3.19"
 ARG NODE="node:16-alpine3.18"
 ARG RUST="rust:1.75-alpine3.19"
-ARG GOLANG="golang:1.20-alpine3.19"
+ARG GOLANG="golang:1.22-alpine3.19"
 
 FROM ${GOLANG} AS dnsproxy
 ENV DNSPROXY="0.64.0"
@@ -21,7 +21,7 @@ RUN mv main /tmp/overture
 
 FROM ${ALPINE} AS adguard-src
 RUN apk add git
-ENV ADGUARD="0.107.43"
+ENV ADGUARD="0.107.48"
 RUN git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${ADGUARD} --depth=1
 
 FROM ${NODE} AS adguard-web
