@@ -1,7 +1,7 @@
-ARG ALPINE="alpine:3.19"
+ARG ALPINE="alpine:3.20"
 ARG NODE="node:16-alpine3.18"
-ARG RUST="rust:1.78-alpine3.19"
-ARG GOLANG="golang:1.22-alpine3.19"
+ARG RUST="rust:1.78-alpine3.20"
+ARG GOLANG="golang:1.22-alpine3.20"
 
 FROM ${GOLANG} AS dnsproxy
 ENV DNSPROXY="0.72.0"
